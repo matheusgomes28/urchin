@@ -1,0 +1,47 @@
+{{ define "contact" }}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Menu and Contact Form</title>
+    <!-- Minified version -->
+    <link rel="stylesheet" href="/static/simple.min.css">
+    <script src="/static/htmx.min.js"></script>
+    <script src="/static/client-side-templates.js"></script>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <br>
+
+    <main>
+        <div id="contact-form">
+            <h2>Contact Us</h2>
+            <form action="#" method="post" hx-post="/contact-send" hx-target="#contact-form">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required><br><br>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required><br><br>
+
+                <label for="message">Message:</label><br>
+                <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </main>
+</body>
+
+</html>
+{{ end }}
