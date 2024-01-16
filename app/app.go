@@ -27,6 +27,10 @@ func Run(app_settings AppSettings, database database.Database) error {
 	r.GET("/contact", makeContactPageHandler(app_settings, database))
 	r.POST("/contact-send", makeContactFormHandler())
 
+
+	// Post related endpoints
+	r.GET("/post/:id", makePostHandler(database))
+
 	r.Static("/static", "./static")
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 

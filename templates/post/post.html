@@ -1,4 +1,4 @@
-{{ define "index" }}
+{{ define "post" }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -25,15 +25,10 @@
     <br>
 
     <main>
-        {{ range $post := .posts }}
         <article>
-            <h2>{{ $post.Title }}</h2>
-            <p>
-                {{ $post.Excerpt }}
-                <a href="/post/{{ $post.Id }}"> read more...</a>
-            </p>
+            <h2>{{ .Title }}</h2>
+            <p>{{ .Content }}</p>
         </article>
-        {{end}}
     </main>
 </body>
 
