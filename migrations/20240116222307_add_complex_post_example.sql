@@ -54,12 +54,12 @@ it makes integrating `envfile`s quite easy.
 
 The following list outlines the environment variables needed.
 
-- `GOCMS_DATABASE_ADDRESS` should contain the database addres,
+- `URCHIN_DATABASE_ADDRESS` should contain the database addres,
   e.g. `localhost`.
-- `GOCMS_DATABASE_PORT` should be the connection port to the
+- `URCHIN_DATABASE_PORT` should be the connection port to the
   database. For example `3306`.
-- `GOCMS_DATABASE_USER` is the database username.
-- `GOCMS_DATABASE_PASSWORD` needs to contain the database
+- `URCHIN_DATABASE_USER` is the database username.
+- `URCHIN_DATABASE_PASSWORD` needs to contain the database
   password for the given user.
 
 ## License

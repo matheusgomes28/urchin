@@ -6,11 +6,16 @@ commands.
 
 ## Features 🚀
 
-- **Headless Architecture:** Adding pages, posts, or forms should all
+- [x] **Headless Architecture:** Adding pages, posts, or forms should all
   be done with easy requests to the API.
-- **Golang-Powered:** Leverage the performance and safety of one of the
+- [x] **Golang-Powered:** Leverage the performance and safety of one of the
   best languages in the market for backend development.
-- **SQL Database Integration:** Store your posts and pages in SQL databases for reliable and scalable data storage.
+- [x] **SQL Database Integration:** Store your posts and pages in SQL databases for reliable and scalable data storage.
+- [ ] **Post**: We can add, update, and delete posts. Posts can be served
+  through a unique URL.
+- [ ] **Pages**: TODO.
+- [ ] **Menus**: TODO
+- [ ] **Live Reload** through the use of `air`.
 
 ## Installation
 
@@ -35,6 +40,27 @@ the configuration by providing the necessary environment variables.
 
 For more information, see the [configuration settings](#configuration).
 
+## Architecture
+
+Currently, the architecture of `urchin` is still in its early days.
+The plan is to have two main applications: the public facing application
+to serve the content through a website, and the admin application that
+can be hidden, where users can modify the settings, add posts, pages, etc.
+
+![diagram of urchin's architecture](static/urchin-architecture.png "Urchin Application Architecture")
+
+In the above image, you can see the two applications running alongside,
+and they share a database connection where the data is actually stored.
+The list below explains some of the data intended to be stored in the
+database:
+
+- **posts**: a table where each row is an individual post, containing
+  the title, content, and any other relevant data.
+- **pages**: a table where HTML can be stored to be served as individual
+  pages on a website.
+- **cards**: Still TODO. Need to decide how this will allow users to display
+  menu-like pages with cards.
+
 ## Dependencies
 
 Urchin relies on the following Golang dependencies:
@@ -50,12 +76,12 @@ it makes integrating `envfile`s quite easy.
 
 The following list outlines the environment variables needed.
 
-- `GOCMS_DATABASE_ADDRESS` should contain the database addres,
+- `URCHIN_DATABASE_ADDRESS` should contain the database addres,
   e.g. `localhost`.
-- `GOCMS_DATABASE_PORT` should be the connection port to the
+- `URCHIN_DATABASE_PORT` should be the connection port to the
   database. For example `3306`.
-- `GOCMS_DATABASE_USER` is the database username.
-- `GOCMS_DATABASE_PASSWORD` needs to contain the database
+- `URCHIN_DATABASE_USER` is the database username.
+- `URCHIN_DATABASE_PASSWORD` needs to contain the database
   password for the given user.
 
 ## License

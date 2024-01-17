@@ -13,6 +13,7 @@ type AppSettings struct {
     Database_port  int
 	Database_user string
 	Database_password string
+	Database_name string
 }
 
 func Run(app_settings AppSettings, database database.Database) error {
