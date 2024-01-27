@@ -1,7 +1,6 @@
 package app
 
 import (
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
 	"github.com/matheusgomes28/database"
+	"github.com/matheusgomes28/views"
 	"github.com/rs/zerolog/log"
 )
 
@@ -63,9 +63,6 @@ func makePostHandler(database database.Database) func(*gin.Context) {
 
 		// serve the templated page here
 		log.Warn().Msgf("Post: %v", post)
-		c.HTML(http.StatusOK, "post", gin.H{
-			"Title": post.Title,
-			"Content": template.HTML(post.Content),
-		})
+		render(c, http.StatusOK, views.MakePostPage(post.Title, post.Content))
 	}
 }

@@ -1,0 +1,35 @@
+package views
+
+
+templ MakePostPage(title string, content string) {
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8" />
+        <title>Menu and Contact Form</title>
+        <!-- Minified version -->
+        <link rel="stylesheet" href="/static/simple.min.css" />
+        <script src="/static/htmx.min.js"></script>
+        <script src="/static/client-side-templates.js"></script>
+    </head>
+
+    <body>
+        @MakeNavBar([]Link{
+            Link{Name: "Home", Href: "/"},
+            Link{Name: "About", Href: "/about"},
+            Link{Name: "Services", Href: "/services"},
+            Link{Name: "Contact", Href: "/contact"},
+        })
+        <main>
+            <article>
+                <h2>{ title }</h2>
+                <p>@templ.Raw(content)</p>
+            </article>
+        </main>
+    
+        @MakeFooter()
+    </body>
+
+    </html>
+}

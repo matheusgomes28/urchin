@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/database"
+	"github.com/matheusgomes28/views"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,8 +20,6 @@ type AppSettings struct {
 func Run(app_settings AppSettings, database database.Database) error {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
-	//r.LoadHTMLFiles("./templates/contact/contact-success.html", "./templates/contact/contact-failure.html")
-	r.LoadHTMLGlob("templates/**/*")
 
 	r.GET("/", makeHomeHandler(app_settings, database))
 
@@ -48,6 +47,6 @@ func makeHomeHandler(settings AppSettings, db database.Database) func(*gin.Conte
 			return
 		}
 
-		c.HTML(http.StatusAccepted, "index", gin.H{"posts": posts})
+		render(c, http.StatusOK, views.MakeIndex(posts))
 	}
 }
