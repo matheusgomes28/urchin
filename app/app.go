@@ -4,20 +4,13 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/matheusgomes28/common"
 	"github.com/matheusgomes28/database"
 	"github.com/matheusgomes28/views"
 	"github.com/rs/zerolog/log"
 )
 
-type AppSettings struct {
-    Database_address string
-    Database_port  int
-	Database_user string
-	Database_password string
-	Database_name string
-}
-
-func Run(app_settings AppSettings, database database.Database) error {
+func Run(app_settings common.AppSettings, database database.Database) error {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
 
@@ -39,7 +32,7 @@ func Run(app_settings AppSettings, database database.Database) error {
 
 /// This function will act as the handler for
 /// the home page
-func makeHomeHandler(settings AppSettings, db database.Database) func(*gin.Context) {
+func makeHomeHandler(settings common.AppSettings, db database.Database) func(*gin.Context) {
 	return func(c *gin.Context){
 		posts, err := db.GetPosts()
 		if err != nil {

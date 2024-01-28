@@ -5,6 +5,7 @@ import (
 	"net/mail"
 
 	"github.com/gin-gonic/gin"
+	"github.com/matheusgomes28/common"
 	"github.com/matheusgomes28/database"
 	"github.com/matheusgomes28/views"
 )
@@ -39,7 +40,7 @@ func makeContactFormHandler() func(*gin.Context) {
 }
 
 // TODO : This is a duplicate of the index handler... abstract
-func makeContactPageHandler(settings AppSettings, db database.Database) func(*gin.Context) {
+func makeContactPageHandler(settings common.AppSettings, db database.Database) func(*gin.Context) {
 	return func(c *gin.Context){
 		render(c, http.StatusOK, views.MakeContactPage())
 	}
