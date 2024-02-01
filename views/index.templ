@@ -20,10 +20,10 @@ templ MakeIndex(posts []Post) {
 
     <body>
         @MakeNavBar([]Link{
-            Link{Name: "Home", Href: "/"},
-            Link{Name: "About", Href: "/about"},
-            Link{Name: "Services", Href: "/services"},
-            Link{Name: "Contact", Href: "/contact"},
+            {Name: "Home", Href: "/"},
+            {Name: "About", Href: "/about"},
+            {Name: "Services", Href: "/services"},
+            {Name: "Contact", Href: "/contact"},
         })
         <main>
             for _, post := range posts {
