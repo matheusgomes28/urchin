@@ -3,10 +3,12 @@ package app
 import (
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/common"
 	"github.com/matheusgomes28/database"
 	"github.com/matheusgomes28/views"
+	"github.com/matheusgomes28/views/tailwind"
 	"github.com/rs/zerolog/log"
 )
 
@@ -14,7 +16,8 @@ func Run(app_settings common.AppSettings, database database.Database) error {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
 
-	r.GET("/", makeHomeHandler(app_settings, database))
+	r.GET("/", makeHomeHandler(app_settings, database, views.MakeIndex))
+	r.GET("/tailwind", makeHomeHandler(app_settings, database, tailwind.MakeIndex))
 
 	// Contact form related endpoints
 	r.GET("/contact", makeContactPageHandler(app_settings, database))
@@ -32,7 +35,7 @@ func Run(app_settings common.AppSettings, database database.Database) error {
 
 /// This function will act as the handler for
 /// the home page
-func makeHomeHandler(settings common.AppSettings, db database.Database) func(*gin.Context) {
+func makeHomeHandler(settings common.AppSettings, db database.Database, factory func([]common.Post) templ.Component) func(*gin.Context) {
 	return func(c *gin.Context){
 		posts, err := db.GetPosts()
 		if err != nil {
@@ -40,6 +43,6 @@ func makeHomeHandler(settings common.AppSettings, db database.Database) func(*gi
 			return
 		}
 
-		render(c, http.StatusOK, views.MakeIndex(posts))
+		render(c, http.StatusOK, factory(posts))
 	}
 }
