@@ -15,6 +15,7 @@ type AppSettings struct {
 	DatabasePassword string `toml:"database_password"`
 	DatabaseName     string `toml:"database_name"`
 	WebserverPort    int    `toml:"webserver_port"`
+	ImageDirectory   string `toml:"image_dir"`
 }
 
 func LoadSettings() (AppSettings, error) {
@@ -59,6 +60,11 @@ func LoadSettings() (AppSettings, error) {
 		return AppSettings{}, fmt.Errorf("URCHIN_WEBSERVER_PORT is not valid: %v", err)
 	}
 
+	image_directory := os.Getenv("URCHIN_IMAGE_DIRECTORY")
+	if len(image_directory) == 0 {
+		return AppSettings{}, fmt.Errorf("URCHIN_IMAGE_DIRECTORY is not defined\n")
+	}
+
 	return AppSettings{
 		DatabaseUser:     database_user,
 		DatabasePassword: database_password,
@@ -66,6 +72,7 @@ func LoadSettings() (AppSettings, error) {
 		DatabasePort:     database_port,
 		DatabaseName:     database_name,
 		WebserverPort:    webserver_port,
+		ImageDirectory:   image_directory,
 	}, nil
 }
 

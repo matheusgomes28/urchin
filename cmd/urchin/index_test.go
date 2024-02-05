@@ -41,6 +41,10 @@ func (db DatabaseMock) DeletePost(id int) error {
 	return fmt.Errorf("not implemented")
 }
 
+func (db DatabaseMock) AddImage(string, string, string) error {
+	return fmt.Errorf("not implemented")
+}
+
 func TestIndexPing(t *testing.T) {
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",

@@ -16,6 +16,7 @@ type Database interface {
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
 	DeletePost(id int) error
+	AddImage(uuid string, name string, alt string) error
 }
 
 type SqlDatabase struct {
@@ -27,14 +28,15 @@ type SqlDatabase struct {
 
 // / This function gets all the posts from the current
 // / database connection.
-func (db SqlDatabase) GetPosts() ([]common.Post, error) {
+func (db SqlDatabase) GetPosts() (all_posts []common.Post, err error) {
 	rows, err := db.Connection.Query("SELECT title, excerpt, id FROM posts;")
 	if err != nil {
 		return make([]common.Post, 0), err
 	}
-	defer rows.Close()
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
 
-	all_posts := make([]common.Post, 0)
 	for rows.Next() {
 		var post common.Post
 		if err = rows.Scan(&post.Title, &post.Excerpt, &post.Id); err != nil {
@@ -48,15 +50,16 @@ func (db SqlDatabase) GetPosts() ([]common.Post, error) {
 
 // / This function gets a post from the database
 // / with the given ID.
-func (db SqlDatabase) GetPost(post_id int) (common.Post, error) {
+func (db SqlDatabase) GetPost(post_id int) (post common.Post, err error) {
 	rows, err := db.Connection.Query("SELECT title, content FROM posts WHERE id=?;", post_id)
 	if err != nil {
 		return common.Post{}, err
 	}
-	defer rows.Close()
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
 
 	rows.Next()
-	var post common.Post
 	if err = rows.Scan(&post.Title, &post.Content); err != nil {
 		return common.Post{}, err
 	}
@@ -128,6 +131,41 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 // / the value will not be updated.
 func (db SqlDatabase) DeletePost(id int) error {
 	if _, err := db.Connection.Exec("DELETE FROM posts WHERE id=?;", id); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AddImage will add the image metadata to the
+// database.
+// name - file name saved to the disk
+// alt - the alternative text
+// returns (uuid, nil) if succeeded, ("", err) otherwise
+func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error) {
+	tx, err := db.Connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		err = errors.Join(tx.Rollback())
+	}()
+
+	if name == "" {
+		return fmt.Errorf("cannot have empty name")
+	}
+
+	if alt == "" {
+		return fmt.Errorf("cannot have empty alt text")
+	}
+
+	query := "INSERT INTO images(uuid, name, alt) VALUES(?, ?, ?);"
+	_, err = tx.Exec(query, uuid, name, alt)
+	if err != nil {
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
 		return err
 	}
 
