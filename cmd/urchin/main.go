@@ -27,5 +27,5 @@ func main() {
 		log.Error().Msgf("could not create database connection: %v", err)
 	}
 
-	app.Run(app_settings, db_connection)
+	app.Run(app_settings, &db_connection)
 }

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"bytes"
 	"net/http"
 	"net/mail"
 
@@ -40,8 +41,10 @@ func makeContactFormHandler() func(*gin.Context) {
 }
 
 // TODO : This is a duplicate of the index handler... abstract
-func makeContactPageHandler(settings common.AppSettings, db database.Database) func(*gin.Context) {
-	return func(c *gin.Context){
-		render(c, http.StatusOK, views.MakeContactPage())
-	}
+func contactHandler(c *gin.Context, app_settings common.AppSettings, db *database.Database) ([]byte, error) {
+	index_view := views.MakeContactPage()
+	html_buffer := bytes.NewBuffer(nil)
+	index_view.Render(c, html_buffer)
+
+	return html_buffer.Bytes(), nil
 }
