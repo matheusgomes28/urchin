@@ -23,6 +23,7 @@ func (db Database) GetPosts() ([]common.Post, error) {
 	if err != nil {
 		return make([]common.Post, 0), err
 	}
+	defer rows.Close()
 
 	all_posts := make([]common.Post, 0)
 	for rows.Next() {
@@ -43,6 +44,7 @@ func (db *Database) GetPost(post_id int) (common.Post, error) {
 	if err != nil {
 		return common.Post{}, err
 	}
+	defer rows.Close()
 
 	rows.Next()
 	var post common.Post
@@ -130,7 +132,7 @@ func MakeSqlConnection(user string, password string, address string, port int, d
 		return Database{}, err
 	}
 	// See "Important settings" section.
-	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetConnMaxLifetime(time.Second * 5)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
