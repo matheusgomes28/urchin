@@ -1,0 +1,30 @@
+name: Build
+
+on: [workflow_call]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build ⚒️
+
+    runs-on: ubuntu-latest
+    container:
+      image: mattgomes28/urchin-golang:0.1
+      options: --user 1001
+
+    steps:
+    - uses: actions/checkout@v3
+      name: Checking Out Repo 👀
+    - name: Golang Build 🐹
+      run: make build
+    - name: Package 📦
+      run: |
+        mkdir urchin-ubuntu-build
+        cp tmp/urchin urchin-ubuntu-build/
+        cp tmp/urchin-admin urchin-ubuntu-build/
+    - uses: actions/upload-artifact@v3
+      with:
+        name: urchin-ubuntu-build
+        path: urchin-ubuntu-build
