@@ -1,0 +1,21 @@
+name: Urchin CI ⚗️
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # failfast:
+  #   uses: ./.github/workflows/failfast.yml
+  build:
+    uses: ./.github/workflows/build.yml
+    # needs: failfast
+  # tests:
+  #   uses: ./.github/workflows/test.yml
+  #   needs: build
+  # release:
+  #   uses: ./.github/workflows/release.yml
+  #   needs: tests
+  #   if: github.ref == 'refs/heads/main'
