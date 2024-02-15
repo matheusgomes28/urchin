@@ -17,11 +17,11 @@ func main() {
 	}
 
 	db_connection, err := database.MakeSqlConnection(
-		app_settings.Database_user,
-		app_settings.Database_password,
-		app_settings.Database_address,
-		app_settings.Database_port,
-		app_settings.Database_name,
+		app_settings.DatabaseUser,
+		app_settings.DatabasePassword,
+		app_settings.DatabaseAddress,
+		app_settings.DatabasePort,
+		app_settings.DatabaseName,
 	)
 	if err != nil {
 		log.Error().Msgf("could not create database connection: %v", err)
