@@ -2,6 +2,7 @@ package admin_app
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -185,7 +186,7 @@ func Run(app_settings common.AppSettings, database database.Database) error {
 	r.POST("/posts", postPostHandler(&database))
 	r.PUT("/posts", putPostHandler(&database))
 	r.DELETE("/posts", deletePostHandler(&database))
-	r.Run(":8081")
+	r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
 
 	return nil
 }
