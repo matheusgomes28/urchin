@@ -1,6 +1,6 @@
-module github.com/matheusgomes28
+module github.com/matheusgomes28/urchin
 
-go 1.21.5
+go 1.22
 
 require (
 	github.com/a-h/templ v0.2.543
@@ -8,6 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/gomarkdown/markdown v0.0.0-20231222211730-1d6d20845b47
 	github.com/rs/zerolog v1.31.0
+	github.com/zutto/shardedmap v0.0.0-20180201164343-415202d0910e
 )
 
 require (
@@ -29,7 +30,6 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/zutto/shardedmap v0.0.0-20180201164343-415202d0910e // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect

@@ -2,9 +2,9 @@ package main
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/matheusgomes28/app"
-	"github.com/matheusgomes28/common"
-	"github.com/matheusgomes28/database"
+	"github.com/matheusgomes28/urchin/app"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
 )
 

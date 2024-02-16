@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/matheusgomes28/common"
+	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
 )
 

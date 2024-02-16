@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/matheusgomes28/common"
-	"github.com/matheusgomes28/database"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
 )
 
