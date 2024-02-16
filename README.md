@@ -27,6 +27,11 @@ go get -u github.com/username/urchin
 
 ## Example - Running the App
 
+First, ensure you have the neccesary libraries to run the application
+```bash
+make install-tools
+```
+
 After you've replaced the default template files with your prefered
 template, simply build and start the app with the following commands.
 
