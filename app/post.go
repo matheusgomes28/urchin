@@ -8,9 +8,9 @@ import (
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/matheusgomes28/common"
-	"github.com/matheusgomes28/database"
-	"github.com/matheusgomes28/views"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/database"
+	"github.com/matheusgomes28/urchin/views"
 )
 
 type PostBinding struct {
