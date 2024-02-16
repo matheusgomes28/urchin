@@ -23,4 +23,7 @@ clean:
 	$(GOCMD) clean
 	rm -rf $(BUILD_DIR)
 
+install-tools:
+	go install github.com/a-h/templ/cmd/templ@v0.2.543
+
 .PHONY: all build test clean
