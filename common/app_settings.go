@@ -7,12 +7,12 @@ import (
 )
 
 type AppSettings struct {
-    DatabaseAddress string
-    DatabasePort  int
-	DatabaseUser string
+	DatabaseAddress  string
+	DatabasePort     int
+	DatabaseUser     string
 	DatabasePassword string
-	DatabaseName string
-	WebserverPort string
+	DatabaseName     string
+	WebserverPort    string
 }
 
 func LoadSettings() (AppSettings, error) {
@@ -41,7 +41,7 @@ func LoadSettings() (AppSettings, error) {
 	if len(database_port_str) == 0 {
 		return AppSettings{}, fmt.Errorf("URCHIN_DATABASE_PORT is not defined")
 	}
-	
+
 	database_port, err := strconv.Atoi(database_port_str)
 	if err != nil {
 		return AppSettings{}, fmt.Errorf("URCHIN_DATABASE_PORT is not a valid integer: %v", err)
@@ -57,7 +57,7 @@ func LoadSettings() (AppSettings, error) {
 		DatabasePassword: database_password,
 		DatabaseAddress:  database_address,
 		DatabasePort:     database_port,
-		DatabaseName: database_name,
-		WebserverPort: webserver_port,
+		DatabaseName:     database_name,
+		WebserverPort:    webserver_port,
 	}, nil
 }

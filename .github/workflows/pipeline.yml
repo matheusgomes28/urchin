@@ -7,11 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # failfast:
-  #   uses: ./.github/workflows/failfast.yml
+  failfast:
+    uses: ./.github/workflows/failfast.yml
+
   build:
     uses: ./.github/workflows/build.yml
-    # needs: failfast
+    needs: failfast
   # tests:
   #   uses: ./.github/workflows/test.yml
   #   needs: build

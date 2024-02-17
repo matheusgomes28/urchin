@@ -20,19 +20,22 @@ type Generator = func(*gin.Context, common.AppSettings, *database.Database) ([]b
 func Run(app_settings common.AppSettings, database *database.Database) error {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
-	
+
 	// All cache-able endpoints
-	cache := makeCache(4, time.Minute * 10)
+	cache := makeCache(4, time.Minute*10)
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
-	
+
 	// DO not cache as it needs to handlenew form values
 	r.POST("/contact-send", makeContactFormHandler())
 
-
 	r.Static("/static", "./static")
-	r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
+	err := r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
+	if err != nil {
+		log.Error().Msgf("could not run app: %v", err)
+		return err
+	}
 
 	return nil
 }
@@ -46,7 +49,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 			c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.contents)
 			return
 		}
-		
+
 		// Before handler call (retrieve from cache)
 		html_buffer, err := generator(c, app_settings, db)
 		if err != nil {
@@ -76,8 +79,8 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 	}
 }
 
-/// This function will act as the handler for
-/// the home page
+// / This function will act as the handler for
+// / the home page
 func homeHandler(c *gin.Context, settings common.AppSettings, db *database.Database) ([]byte, error) {
 	posts, err := db.GetPosts()
 	if err != nil {
@@ -87,6 +90,12 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db *database.Datab
 	// if not cached, create the cache
 	index_view := views.MakeIndex(posts)
 	html_buffer := bytes.NewBuffer(nil)
-	index_view.Render(c, html_buffer)
+
+	err = index_view.Render(c, html_buffer)
+	if err != nil {
+		log.Error().Msgf("could not render index: %v", err)
+		return []byte{}, err
+	}
+
 	return html_buffer.Bytes(), nil
 }

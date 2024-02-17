@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -55,8 +56,8 @@ func (db *Database) GetPost(post_id int) (common.Post, error) {
 	return post, nil
 }
 
-/// This function adds a post to the database
-func (db *Database) AddPost(title string, excerpt string, content string)  (int, error) {
+// / This function adds a post to the database
+func (db *Database) AddPost(title string, excerpt string, content string) (int, error) {
 	res, err := db.Connection.Exec("INSERT INTO posts(content, title, excerpt) VALUES(?, ?, ?)", content, title, excerpt)
 	if err != nil {
 		return -1, err
@@ -74,16 +75,18 @@ func (db *Database) AddPost(title string, excerpt string, content string)  (int,
 	return int(id), nil
 }
 
-/// This function changes a post based on the values
-/// provided. Note that empty strings will mean that
-/// the value will not be updated.
+// / This function changes a post based on the values
+// / provided. Note that empty strings will mean that
+// / the value will not be updated.
 func (db *Database) ChangePost(id int, title string, excerpt string, content string) error {
 	tx, err := db.Connection.Begin()
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
-	
+	defer func() {
+		err = errors.Join(tx.Rollback())
+	}()
+
 	if len(title) > 0 {
 		_, err := tx.Exec("UPDATE posts SET title = ? WHERE id = ?;", title, id)
 		if err != nil {
@@ -112,9 +115,9 @@ func (db *Database) ChangePost(id int, title string, excerpt string, content str
 	return nil
 }
 
-/// This function changes a post based on the values
-/// provided. Note that empty strings will mean that
-/// the value will not be updated.
+// / This function changes a post based on the values
+// / provided. Note that empty strings will mean that
+// / the value will not be updated.
 func (db *Database) DeletePost(id int) error {
 	if _, err := db.Connection.Exec("DELETE FROM posts WHERE id=?;", id); err != nil {
 		return err
