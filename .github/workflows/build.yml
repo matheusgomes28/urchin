@@ -11,7 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: mattgomes28/urchin-golang:0.1
+      image: mattgomes28/urchin-golang:0.2
       options: --user 1001
 
     steps:

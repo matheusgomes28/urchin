@@ -1,4 +1,4 @@
-# Version: 0.1
+# Version: 0.2
 
 #
 # We base our image from the alpine light image
@@ -28,6 +28,9 @@ RUN apt-get update \
     && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz \
     && GOBIN=/usr/local/bin go install github.com/pressly/goose/v3/cmd/goose@v3.18.0 \
     && GOBIN=/usr/local/bin go install github.com/a-h/templ/cmd/templ@v0.2.543 \
+    && wget https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh -P golangci-install \ 
+    && sh ./golangci-install/install.sh -b /usr/local/bin v1.56.2 \
+    && rm -rf ./golangci-install \
     && apt-get remove -y wget \
     && apt-get clean \  
     && apt-get autoremove -y \
@@ -39,3 +42,4 @@ RUN apt-get update \
     && rm -rf golang-install \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /usr/lib/gcc/x86_64-linux-gnu/7*
+
