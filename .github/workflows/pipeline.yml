@@ -13,9 +13,11 @@ jobs:
   build:
     uses: ./.github/workflows/build.yml
     needs: failfast
-  # tests:
-  #   uses: ./.github/workflows/test.yml
-  #   needs: build
+
+  tests:
+    uses: ./.github/workflows/test.yml
+    needs: build
+
   # release:
   #   uses: ./.github/workflows/release.yml
   #   needs: tests

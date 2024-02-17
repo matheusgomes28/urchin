@@ -10,7 +10,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type Database struct {
+type Database interface {
+	GetPosts() ([]common.Post, error)
+	GetPost(post_id int) (common.Post, error)
+	AddPost(title string, excerpt string, content string) (int, error)
+	ChangePost(id int, title string, excerpt string, content string) error
+	DeletePost(id int) error
+}
+
+type SqlDatabase struct {
 	Address    string
 	Port       int
 	User       string
@@ -19,7 +27,7 @@ type Database struct {
 
 // / This function gets all the posts from the current
 // / database connection.
-func (db Database) GetPosts() ([]common.Post, error) {
+func (db SqlDatabase) GetPosts() ([]common.Post, error) {
 	rows, err := db.Connection.Query("SELECT title, excerpt, id FROM posts;")
 	if err != nil {
 		return make([]common.Post, 0), err
@@ -40,7 +48,7 @@ func (db Database) GetPosts() ([]common.Post, error) {
 
 // / This function gets a post from the database
 // / with the given ID.
-func (db *Database) GetPost(post_id int) (common.Post, error) {
+func (db SqlDatabase) GetPost(post_id int) (common.Post, error) {
 	rows, err := db.Connection.Query("SELECT title, content FROM posts WHERE id=?;", post_id)
 	if err != nil {
 		return common.Post{}, err
@@ -57,7 +65,7 @@ func (db *Database) GetPost(post_id int) (common.Post, error) {
 }
 
 // / This function adds a post to the database
-func (db *Database) AddPost(title string, excerpt string, content string) (int, error) {
+func (db SqlDatabase) AddPost(title string, excerpt string, content string) (int, error) {
 	res, err := db.Connection.Exec("INSERT INTO posts(content, title, excerpt) VALUES(?, ?, ?)", content, title, excerpt)
 	if err != nil {
 		return -1, err
@@ -78,7 +86,7 @@ func (db *Database) AddPost(title string, excerpt string, content string) (int, 
 // / This function changes a post based on the values
 // / provided. Note that empty strings will mean that
 // / the value will not be updated.
-func (db *Database) ChangePost(id int, title string, excerpt string, content string) error {
+func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content string) error {
 	tx, err := db.Connection.Begin()
 	if err != nil {
 		return err
@@ -118,7 +126,7 @@ func (db *Database) ChangePost(id int, title string, excerpt string, content str
 // / This function changes a post based on the values
 // / provided. Note that empty strings will mean that
 // / the value will not be updated.
-func (db *Database) DeletePost(id int) error {
+func (db SqlDatabase) DeletePost(id int) error {
 	if _, err := db.Connection.Exec("DELETE FROM posts WHERE id=?;", id); err != nil {
 		return err
 	}
@@ -126,20 +134,20 @@ func (db *Database) DeletePost(id int) error {
 	return nil
 }
 
-func MakeSqlConnection(user string, password string, address string, port int, database string) (Database, error) {
+func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
 	/// Checking the DB connection
 	/// TODO : let user specify the DB
 	connection_str := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, address, port, database)
 	db, err := sql.Open("mysql", connection_str)
 	if err != nil {
-		return Database{}, err
+		return SqlDatabase{}, err
 	}
 	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Second * 5)
 	db.SetMaxOpenConns(10)
 	db.SetMaxIdleConns(10)
 
-	return Database{
+	return SqlDatabase{
 		Address:    address,
 		Port:       port,
 		User:       user,

@@ -1,0 +1,24 @@
+name: Tests
+
+on: [workflow_call]
+
+jobs:
+  linters:
+    name: Tests 🧪
+
+    runs-on: ubuntu-latest
+    container:
+      image: mattgomes28/urchin-golang:0.2
+      options: --user 1001
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Generating templ files
+      run: |
+        templ generate
+      shell: bash
+    
+    - name: Running Go Tests 🧪
+      run: |
+        go test ./... -v
