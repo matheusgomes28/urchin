@@ -9,11 +9,19 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 	"github.com/matheusgomes28/urchin/views"
+	"github.com/rs/zerolog/log"
 )
 
 func makeContactFormHandler() func(*gin.Context) {
 	return func(c *gin.Context) {
-		c.Request.ParseForm()
+		if err := c.Request.ParseForm(); err != nil {
+			log.Error().Msgf("could not parse form %v", err)
+			if err = render(c, http.StatusOK, views.MakeContactFailure("unknown", err.Error())); err != nil {
+				log.Error().Msgf("could not render %v", err)
+			}
+			return
+		}
+
 		email := c.Request.FormValue("email")
 		name := c.Request.FormValue("name")
 		message := c.Request.FormValue("message")
@@ -21,22 +29,31 @@ func makeContactFormHandler() func(*gin.Context) {
 		// Parse email
 		_, err := mail.ParseAddress(email)
 		if err != nil {
-			render(c, http.StatusOK, views.MakeContactFailure(email, err.Error()))
+			log.Error().Msgf("could not parse email: %v", err)
+			if err = render(c, http.StatusOK, views.MakeContactFailure(email, err.Error())); err != nil {
+				log.Error().Msgf("could not render: %v", err)
+			}
 			return
 		}
 
 		// Make sure name and message is reasonable
 		if len(name) > 200 {
-			render(c, http.StatusOK, views.MakeContactFailure(email, "name too long (200 chars max)"))
-			return
-		} 
-
-		if len(message) > 10000 {
-			render(c, http.StatusOK, views.MakeContactFailure(email, "message too long (1000 chars max)"))
+			if err = render(c, http.StatusOK, views.MakeContactFailure(email, "name too long (200 chars max)")); err != nil {
+				log.Error().Msgf("could not render: %v", err)
+			}
 			return
 		}
 
-		render(c, http.StatusOK, views.MakeContactSuccess(email, name))
+		if len(message) > 10000 {
+			if err = render(c, http.StatusOK, views.MakeContactFailure(email, "message too long (1000 chars max)")); err != nil {
+				log.Error().Msgf("could not render: %v", err)
+			}
+			return
+		}
+
+		if err = render(c, http.StatusOK, views.MakeContactSuccess(email, name)); err != nil {
+			log.Error().Msgf("could not render: %v", err)
+		}
 	}
 }
 
@@ -44,7 +61,9 @@ func makeContactFormHandler() func(*gin.Context) {
 func contactHandler(c *gin.Context, app_settings common.AppSettings, db *database.Database) ([]byte, error) {
 	index_view := views.MakeContactPage()
 	html_buffer := bytes.NewBuffer(nil)
-	index_view.Render(c, html_buffer)
+	if err := index_view.Render(c, html_buffer); err != nil {
+		log.Error().Msgf("could not render: %v", err)
+	}
 
 	return html_buffer.Bytes(), nil
 }

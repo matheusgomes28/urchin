@@ -40,7 +40,7 @@ func getPostHandler(database *database.Database) func(*gin.Context) {
 		if err := c.ShouldBindUri(&post_binding); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "could not get post id",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -49,7 +49,7 @@ func getPostHandler(database *database.Database) func(*gin.Context) {
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid post id type",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -59,14 +59,14 @@ func getPostHandler(database *database.Database) func(*gin.Context) {
 			log.Warn().Msgf("could not get post from DB: %v", err)
 			c.JSON(http.StatusNotFound, gin.H{
 				"error": "post id not found",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"id": post.Id,
-			"title": post.Title,
+			"id":      post.Id,
+			"title":   post.Title,
 			"excerpt": post.Excerpt,
 			"content": post.Content,
 		})
@@ -83,7 +83,7 @@ func postPostHandler(database *database.Database) func(*gin.Context) {
 			log.Warn().Msgf("could not get post from DB: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid request body",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -97,7 +97,7 @@ func postPostHandler(database *database.Database) func(*gin.Context) {
 			log.Error().Msgf("failed to add post: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "could not add post",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -119,7 +119,7 @@ func putPostHandler(database *database.Database) func(*gin.Context) {
 			log.Warn().Msgf("could not get post from DB: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid request body",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -134,7 +134,7 @@ func putPostHandler(database *database.Database) func(*gin.Context) {
 			log.Error().Msgf("failed to change post: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "could not change post",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -156,7 +156,7 @@ func deletePostHandler(database *database.Database) func(*gin.Context) {
 			log.Warn().Msgf("could not delete post: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid request body",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -166,7 +166,7 @@ func deletePostHandler(database *database.Database) func(*gin.Context) {
 			log.Error().Msgf("failed to delete post: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "could not delete post",
-				"msg": err.Error(),
+				"msg":   err.Error(),
 			})
 			return
 		}
@@ -186,7 +186,12 @@ func Run(app_settings common.AppSettings, database database.Database) error {
 	r.POST("/posts", postPostHandler(&database))
 	r.PUT("/posts", putPostHandler(&database))
 	r.DELETE("/posts", deletePostHandler(&database))
-	r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
+
+	err := r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
+	if err != nil {
+		log.Error().Msgf("could not run app: %v", err)
+		return err
+	}
 
 	return nil
 }

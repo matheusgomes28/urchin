@@ -8,7 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-
 func main() {
 
 	// sets zerolog as the main logger

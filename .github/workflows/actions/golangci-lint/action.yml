@@ -1,0 +1,25 @@
+name: golangci-lint step
+description: golangci-lint step
+inputs:
+  linters:
+    description: Linter to run
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Generating templ files
+      run: |
+        templ generate
+      shell: bash
+        
+    - name: prepping lint commands
+      id: set-command
+      run: |
+        export LINTERS="${{ inputs.linters }}"
+        export LINTER_CMD="golangci-lint run --disable-all -E ${LINTERS//;/ -E }"
+        echo "linter_cmd=${LINTER_CMD}" >> $GITHUB_OUTPUT
+      shell: bash
+      
+    - name: running the linter command
+      run: eval ${{ steps.set-command.outputs.linter_cmd }}
+      shell: bash

@@ -11,6 +11,7 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 	"github.com/matheusgomes28/urchin/views"
+	"github.com/rs/zerolog/log"
 )
 
 type PostBinding struct {
@@ -38,8 +39,8 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database *data
 	if err := c.ShouldBindUri(&post_binding); err != nil {
 		return nil, err
 	}
-	
-	// Get the post with the ID 
+
+	// Get the post with the ID
 	post_id, err := strconv.Atoi(post_binding.Id)
 	if err != nil {
 		return nil, err
@@ -54,7 +55,9 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database *data
 	post.Content = string(mdToHTML([]byte(post.Content)))
 	post_view := views.MakePostPage(post.Title, post.Content)
 	html_buffer := bytes.NewBuffer(nil)
-	post_view.Render(c, html_buffer)
+	if err = post_view.Render(c, html_buffer); err != nil {
+		log.Error().Msgf("could not render: %v", err)
+	}
 
 	return html_buffer.Bytes(), nil
 }
