@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -12,11 +13,27 @@ import (
 )
 
 func main() {
-	/// Load global application settings
-	app_settings, err := common.LoadSettings()
-	if err != nil {
-		log.Error().Msgf("could not get app settings: %v\n", err)
-		os.Exit(-1)
+	config_toml := flag.String("config", "", "path to the config to be used")
+	flag.Parse()
+
+	var app_settings common.AppSettings
+	if (*config_toml) != "" {
+		log.Info().Msgf("reading config file %s", *config_toml)
+		settings, err := common.ReadConfigToml(*config_toml)
+		if err != nil {
+			log.Error().Msgf("could not read config file: %v", err)
+			os.Exit(-1)
+		}
+
+		app_settings = settings
+	} else {
+		log.Info().Msgf("no config file, reading environment variables")
+		settings, err := common.LoadSettings()
+		if err != nil {
+			log.Error().Msgf("could not load settings: %v", err)
+			os.Exit(-1)
+		}
+		app_settings = settings
 	}
 
 	db_connection, err := database.MakeSqlConnection(

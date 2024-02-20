@@ -6,7 +6,7 @@ tmp_dir = "tmp"
   cmd = "make build"
   args_bin = []
   bin = "./tmp/urchin"
-  full_bin = "URCHIN_WEBSERVER_PORT=8080 URCHIN_DATABASE_ADDRESS=mariadb URCHIN_DATABASE_PORT=3306 URCHIN_DATABASE_USER=root URCHIN_DATABASE_PASSWORD=root URCHIN_DATABASE_NAME=urchin ./tmp/urchin"
+  full_bin = "./tmp/urchin --config urchin_config.toml"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
