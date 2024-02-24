@@ -4,15 +4,17 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/BurntSushi/toml"
 )
 
 type AppSettings struct {
-	DatabaseAddress  string
-	DatabasePort     int
-	DatabaseUser     string
-	DatabasePassword string
-	DatabaseName     string
-	WebserverPort    int
+	DatabaseAddress  string `toml:"database_address"`
+	DatabasePort     int    `toml:"database_port"`
+	DatabaseUser     string `toml:"database_user"`
+	DatabasePassword string `toml:"database_password"`
+	DatabaseName     string `toml:"database_name"`
+	WebserverPort    int    `toml:"webserver_port"`
 }
 
 func LoadSettings() (AppSettings, error) {
@@ -65,4 +67,14 @@ func LoadSettings() (AppSettings, error) {
 		DatabaseName:     database_name,
 		WebserverPort:    webserver_port,
 	}, nil
+}
+
+func ReadConfigToml(filepath string) (AppSettings, error) {
+	var config AppSettings
+	_, err := toml.DecodeFile(filepath, &config)
+	if err != nil {
+		return AppSettings{}, err
+	}
+
+	return config, nil
 }
