@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/matheusgomes28/urchin/app"
 	"github.com/matheusgomes28/urchin/common"
@@ -13,7 +16,7 @@ func main() {
 	app_settings, err := common.LoadSettings()
 	if err != nil {
 		log.Error().Msgf("could not get app settings: %v\n", err)
-		return
+		os.Exit(-1)
 	}
 
 	db_connection, err := database.MakeSqlConnection(
@@ -25,9 +28,13 @@ func main() {
 	)
 	if err != nil {
 		log.Error().Msgf("could not create database connection: %v", err)
+		os.Exit(-1)
 	}
 
-	if err = app.Run(app_settings, &db_connection); err != nil {
+	r := app.SetupRoutes(app_settings, db_connection)
+	err = r.Run(fmt.Sprintf(":%d", app_settings.WebserverPort))
+	if err != nil {
 		log.Error().Msgf("could not run app: %v", err)
+		os.Exit(-1)
 	}
 }

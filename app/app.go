@@ -2,7 +2,6 @@ package app
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -15,9 +14,9 @@ import (
 
 const CACHE_TIMEOUT = 20 * time.Second
 
-type Generator = func(*gin.Context, common.AppSettings, *database.Database) ([]byte, error)
+type Generator = func(*gin.Context, common.AppSettings, database.Database) ([]byte, error)
 
-func Run(app_settings common.AppSettings, database *database.Database) error {
+func SetupRoutes(app_settings common.AppSettings, database database.Database) *gin.Engine {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
 
@@ -31,20 +30,14 @@ func Run(app_settings common.AppSettings, database *database.Database) error {
 	r.POST("/contact-send", makeContactFormHandler())
 
 	r.Static("/static", "./static")
-	err := r.Run(fmt.Sprintf(":%s", app_settings.WebserverPort))
-	if err != nil {
-		log.Error().Msgf("could not run app: %v", err)
-		return err
-	}
-
-	return nil
+	return r
 }
 
-func addCachableHandler(e *gin.Engine, method string, endpoint string, generator Generator, cache *Cache, app_settings common.AppSettings, db *database.Database) {
+func addCachableHandler(e *gin.Engine, method string, endpoint string, generator Generator, cache *Cache, app_settings common.AppSettings, db database.Database) {
 
 	handler := func(c *gin.Context) {
 		// if the endpoint is cached
-		cached_endpoint, err := cache.Get(c.Request.RequestURI)
+		cached_endpoint, err := (*cache).Get(c.Request.RequestURI)
 		if err == nil {
 			c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.contents)
 			return
@@ -57,7 +50,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		}
 
 		// After handler  (add to cache)
-		err = cache.Store(c.Request.RequestURI, html_buffer)
+		err = (*cache).Store(c.Request.RequestURI, html_buffer)
 		if err != nil {
 			log.Warn().Msgf("could not add page to cache: %v", err)
 		}
@@ -81,7 +74,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 
 // / This function will act as the handler for
 // / the home page
-func homeHandler(c *gin.Context, settings common.AppSettings, db *database.Database) ([]byte, error) {
+func homeHandler(c *gin.Context, settings common.AppSettings, db database.Database) ([]byte, error) {
 	posts, err := db.GetPosts()
 	if err != nil {
 		return nil, err

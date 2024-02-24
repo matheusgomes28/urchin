@@ -32,7 +32,7 @@ func mdToHTML(md []byte) []byte {
 	return markdown.Render(doc, renderer)
 }
 
-func postHandler(c *gin.Context, app_settings common.AppSettings, database *database.Database) ([]byte, error) {
+func postHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
 	// localhost:8080/post/{id}
 
 	var post_binding PostBinding
