@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
@@ -17,21 +18,22 @@ type AddImageRequest struct {
 	Alt string `json:"alt"`
 }
 
+// TODO : need these endpoints
 // r.GET("/images/:id", getImageHandler(&database))
 // r.POST("/images", postImageHandler(&database))
 // r.DELETE("/images", deleteImageHandler(&database))
-
-func getImageHandler(database *database.Database) func(*gin.Context) {
-	return func(c *gin.Context) {
-		// Get the image from database
-	}
-}
+// func getImageHandler(database *database.Database) func(*gin.Context) {
+// 	return func(c *gin.Context) {
+// 		// Get the image from database
+// 	}
+// }
 
 func postImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
+		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 10*1000000)
 		form, err := c.MultipartForm()
 		if err != nil {
-			log.Error().Msgf("could nto create multipart form: %v", err)
+			log.Error().Msgf("could not create multipart form: %v", err)
 			return
 		}
 
@@ -52,6 +54,11 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 			log.Error().Msgf("could not upload file: %v", err)
 			return
 		}
+		allowed_types := []string{"image/jpeg", "image/png", "image/gif"}
+		if file_content_type := file.Header.Get("content-type"); !slices.Contains(allowed_types, file_content_type) {
+			log.Error().Msgf("file type not supported")
+			return
+		}
 
 		uuid, err := uuid.New()
 		if err != nil {
@@ -59,10 +66,11 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 			return
 		}
 
+		allowed_extensions := []string{"jpeg", "jpg", "png"}
 		ext := filepath.Ext(file.Filename)
 		// check ext is supported
-		if ext == "" {
-			log.Error().Msgf("could not get file extension %v", err)
+		if ext == "" && slices.Contains(allowed_extensions, ext) {
+			log.Error().Msgf("file extension is not supported %v", err)
 			return
 		}
 

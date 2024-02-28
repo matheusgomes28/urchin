@@ -151,6 +151,7 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 		err = errors.Join(tx.Rollback())
 	}()
 
+	log.Info().Msgf("adding stuff to the DB")
 	if name == "" {
 		return fmt.Errorf("cannot have empty name")
 	}
