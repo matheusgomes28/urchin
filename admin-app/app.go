@@ -42,5 +42,8 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.POST("/images", postImageHandler(app_settings, database))
 	// r.DELETE("/images", deleteImageHandler(&database))
 
+	// Card related endpoints
+	r.POST("/card", postCardHandler(database))
+
 	return r
 }
