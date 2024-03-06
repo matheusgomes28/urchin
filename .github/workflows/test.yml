@@ -21,4 +21,7 @@ jobs:
     
     - name: Running Go Tests 🧪
       run: |
-        go test ./... -v
+        go test -coverprofile=coverage.out -covermode=atomic ./... -v
+
+    - name: Upload coverage to Codecov 📓
+      uses: codecov/codecov-action@v3
