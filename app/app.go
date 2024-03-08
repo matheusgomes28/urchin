@@ -39,6 +39,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.POST("/contact-send", makeContactFormHandler())
 
 	r.Static("/static", "./static")
+	r.Static("/media", "./media")
 	return r
 }
 
