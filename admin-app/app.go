@@ -4,15 +4,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
+	lua "github.com/yuin/gopher-lua"
 )
 
-func SetupRoutes(app_settings common.AppSettings, database database.Database) *gin.Engine {
+func SetupRoutes(app_settings common.AppSettings, database database.Database, shortcode_handlers map[string]*lua.LState) *gin.Engine {
 
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
 
 	r.GET("/posts/:id", getPostHandler(database))
-	r.POST("/posts", postPostHandler(database))
+	r.POST("/posts", postPostHandler(database, shortcode_handlers))
 	r.PUT("/posts", putPostHandler(database))
 	r.DELETE("/posts/:id", deletePostHandler(database))
 
