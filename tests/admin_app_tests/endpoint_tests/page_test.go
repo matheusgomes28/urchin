@@ -10,6 +10,7 @@ import (
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	lua "github.com/yuin/gopher-lua"
 )
 
 func TestAddPageHappyPath(t *testing.T) {
@@ -25,7 +26,7 @@ func TestAddPageHappyPath(t *testing.T) {
 		Link:    "Link",
 	}
 
-	router := admin_app.SetupRoutes(app_settings, databaseMock)
+	router := admin_app.SetupRoutes(app_settings, databaseMock, make(map[string]*lua.LState))
 	responseRecorder := httptest.NewRecorder()
 
 	body, _ := json.Marshal(page_data)

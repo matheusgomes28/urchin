@@ -96,6 +96,8 @@ func TestPostFailurePostDoesntExist(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
+	fmt.Printf("Value for the request: %d", responseRecorder.Code)
+
 	require.Equal(t, http.StatusNotFound, responseRecorder.Code)
 }
 

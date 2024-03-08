@@ -2,23 +2,23 @@
 database_address = "localhost"
 
 # User to access datbaase
-database_user = "urchin"
+database_user = "root"
 
 # Password for the database user
-database_password = "urchinpw"
+database_password = "root"
 
 # port
 database_port = 3306
 
 # name of database where urchin's
 # migrations was installed
-database_name = "urchin"
+database_name = "gocms"
 
 # port to run the webserver on
-webserver_port = 8080
+webserver_port = 8082
 
 # port to run the admin app on
-admin_port = 8081
+admin_port = 8083
 
 # Directory to use for storing uploaded images.
 image_dir = "./images"
@@ -39,3 +39,13 @@ links = [
     { name = "Images", href = "/images", title = "Images page" },
     { name = "Contact", href = "/contact", title = "Contacts page" },
 ]
+
+[[shortcodes]]
+name = "img"
+# must have function "HandleShortcode(arguments []string) -> string"
+plugin = "plugins/image_shortcode.lua"
+
+[[shortcodes]]
+name = "table"
+# must have function "HandleShortcode(arguments []string) -> string"
+plugin = "plugins/table_shortcode.lua"
