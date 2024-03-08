@@ -35,6 +35,7 @@ func TestCorrectToml(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		WebserverPort:    99999,
 		DatabasePort:     666,
+		Shortcodes:       []Shortcode{},
 	}
 	bytes, err := toml.Marshal(expected)
 	assert.Nil(t, err)
@@ -50,17 +51,19 @@ func TestCorrectToml(t *testing.T) {
 func TestMissingDatabaseAddress(t *testing.T) {
 
 	missing_database_address := struct {
-		DatabaseUser     string `toml:"database_user"`
-		DatabasePassword string `toml:"database_password"`
-		DatabaseName     string `toml:"database_name"`
-		WebserverPort    string `toml:"webserver_port"`
-		DatabasePort     string `toml:"database_port"`
+		DatabaseUser     string      `toml:"database_user"`
+		DatabasePassword string      `toml:"database_password"`
+		DatabaseName     string      `toml:"database_name"`
+		WebserverPort    string      `toml:"webserver_port"`
+		DatabasePort     string      `toml:"database_port"`
+		Shortcodes       []Shortcode `toml:"shortcodes"`
 	}{
 		DatabaseUser:     "test_database_user",
 		DatabasePassword: "test_database_password",
 		DatabaseName:     "test_database_name",
 		WebserverPort:    "99999",
 		DatabasePort:     "666",
+		Shortcodes:       []Shortcode{},
 	}
 
 	bytes, err := toml.Marshal(missing_database_address)

@@ -8,14 +8,22 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type Shortcode struct {
+	// name for the shortcode {{name:...:...}}
+	Name string `toml:"name"`
+	// The lua plugin path
+	Plugin string `toml:"plugin"`
+}
+
 type AppSettings struct {
-	DatabaseAddress  string `toml:"database_address"`
-	DatabasePort     int    `toml:"database_port"`
-	DatabaseUser     string `toml:"database_user"`
-	DatabasePassword string `toml:"database_password"`
-	DatabaseName     string `toml:"database_name"`
-	WebserverPort    int    `toml:"webserver_port"`
-	ImageDirectory   string `toml:"image_dir"`
+	DatabaseAddress  string      `toml:"database_address"`
+	DatabasePort     int         `toml:"database_port"`
+	DatabaseUser     string      `toml:"database_user"`
+	DatabasePassword string      `toml:"database_password"`
+	DatabaseName     string      `toml:"database_name"`
+	WebserverPort    int         `toml:"webserver_port"`
+	ImageDirectory   string      `toml:"image_dir"`
+	Shortcodes       []Shortcode `toml:"shortcodes"`
 }
 
 func LoadSettings() (AppSettings, error) {
