@@ -13,9 +13,9 @@ import (
 const MAX_CACHE_SIZE_MB = 10
 
 type EndpointCache struct {
-	name       string
-	contents   []byte
-	validUntil time.Time
+	Name       string
+	Contents   []byte
+	ValidUntil time.Time
 }
 
 func emptyEndpointCache() EndpointCache {
@@ -36,7 +36,7 @@ type TimeValidator struct{}
 
 func (validator *TimeValidator) IsValid(cache *EndpointCache) bool {
 	// We only return the cache if it's still valid
-	return cache.validUntil.After(time.Now())
+	return cache.ValidUntil.After(time.Now())
 }
 
 type TimedCache struct {
@@ -54,9 +54,9 @@ func (cache *TimedCache) Store(name string, buffer []byte) error {
 	}
 
 	var cache_entry interface{} = EndpointCache{
-		name:       name,
-		contents:   buffer,
-		validUntil: time.Now().Add(cache.cacheTimeout),
+		Name:       name,
+		Contents:   buffer,
+		ValidUntil: time.Now().Add(cache.cacheTimeout),
 	}
 	cache.cacheMap.Set(name, &cache_entry)
 	cache.estimatedSize.Add(uint64(len(buffer)))
@@ -85,11 +85,11 @@ func (cache *TimedCache) Size() uint64 {
 	return cache.estimatedSize.Load()
 }
 
-func makeCache(n_shards int, expiry_duration time.Duration) Cache {
+func MakeCache(n_shards int, expiry_duration time.Duration, validator CacheValidator) Cache {
 	return &TimedCache{
 		cacheMap:      shardedmap.NewShardMap(n_shards),
 		cacheTimeout:  expiry_duration,
 		estimatedSize: atomic.Uint64{},
-		validator:     &TimeValidator{},
+		validator:     validator,
 	}
 }

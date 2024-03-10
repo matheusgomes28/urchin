@@ -1,42 +1,23 @@
-package app
+package cache_tests
 
 import (
-	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/matheusgomes28/urchin/app"
 	"github.com/stretchr/testify/assert"
-	shardedmap "github.com/zutto/shardedmap"
 )
 
 type TrueTimeMockValidator struct{}
 
-func (validator *TrueTimeMockValidator) IsValid(cache *EndpointCache) bool {
+func (validator *TrueTimeMockValidator) IsValid(cache *app.EndpointCache) bool {
 	return true
 }
 
 type FalseTimeMockValidator struct{}
 
-func (validator *FalseTimeMockValidator) IsValid(cache *EndpointCache) bool {
+func (validator *FalseTimeMockValidator) IsValid(cache *app.EndpointCache) bool {
 	return false
-}
-
-func makeTrueCacheMock() Cache {
-	return &TimedCache{
-		cacheMap:      shardedmap.NewShardMap(2),
-		cacheTimeout:  10 * time.Second,
-		estimatedSize: atomic.Uint64{},
-		validator:     &TrueTimeMockValidator{},
-	}
-}
-
-func makeFalseCacheMock() Cache {
-	return &TimedCache{
-		cacheMap:      shardedmap.NewShardMap(2),
-		cacheTimeout:  10 * time.Second,
-		estimatedSize: atomic.Uint64{},
-		validator:     &FalseTimeMockValidator{},
-	}
 }
 
 func TestCacheAddition(t *testing.T) {
@@ -51,7 +32,7 @@ func TestCacheAddition(t *testing.T) {
 		{"nPe9Rkff6ER6EzAxPUIpxc8UBBLm71hhq2MO9hkQWisrfihUqv", []byte("oA7Hv1A7vOuZSKrPT4ZN5DGKNSHZqpLEvUA5hu54CMyIt8c78u")},
 	}
 
-	cache := makeTrueCacheMock()
+	cache := app.MakeCache(1, 10*time.Second, &TrueTimeMockValidator{})
 
 	rolling_size := uint64(0)
 	for _, test_case := range test_data {
@@ -63,7 +44,7 @@ func TestCacheAddition(t *testing.T) {
 
 		endpoint_cache, err := cache.Get(test_case.name)
 		assert.Nil(t, err)
-		assert.Equal(t, endpoint_cache.contents, test_case.contents)
+		assert.Equal(t, endpoint_cache.Contents, test_case.contents)
 	}
 }
 
@@ -79,7 +60,7 @@ func TestCacheFailure(t *testing.T) {
 		{"nPe9Rkff6ER6EzAxPUIpxc8UBBLm71hhq2MO9hkQWisrfihUqv", []byte("oA7Hv1A7vOuZSKrPT4ZN5DGKNSHZqpLEvUA5hu54CMyIt8c78u")},
 	}
 
-	cache := makeFalseCacheMock()
+	cache := app.MakeCache(1, 10*time.Second, &FalseTimeMockValidator{})
 
 	rolling_size := uint64(0)
 	for _, test_case := range test_data {
@@ -92,4 +73,15 @@ func TestCacheFailure(t *testing.T) {
 		_, err = cache.Get(test_case.name)
 		assert.NotNil(t, err)
 	}
+}
+
+// Tests that storing over 10MB fails
+func TestCacheStoreMaxBytes(t *testing.T) {
+	cache := app.MakeCache(1, 10*time.Second, &FalseTimeMockValidator{})
+
+	err := cache.Store("fatty", make([]byte, 10000000))
+	assert.Nil(t, err)
+
+	err = cache.Store("slim", make([]byte, 1000))
+	assert.NotNil(t, err)
 }

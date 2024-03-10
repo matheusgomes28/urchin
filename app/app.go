@@ -21,7 +21,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.MaxMultipartMemory = 1
 
 	// All cache-able endpoints
-	cache := makeCache(4, time.Minute*10)
+	cache := MakeCache(4, time.Minute*10, &TimeValidator{})
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
@@ -39,7 +39,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		// if the endpoint is cached
 		cached_endpoint, err := (*cache).Get(c.Request.RequestURI)
 		if err == nil {
-			c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.contents)
+			c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.Contents)
 			return
 		}
 
@@ -47,6 +47,12 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		html_buffer, err := generator(c, app_settings, db)
 		if err != nil {
 			log.Error().Msgf("could not generate html: %v", err)
+			// TODO : Need a proper error page
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "could not render HTML",
+				"msg":   err.Error(),
+			})
+			return
 		}
 
 		// After handler  (add to cache)
