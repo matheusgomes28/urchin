@@ -28,8 +28,9 @@ type SqlDatabase struct {
 
 // / This function gets all the posts from the current
 // / database connection.
-func (db SqlDatabase) GetPosts() (all_posts []common.Post, err error) {
-	rows, err := db.Connection.Query("SELECT title, excerpt, id FROM posts;")
+func (db SqlDatabase) GetPosts(limit int, offset int) (all_posts []common.Post, err error) {
+	query := fmt.Sprintf("SELECT title, excerpt, id FROM posts LIMIT %d OFFSET %d;", limit, offset)
+	rows, err := db.Connection.Query(query)
 	if err != nil {
 		return make([]common.Post, 0), err
 	}

@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,11 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 
 	// DO not cache as it needs to handlenew form values
 	r.POST("/contact-send", makeContactFormHandler())
+
+	// this will setup the route for pagination
+	r.GET("/page/:num", func(c *gin.Context) {
+		homeHandler(c, app_settings, database)
+	})
 
 	r.Static("/static", "./static")
 	return r
@@ -75,7 +81,16 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 // / This function will act as the handler for
 // / the home page
 func homeHandler(c *gin.Context, settings common.AppSettings, db database.Database) ([]byte, error) {
-	posts, err := db.GetPosts()
+	pageNumQuery := c.Param("num")
+	pageNum, err := strconv.Atoi(pageNumQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	limit := 10 // or whatever limit you want
+	offset := (pageNum - 1) * limit
+
+	posts, err := db.GetPosts(limit, offset)
 	if err != nil {
 		return nil, err
 	}
