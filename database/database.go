@@ -11,7 +11,7 @@ import (
 )
 
 type Database interface {
-	GetPosts() ([]common.Post, error)
+	GetPosts(int, int) ([]common.Post, error)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
