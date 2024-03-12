@@ -57,7 +57,7 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 		err := decoder.Decode(&add_post_request)
 
 		if err != nil {
-			log.Warn().Msgf("could not get post from DB: %v", err)
+			log.Warn().Msgf("invalid post request: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "invalid request body",
 				"msg":   err.Error(),

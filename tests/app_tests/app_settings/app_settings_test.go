@@ -1,10 +1,11 @@
-package common
+package app_settings_tests
 
 import (
 	"errors"
 	"os"
 	"testing"
 
+	"github.com/matheusgomes28/urchin/common"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +29,7 @@ func writeToml(contents []byte) (s string, err error) {
 }
 
 func TestCorrectToml(t *testing.T) {
-	expected := AppSettings{
+	expected := common.AppSettings{
 		DatabaseAddress:  "test_database_address",
 		DatabaseUser:     "test_database_user",
 		DatabasePassword: "test_database_password",
@@ -42,7 +43,7 @@ func TestCorrectToml(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	actual, err := ReadConfigToml(filepath)
+	actual, err := common.ReadConfigToml(filepath)
 	assert.Nil(t, err)
 	assert.Equal(t, actual, expected)
 }
@@ -69,7 +70,7 @@ func TestMissingDatabaseAddress(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -95,7 +96,7 @@ func TestMissingDatabaseUser(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -120,7 +121,7 @@ func TestMissingDatabasePassword(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -145,7 +146,7 @@ func TestMissingDatabaseName(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -170,7 +171,7 @@ func TestMissingWebserverPort(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -195,7 +196,7 @@ func TestMissingDatabasePort(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -222,7 +223,7 @@ func TestWrongDatabasePortValueType(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
 
@@ -249,6 +250,6 @@ func TestWrongwebserverPortValueType(t *testing.T) {
 	filepath, err := writeToml(bytes)
 	assert.Nil(t, err)
 
-	_, err = ReadConfigToml(filepath)
+	_, err = common.ReadConfigToml(filepath)
 	assert.NotNil(t, err)
 }
