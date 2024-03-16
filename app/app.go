@@ -94,12 +94,8 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 			log.Error().Msgf("Invalid page number: %s", pageNumQuery)
 		}
 	}
-
-	// Ensure pageNum is at least 1
-	pageNum = max(pageNum, 1)
-
 	limit := 10 // or whatever limit you want
-	offset := (pageNum - 1) * limit
+	offset := max((pageNum-1)*limit, 0)
 
 	posts, err := db.GetPosts(limit, offset)
 	if err != nil {
@@ -117,11 +113,4 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 	}
 
 	return html_buffer.Bytes(), nil
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }
