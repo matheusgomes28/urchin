@@ -1,8 +1,8 @@
 package common
 
 type Post struct {
-	Title string
+	Title   string
 	Content string
 	Excerpt string
-	Id int
+	Id      int
 }

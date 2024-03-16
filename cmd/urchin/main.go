@@ -1,31 +1,57 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"os"
+
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/matheusgomes28/app"
-	"github.com/matheusgomes28/common"
-	"github.com/matheusgomes28/database"
+	"github.com/matheusgomes28/urchin/app"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
 )
 
 func main() {
-	/// Load global application settings
-	app_settings, err := common.LoadSettings()
-	if err != nil {
-		log.Error().Msgf("could not get app settings: %v\n", err)
-		return
+	config_toml := flag.String("config", "", "path to the config to be used")
+	flag.Parse()
+
+	var app_settings common.AppSettings
+	if (*config_toml) != "" {
+		log.Info().Msgf("reading config file %s", *config_toml)
+		settings, err := common.ReadConfigToml(*config_toml)
+		if err != nil {
+			log.Error().Msgf("could not read config file: %v", err)
+			os.Exit(-1)
+		}
+
+		app_settings = settings
+	} else {
+		log.Info().Msgf("no config file, reading environment variables")
+		settings, err := common.LoadSettings()
+		if err != nil {
+			log.Error().Msgf("could not load settings: %v", err)
+			os.Exit(-1)
+		}
+		app_settings = settings
 	}
 
 	db_connection, err := database.MakeSqlConnection(
-		app_settings.Database_user,
-		app_settings.Database_password,
-		app_settings.Database_address,
-		app_settings.Database_port,
-		app_settings.Database_name,
+		app_settings.DatabaseUser,
+		app_settings.DatabasePassword,
+		app_settings.DatabaseAddress,
+		app_settings.DatabasePort,
+		app_settings.DatabaseName,
 	)
 	if err != nil {
 		log.Error().Msgf("could not create database connection: %v", err)
+		os.Exit(-1)
 	}
 
-	app.Run(app_settings, db_connection)
+	r := app.SetupRoutes(app_settings, db_connection)
+	err = r.Run(fmt.Sprintf(":%d", app_settings.WebserverPort))
+	if err != nil {
+		log.Error().Msgf("could not run app: %v", err)
+		os.Exit(-1)
+	}
 }

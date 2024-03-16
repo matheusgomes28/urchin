@@ -1,15 +1,16 @@
 package app
 
 import (
-	"net/http"
+	"bytes"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
 	"github.com/gomarkdown/markdown/parser"
-	"github.com/matheusgomes28/database"
-	"github.com/matheusgomes28/views"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/database"
+	"github.com/matheusgomes28/urchin/views"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,38 +32,32 @@ func mdToHTML(md []byte) []byte {
 	return markdown.Render(doc, renderer)
 }
 
-func makePostHandler(database database.Database) func(*gin.Context) {
-	return func(c *gin.Context) {
+func postHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
+	// localhost:8080/post/{id}
 
-		// localhost:8080/post/{id}
-		var post_binding PostBinding
-		if err := c.ShouldBindUri(&post_binding); err != nil {
-			// TODO redo this error to serve error page
-			c.JSON(400, gin.H{"msg": err})
-			return
-		}
-		
-		// Get the post with the ID 
-		post_id, err := strconv.Atoi(post_binding.Id)
-		if err != nil {
-			// TODO redo this error to serve error page
-			c.JSON(400, gin.H{"msg": err})
-			return
-		}
-
-		post, err := database.GetPost(post_id)
-		if err != nil {
-			// TODO redo this error to serve error page
-			c.JSON(400, gin.H{"msg": err})
-			return
-		}
-
-		// Markdown to HTML the post content
-		// ...
-		post.Content = string(mdToHTML([]byte(post.Content)))
-
-		// serve the templated page here
-		log.Warn().Msgf("Post: %v", post)
-		render(c, http.StatusOK, views.MakePostPage(post.Title, post.Content))
+	var post_binding PostBinding
+	if err := c.ShouldBindUri(&post_binding); err != nil {
+		return nil, err
 	}
+
+	// Get the post with the ID
+	post_id, err := strconv.Atoi(post_binding.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	post, err := database.GetPost(post_id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Generate HTML page
+	post.Content = string(mdToHTML([]byte(post.Content)))
+	post_view := views.MakePostPage(post.Title, post.Content)
+	html_buffer := bytes.NewBuffer(nil)
+	if err = post_view.Render(c, html_buffer); err != nil {
+		log.Error().Msgf("could not render: %v", err)
+	}
+
+	return html_buffer.Bytes(), nil
 }

@@ -17,6 +17,8 @@ build:
 	$(TAILWIND) -i ./static/style.css -o ./static/output.css -m
 	$(GOCMD) build -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	$(GOCMD) build -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
+	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
+	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
 
 test:
 	$(GOCMD) test -v ./...
@@ -24,5 +26,8 @@ test:
 clean:
 	$(GOCMD) clean
 	rm -rf $(BUILD_DIR)
+
+install-tools:
+	go install github.com/a-h/templ/cmd/templ@v0.2.543
 
 .PHONY: all build test clean

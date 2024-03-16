@@ -4,6 +4,8 @@ Urchin is a headless CMS (Content Management System) written in Golang, designed
 create a website or blog, with any template you like, in only a few
 commands.
 
+![Really no head?](static/nohead.gif "So no head meme?")
+
 ## Features 🚀
 
 - [x] **Headless Architecture:** Adding pages, posts, or forms should all
@@ -27,6 +29,22 @@ go get -u github.com/username/urchin
 
 ## Example - Running the App
 
+First, ensure you have the neccesary libraries to run the application
+```bash
+make install-tools
+```
+
+Following that, make sure you run the Goose migrations for the database.
+We recommend creating a database called `urchin` and running the following
+command:
+
+```bash
+GOOSE_DRIVER="mysql" GOOSE_DBSTRING="root:root@/gocms" goose up
+```
+
+Replace the database connection string with the appropriate string
+dependending on where your database is.
+
 After you've replaced the default template files with your prefered
 template, simply build and start the app with the following commands.
 
@@ -39,6 +57,20 @@ This will start Urchin on `http://localhost:8080`. You can customize
 the configuration by providing the necessary environment variables.
 
 For more information, see the [configuration settings](#configuration).
+
+## Example - Running with Docker Compose
+
+To run with `docker-compose`, use the following
+command:
+
+```bash
+docker-compose up
+```
+
+This will start two containers: one containing the `urchin` app,
+serving on port `8080`, and another one serving the `mariadb`
+database internally. This will also run the migrations automatically
+to setup the database!
 
 ## Architecture
 
