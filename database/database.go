@@ -181,6 +181,10 @@ func MakeSqlConnection(user string, password string, address string, port int, d
 	if err != nil {
 		return SqlDatabase{}, err
 	}
+
+	if err := db.Ping(); err != nil {
+		return SqlDatabase{}, err
+	}
 	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Second * 5)
 	db.SetMaxOpenConns(10)
