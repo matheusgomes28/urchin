@@ -8,11 +8,11 @@ import (
 
 type DatabaseMock struct {
 	GetPostHandler  func(int) (common.Post, error)
-	GetPostsHandler func() ([]common.Post, error)
+	GetPostsHandler func(int, int) ([]common.Post, error)
 }
 
-func (db DatabaseMock) GetPosts() ([]common.Post, error) {
-	return db.GetPostsHandler()
+func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
+	return db.GetPostsHandler(limit, offset)
 }
 
 func (db DatabaseMock) GetPost(post_id int) (common.Post, error) {

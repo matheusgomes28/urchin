@@ -11,7 +11,7 @@ import (
 )
 
 type Database interface {
-	GetPosts() ([]common.Post, error)
+	GetPosts(int, int) ([]common.Post, error)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
@@ -28,8 +28,9 @@ type SqlDatabase struct {
 
 // / This function gets all the posts from the current
 // / database connection.
-func (db SqlDatabase) GetPosts() (all_posts []common.Post, err error) {
-	rows, err := db.Connection.Query("SELECT title, excerpt, id FROM posts;")
+func (db SqlDatabase) GetPosts(limit int, offset int) (all_posts []common.Post, err error) {
+	query := "SELECT title, excerpt, id FROM posts LIMIT ? OFFSET ?;"
+	rows, err := db.Connection.Query(query, limit, offset)
 	if err != nil {
 		return make([]common.Post, 0), err
 	}
