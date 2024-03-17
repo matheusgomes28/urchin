@@ -1,0 +1,10 @@
+version: '3.1'
+
+services:
+  urchindb:
+    image: mysql
+    container_name: urchindb
+    ports: 
+      - 3306:3306
+    env_file: 
+      - ../.dev.env

@@ -2,3 +2,4 @@
 **/__debug*
 **/*_templ.go
 tmp/
+**/main
