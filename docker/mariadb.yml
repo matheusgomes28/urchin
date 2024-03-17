@@ -2,7 +2,7 @@ version: '3.1'
 
 services:
   urchindb:
-    image: mysql
+    image: mariadb:11.2.3-jammy
     container_name: urchindb
     ports: 
       - 3306:3306

@@ -64,7 +64,7 @@ To run with `docker-compose`, use the following
 command:
 
 ```bash
-docker-compose up
+docker-compose -f docker/docker-compose.yml up
 ```
 
 This will start two containers: one containing the `urchin` app,
@@ -102,11 +102,27 @@ Urchin relies on the following Golang dependencies:
 
 ## Configuration
 
-The runtime configuration is handled through reading the
-necessary environment variables. This approach was chosen as
-it makes integrating `envfile`s quite easy.
+The runtime configuration can be done through a [toml](https://toml.io/en/) configuration file or by setting the mandatory environment variables (*fallback*). This approach was chosen because configuration via toml supports advanced features (i.e. *relationships*, *arrays*, etc.). The `.dev.env`-file is used to configure the development database through `docker-compose`.
 
-The following list outlines the environment variables needed.
+### toml configuration
+
+The application can be started by providing the `config` flag which has to be set to a toml configuration file. The file has to contain the following mandatory values:
+
+```toml
+database_address = "localhost" # Address to the MariaDB database
+database_user = "urchin" # User to access database
+database_password = "urchinpw" # Password for the database user
+database_port = 3306 # The port to use for the application
+database_name = "urchin" # The database to use for Urchin
+webserver_port = 8080 # The application port Urchin should use
+image_dir = "./images" # Directory to use for storing uploaded images.
+```
+
+**Important**: The configuration values above are used to start-up the local development database.
+
+### Environment variables configuration (fallback)
+
+If chosen, by setting the following environment variables the application can be started without providing a toml configuration file. 
 
 - `URCHIN_DATABASE_ADDRESS` should contain the database addres,
   e.g. `localhost`.
@@ -120,15 +136,11 @@ The following list outlines the environment variables needed.
 
 ## Development
 
-To ease up the development process, Docker is highly recommended. This way you can use the `docker/mysqldb.yml` to set up a predefined MySQL database server. The docker-compose file references the [`.dev.env`](#env-file) and creates the Urchin database and an application user.
+To ease up the development process, Docker is highly recommended. This way you can use the `docker/mariadb.yml` to set up a predefined MariaDB database server. The docker-compose file references the `.dev.env` and creates the Urchin database and an application user.
 
 ```bash
-$ docker-compose -f docker/mysqldb.yml up -d
+$ docker-compose -f docker/mariadb.yml up -d
 ```
-
-### .env-file
-
-As described under [configuration section](#configuration), specific environment variables have to be defined for Urchin to run properly. For this an `.dev.env` file is pre-configured to set the required variables with some dummy values. This .env-file includes variables for the database and Urchin and can be used for the launch configuration in VSCode.
 
 ### Dependencies
 
@@ -153,7 +165,7 @@ After installing the required dependecies and starting the pre-configured databa
 ```bash
 $ source .dev.env # sets the environment variable for the goose command.
 $ cd migrations/
-$ GOOSE_DRIVER="mysql" GOOSE_DBSTRING="$URCHIN_DATABASE_USER:$URCHIN_DATABASE_PASSWORD@tcp($URCHIN_DATABASE_ADDRESS:$URCHIN_DATABASE_PORT)/$URCHIN_DATABASE_NAME" goose up
+$ GOOSE_DRIVER="mysql" GOOSE_DBSTRING="$MARIADB_USER:$MARIADB_PASSWORD@tcp($MARIADB_ADDRESS:$MARIADB_PORT)/$MARIADB_DATABASE" goose up
 ```
 
 ### Launching & Debugging
@@ -171,7 +183,10 @@ To debug the application or simply running it from within VSCode create a `launc
       "mode": "auto",
       "program": "${workspaceFolder}/cmd/urchin/main.go",
       "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.dev.env",
+      "args": [
+          "--config",
+          "urchin_config.toml"
+      ]
     },
     {
       "name": "Urchin Admin",
@@ -180,7 +195,10 @@ To debug the application or simply running it from within VSCode create a `launc
       "mode": "auto",
       "program": "${workspaceFolder}/cmd/urchin-admin/main.go",
       "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.dev.env",
+      "args": [
+          "--config",
+          "urchin_config.toml"
+      ]
     }
   ]
 }
