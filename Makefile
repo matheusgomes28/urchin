@@ -11,12 +11,15 @@ ADMIN_BINARY_NAME=urchin-admin
 
 all: build test
 
-build:
+prepare_env:
+	cp -r migrations tests/system_tests/endpoint_tests/
+
+build: prepare_env
 	$(TEMPL) generate
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
 
-test:
+test: prepare_env
 	$(GOCMD) test -v ./...
 
 clean:
