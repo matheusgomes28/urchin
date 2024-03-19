@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  golang_app:
+  urchin_app:
     image: mattgomes28/urchin-golang:0.3
     ports:
       - "8080:8080"
     volumes:
       - type: bind
-        source: .
+        source: ..
         target: /urchin
         volume:
           nocopy: true
-    command: ./urchin/compose-run.sh
+    command: /urchin/docker/start-app.sh
     depends_on:
       mariadb:
         condition: service_healthy
@@ -22,10 +22,8 @@ services:
   mariadb:
     image: mariadb:11.2.3-jammy
     container_name: mariadb
-    environment:
-      MARIADB_PASSWORD: root
-      MARIADB_DATABASE: urchin
-      MARIADB_ROOT_PASSWORD: root
+    env_file:
+      - ../.dev.env
     healthcheck:
       test: [ "CMD", "mariadb", "-u", "root", "-proot", "-e", "USE urchin" ]
       interval: 10s
