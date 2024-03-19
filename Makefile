@@ -27,6 +27,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 install-tools:
-	go install github.com/a-h/templ/cmd/templ@v0.2.543
+	go install github.com/pressly/goose/v3/cmd/goose@v3.18.0 0.2.543
+	go install github.com/a-h/templ/cmd/templ@v0.2.543 0.2.543 
+	go install github.com/cosmtrek/air@v1.49.0 
 
 .PHONY: all build test clean
