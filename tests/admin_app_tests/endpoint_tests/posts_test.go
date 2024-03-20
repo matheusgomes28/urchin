@@ -30,6 +30,7 @@ var app_settings = common.AppSettings{
 	DatabasePassword: "root",
 	DatabaseName:     "urchin",
 	WebserverPort:    8080,
+	ImageDirectory:   "../../../images",
 }
 
 func TestIndexPing(t *testing.T) {
