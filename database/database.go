@@ -96,7 +96,9 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 		return err
 	}
 	defer func() {
-		err = errors.Join(tx.Rollback())
+		if commit_err := tx.Commit(); commit_err != nil {
+			err = errors.Join(err, tx.Rollback(), commit_err)
+		}
 	}()
 
 	if len(title) > 0 {
@@ -118,10 +120,6 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 		if err != nil {
 			return err
 		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		return err
 	}
 
 	return nil
@@ -149,7 +147,9 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 		return err
 	}
 	defer func() {
-		err = errors.Join(tx.Rollback())
+		if commit_err := tx.Commit(); commit_err != nil {
+			err = errors.Join(err, tx.Rollback(), commit_err)
+		}
 	}()
 
 	log.Info().Msgf("adding stuff to the DB")
@@ -164,10 +164,6 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 	query := "INSERT INTO images(uuid, name, alt) VALUES(?, ?, ?);"
 	_, err = tx.Exec(query, uuid, name, alt)
 	if err != nil {
-		return err
-	}
-
-	if err = tx.Commit(); err != nil {
 		return err
 	}
 
