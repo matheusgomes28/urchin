@@ -1,4 +1,4 @@
-package index_test
+package helpers
 
 import (
 	"context"
@@ -20,12 +20,10 @@ import (
 //go:generate ../../../migrations ./migrations
 
 //go:embed migrations/*.sql
-var embedMigrations embed.FS
+var EmbedMigrations embed.FS
 
-var current_port int = 0
-
-func runDatabaseServer(app_settings common.AppSettings) {
-	pro := createTestDatabase(app_settings.DatabaseName)
+func RunDatabaseServer(app_settings common.AppSettings) {
+	pro := CreateTestDatabase(app_settings.DatabaseName)
 	engine := sqle.NewDefault(pro)
 	engine.Analyzer.Catalog.MySQLDb.AddRootAccount()
 
@@ -46,7 +44,7 @@ func runDatabaseServer(app_settings common.AppSettings) {
 	}
 }
 
-func createTestDatabase(name string) *memory.DbProvider {
+func CreateTestDatabase(name string) *memory.DbProvider {
 	db := memory.NewDatabase(name)
 	db.BaseDatabase.EnablePrimaryKeyIndexes()
 
@@ -54,7 +52,7 @@ func createTestDatabase(name string) *memory.DbProvider {
 	return pro
 }
 
-func waitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
+func WaitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 
 	for range 400 {
 		database, err := database.MakeSqlConnection(
@@ -75,16 +73,22 @@ func waitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 	return database.SqlDatabase{}, fmt.Errorf("database did not start")
 }
 
-func getAppSettings() common.AppSettings {
+// GetAppSettings gets the settings for the http servers
+// taking into account a unique port. Very hacky way to
+// get a unique port: manually have to pass a new number
+// for every test...
+// TODO : Find a way to assign a unique port at compile
+//
+//	time
+func GetAppSettings(app_num int) common.AppSettings {
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",
-		DatabasePort:     3336 + current_port, // Initial port
+		DatabasePort:     3336 + app_num, // Initial port
 		DatabaseUser:     "root",
 		DatabasePassword: "",
 		DatabaseName:     "urchin",
 		WebserverPort:    8080,
 	}
-	current_port++
 
 	return app_settings
 }
