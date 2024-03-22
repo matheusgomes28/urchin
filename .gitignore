@@ -2,3 +2,5 @@
 **/__debug*
 **/*_templ.go
 tmp/
+
+tests/system_tests/helpers/migrations

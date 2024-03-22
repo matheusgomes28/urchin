@@ -12,7 +12,7 @@ ADMIN_BINARY_NAME=urchin-admin
 all: build test
 
 prepare_env:
-	cp -r migrations tests/system_tests/endpoint_tests/
+	cp -r migrations tests/system_tests/helpers/
 
 build: prepare_env
 	$(TEMPL) generate

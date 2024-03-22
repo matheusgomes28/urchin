@@ -1,4 +1,4 @@
-package index_test
+package endpoint_tests
 
 import (
 	_ "database/sql"
@@ -10,17 +10,18 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/matheusgomes28/urchin/app"
+	"github.com/matheusgomes28/urchin/tests/system_tests/helpers"
 	"github.com/pressly/goose/v3"
 )
 
 func TestPostExists(t *testing.T) {
 
 	// This is gonna be the in-memory mysql
-	app_settings := getAppSettings()
-	go runDatabaseServer(app_settings)
-	database, err := waitForDb(app_settings)
+	app_settings := helpers.GetAppSettings(10)
+	go helpers.RunDatabaseServer(app_settings)
+	database, err := helpers.WaitForDb(app_settings)
 	require.Nil(t, err)
-	goose.SetBaseFS(embedMigrations)
+	goose.SetBaseFS(helpers.EmbedMigrations)
 
 	if err := goose.SetDialect("mysql"); err != nil {
 		require.Nil(t, err)

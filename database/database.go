@@ -52,7 +52,7 @@ func (db SqlDatabase) GetPosts(limit int, offset int) (all_posts []common.Post, 
 // / This function gets a post from the database
 // / with the given ID.
 func (db SqlDatabase) GetPost(post_id int) (post common.Post, err error) {
-	rows, err := db.Connection.Query("SELECT title, content FROM posts WHERE id=?;", post_id)
+	rows, err := db.Connection.Query("SELECT id, title, content, excerpt FROM posts WHERE id=?;", post_id)
 	if err != nil {
 		return common.Post{}, err
 	}
@@ -61,7 +61,7 @@ func (db SqlDatabase) GetPost(post_id int) (post common.Post, err error) {
 	}()
 
 	rows.Next()
-	if err = rows.Scan(&post.Title, &post.Content); err != nil {
+	if err = rows.Scan(&post.Id, &post.Title, &post.Content, &post.Excerpt); err != nil {
 		return common.Post{}, err
 	}
 
