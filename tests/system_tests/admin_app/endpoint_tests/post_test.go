@@ -17,23 +17,6 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-type AddPostRequest struct {
-	Title   string `json:"title"`
-	Excerpt string `json:"excerpt"`
-	Content string `json:"content"`
-}
-
-type AddPostResponse struct {
-	Id int `json:"id"`
-}
-
-type GetPostResponse struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Excerpt string `json:"excerpt"`
-	Content string `json:"content"`
-}
-
 func TestPostExists(t *testing.T) {
 
 	// This is gonna be the in-memory mysql
@@ -68,7 +51,7 @@ func TestPostExists(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	// Make sure it's an expected response
-	var add_post_response AddPostResponse
+	var add_post_response admin_app.PostIdResponse
 	err = json.Unmarshal(w.Body.Bytes(), &add_post_response)
 	require.Nil(t, err)
 
@@ -80,7 +63,7 @@ func TestPostExists(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 
 	// Make sure it's the expected content
-	var get_post_response GetPostResponse
+	var get_post_response admin_app.GetPostResponse
 
 	err = json.Unmarshal(w.Body.Bytes(), &get_post_response)
 	require.Nil(t, err)
