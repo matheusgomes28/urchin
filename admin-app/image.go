@@ -1,6 +1,7 @@
 package admin_app
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -78,8 +79,11 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 
 		// Begin saving the file to the filesystem
 		file_array := form.File["file"]
-		if len(file_array) == 0 {
+		if len(file_array) == 0 || file_array[0] == nil {
 			log.Error().Msgf("could not get the file array: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "no file provided for image upload",
+			})
 			return
 		}
 
@@ -134,9 +138,10 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 		err = database.AddImage(uuid.String(), file.Filename, alt_text, ext)
 		if err != nil {
 			log.Error().Msgf("could not add image metadata to db: %v", err)
-			err := os.Remove(image_path)
-			if err != nil {
+			os_err := os.Remove(image_path)
+			if os_err != nil {
 				log.Error().Msgf("could not remove image: %v", err)
+				err = errors.Join(err, os_err)
 			}
 			c.JSON(http.StatusInternalServerError, ErrorRes("failed to save image", err))
 			return
