@@ -178,9 +178,17 @@ func MakeSqlConnection(user string, password string, address string, port int, d
 	/// TODO : let user specify the DB
 	connection_str := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, address, port, database)
 	db, err := sql.Open("mysql", connection_str)
+
 	if err != nil {
 		return SqlDatabase{}, err
 	}
+
+	err = db.Ping()
+
+	if err != nil {
+		return SqlDatabase{}, err
+	}
+
 	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Second * 5)
 	db.SetMaxOpenConns(10)

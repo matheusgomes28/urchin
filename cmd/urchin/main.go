@@ -43,6 +43,7 @@ func main() {
 		app_settings.DatabasePort,
 		app_settings.DatabaseName,
 	)
+
 	if err != nil {
 		log.Error().Msgf("could not create database connection: %v", err)
 		os.Exit(-1)
