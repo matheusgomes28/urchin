@@ -3,6 +3,7 @@ package app
 import (
 	"bytes"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,9 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
+
+	// Add the pagination route as a cacheable endpoint
+	addCachableHandler(r, "GET", "/page/:num", homeHandler, &cache, app_settings, database)
 
 	// DO not cache as it needs to handlenew form values
 	r.POST("/contact-send", makeContactFormHandler())
@@ -81,7 +85,19 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 // / This function will act as the handler for
 // / the home page
 func homeHandler(c *gin.Context, settings common.AppSettings, db database.Database) ([]byte, error) {
-	posts, err := db.GetPosts()
+	pageNum := 0 // Default to page 0
+	if pageNumQuery := c.Param("num"); pageNumQuery != "" {
+		num, err := strconv.Atoi(pageNumQuery)
+		if err == nil && num > 0 {
+			pageNum = num
+		} else {
+			log.Error().Msgf("Invalid page number: %s", pageNumQuery)
+		}
+	}
+	limit := 10 // or whatever limit you want
+	offset := max((pageNum-1)*limit, 0)
+
+	posts, err := db.GetPosts(limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +108,7 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 
 	err = index_view.Render(c, html_buffer)
 	if err != nil {
-		log.Error().Msgf("could not render index: %v", err)
+		log.Error().Msgf("Could not render index: %v", err)
 		return []byte{}, err
 	}
 

@@ -11,7 +11,7 @@ import (
 )
 
 type Database interface {
-	GetPosts() ([]common.Post, error)
+	GetPosts(int, int) ([]common.Post, error)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
@@ -28,8 +28,9 @@ type SqlDatabase struct {
 
 // / This function gets all the posts from the current
 // / database connection.
-func (db SqlDatabase) GetPosts() (all_posts []common.Post, err error) {
-	rows, err := db.Connection.Query("SELECT title, excerpt, id FROM posts;")
+func (db SqlDatabase) GetPosts(limit int, offset int) (all_posts []common.Post, err error) {
+	query := "SELECT title, excerpt, id FROM posts LIMIT ? OFFSET ?;"
+	rows, err := db.Connection.Query(query, limit, offset)
 	if err != nil {
 		return make([]common.Post, 0), err
 	}
@@ -51,7 +52,7 @@ func (db SqlDatabase) GetPosts() (all_posts []common.Post, err error) {
 // / This function gets a post from the database
 // / with the given ID.
 func (db SqlDatabase) GetPost(post_id int) (post common.Post, err error) {
-	rows, err := db.Connection.Query("SELECT title, content FROM posts WHERE id=?;", post_id)
+	rows, err := db.Connection.Query("SELECT id, title, content, excerpt FROM posts WHERE id=?;", post_id)
 	if err != nil {
 		return common.Post{}, err
 	}
@@ -60,7 +61,7 @@ func (db SqlDatabase) GetPost(post_id int) (post common.Post, err error) {
 	}()
 
 	rows.Next()
-	if err = rows.Scan(&post.Title, &post.Content); err != nil {
+	if err = rows.Scan(&post.Id, &post.Title, &post.Content, &post.Excerpt); err != nil {
 		return common.Post{}, err
 	}
 
@@ -95,7 +96,9 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 		return err
 	}
 	defer func() {
-		err = errors.Join(tx.Rollback())
+		if commit_err := tx.Commit(); commit_err != nil {
+			err = errors.Join(err, tx.Rollback(), commit_err)
+		}
 	}()
 
 	if len(title) > 0 {
@@ -117,10 +120,6 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 		if err != nil {
 			return err
 		}
-	}
-
-	if err = tx.Commit(); err != nil {
-		return err
 	}
 
 	return nil
@@ -148,7 +147,9 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 		return err
 	}
 	defer func() {
-		err = errors.Join(tx.Rollback())
+		if commit_err := tx.Commit(); commit_err != nil {
+			err = errors.Join(err, tx.Rollback(), commit_err)
+		}
 	}()
 
 	log.Info().Msgf("adding stuff to the DB")
@@ -166,15 +167,11 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 		return err
 	}
 
-	if err = tx.Commit(); err != nil {
-		return err
-	}
-
 	return nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
-	/// Checking the DB connection
+
 	/// TODO : let user specify the DB
 	connection_str := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, address, port, database)
 	db, err := sql.Open("mysql", connection_str)
@@ -183,12 +180,18 @@ func MakeSqlConnection(user string, password string, address string, port int, d
 		return SqlDatabase{}, err
 	}
 
+<<<<<<< HEAD
 	err = db.Ping()
 
 	if err != nil {
 		return SqlDatabase{}, err
 	}
 
+=======
+	if err := db.Ping(); err != nil {
+		return SqlDatabase{}, err
+	}
+>>>>>>> 6740630ba88294a13bac80f701106e314201b989
 	// See "Important settings" section.
 	db.SetConnMaxLifetime(time.Second * 5)
 	db.SetMaxOpenConns(10)

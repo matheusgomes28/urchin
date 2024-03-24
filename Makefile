@@ -11,12 +11,15 @@ ADMIN_BINARY_NAME=urchin-admin
 
 all: build test
 
-build:
+prepare_env:
+	cp -r migrations tests/system_tests/helpers/
+
+build: prepare_env
 	$(TEMPL) generate
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
 
-test:
+test: prepare_env
 	$(GOCMD) test -v ./...
 
 clean:
@@ -24,6 +27,8 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 install-tools:
-	go install github.com/a-h/templ/cmd/templ@v0.2.543
+	go install github.com/pressly/goose/v3/cmd/goose@v3.18.0 0.2.543
+	go install github.com/a-h/templ/cmd/templ@v0.2.543 0.2.543 
+	go install github.com/cosmtrek/air@v1.49.0 
 
 .PHONY: all build test clean

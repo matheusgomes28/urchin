@@ -1,5 +1,5 @@
 # Address to the MariaDB database
-database_address = "localhost"
+database_address = "mariadb"
 
 # User to access datbaase
 database_user = "urchin"

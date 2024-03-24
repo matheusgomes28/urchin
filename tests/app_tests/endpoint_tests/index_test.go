@@ -24,7 +24,7 @@ func TestIndexSuccess(t *testing.T) {
 	}
 
 	database_mock := mocks.DatabaseMock{
-		GetPostsHandler: func() ([]common.Post, error) {
+		GetPostsHandler: func(limit int, offset int) ([]common.Post, error) {
 			return []common.Post{
 				{
 					Title:   "TestPost",
@@ -38,7 +38,7 @@ func TestIndexSuccess(t *testing.T) {
 
 	r := app.SetupRoutes(app_settings, database_mock)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/page/0", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -57,7 +57,7 @@ func TestIndexFailToGetPosts(t *testing.T) {
 	}
 
 	database_mock := mocks.DatabaseMock{
-		GetPostsHandler: func() ([]common.Post, error) {
+		GetPostsHandler: func(limit int, offset int) ([]common.Post, error) {
 			return []common.Post{}, fmt.Errorf("invalid")
 		},
 	}

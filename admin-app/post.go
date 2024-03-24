@@ -53,6 +53,13 @@ func getPostHandler(database database.Database) func(*gin.Context) {
 func postPostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var add_post_request AddPostRequest
+		if c.Request.Body == nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid request",
+				"msg":   "null request body",
+			})
+			return
+		}
 		decoder := json.NewDecoder(c.Request.Body)
 		err := decoder.Decode(&add_post_request)
 
