@@ -90,7 +90,7 @@ func TestPostFailurePostDoesntExist(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 
 }
 
@@ -116,6 +116,6 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 
 }
