@@ -64,11 +64,11 @@ func TestPostFailureStringKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 
 }
 
-func TestPostFailureNegativeKey(t *testing.T) {
+func TestPostFailurePostDoesntExist(t *testing.T) {
 
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",
