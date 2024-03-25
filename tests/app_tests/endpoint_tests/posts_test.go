@@ -9,6 +9,7 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPostSuccess(t *testing.T) {
@@ -41,7 +42,7 @@ func TestPostSuccess(t *testing.T) {
 	assert.Contains(t, w.Body.String(), "TestPost")
 }
 
-func TestPostFailure(t *testing.T) {
+func TestPostFailureStringKey(t *testing.T) {
 
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",
@@ -52,25 +53,66 @@ func TestPostFailure(t *testing.T) {
 		WebserverPort:    8080,
 	}
 
-	database_mock := mocks.DatabaseMock{
-		GetPostHandler: func(post_id int) (common.Post, error) {
-			return common.Post{
-				Title:   "TestPost",
-				Content: "TestContent",
-				Excerpt: "TestExcerpt",
-				Id:      post_id,
-			}, nil
-		},
-	}
+	database_mock := mocks.DatabaseMock{}
 
 	router := app.SetupRoutes(app_settings, database_mock)
 	responseRecorder := httptest.NewRecorder()
 
 	request, err := http.NewRequest("GET", "/post/sampleString", nil)
 
-	if err != nil {
-		t.Errorf("could not create request: %v", err)
+	require.Nil(t, err)
+
+	router.ServeHTTP(responseRecorder, request)
+
+	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+
+}
+
+func TestPostFailureNegativeKey(t *testing.T) {
+
+	app_settings := common.AppSettings{
+		DatabaseAddress:  "localhost",
+		DatabasePort:     3006,
+		DatabaseUser:     "root",
+		DatabasePassword: "root",
+		DatabaseName:     "urchin",
+		WebserverPort:    8080,
 	}
+
+	database_mock := mocks.DatabaseMock{}
+
+	router := app.SetupRoutes(app_settings, database_mock)
+	responseRecorder := httptest.NewRecorder()
+
+	request, err := http.NewRequest("GET", "/post/-1", nil)
+
+	require.Nil(t, err)
+
+	router.ServeHTTP(responseRecorder, request)
+
+	assert.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+
+}
+
+func TestPostFailureNegativeInvalidKey(t *testing.T) {
+
+	app_settings := common.AppSettings{
+		DatabaseAddress:  "localhost",
+		DatabasePort:     3006,
+		DatabaseUser:     "root",
+		DatabasePassword: "root",
+		DatabaseName:     "urchin",
+		WebserverPort:    8080,
+	}
+
+	database_mock := mocks.DatabaseMock{}
+
+	router := app.SetupRoutes(app_settings, database_mock)
+	responseRecorder := httptest.NewRecorder()
+
+	request, err := http.NewRequest("GET", "/post/10000", nil)
+
+	require.Nil(t, err)
 
 	router.ServeHTTP(responseRecorder, request)
 
