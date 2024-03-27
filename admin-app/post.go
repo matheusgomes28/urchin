@@ -3,7 +3,6 @@ package admin_app
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
@@ -16,23 +15,14 @@ func getPostHandler(database database.Database) func(*gin.Context) {
 		// localhost:8080/post/{id}
 		var post_binding common.PostIdBinding
 		if err := c.ShouldBindUri(&post_binding); err != nil {
-			c.JSON(http.StatusBadRequest, ErrorRes("could not get post id", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not get post id", err))
 			return
 		}
 
-		post_id, err := strconv.Atoi(post_binding.Id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": "invalid post id type",
-				"msg":   err.Error(),
-			})
-			return
-		}
-
-		post, err := database.GetPost(post_id)
+		post, err := database.GetPost(post_binding.Id)
 		if err != nil {
 			log.Warn().Msgf("could not get post from DB: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("post id not found", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("post id not found", err))
 			return
 		}
 
@@ -49,7 +39,7 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var add_post_request AddPostRequest
 		if c.Request.Body == nil {
-			c.JSON(http.StatusBadRequest, MsgErrorRes("no request body provided"))
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes("no request body provided"))
 			return
 		}
 		decoder := json.NewDecoder(c.Request.Body)
@@ -57,7 +47,7 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 
 		if err != nil {
 			log.Warn().Msgf("invalid post request: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("invalid request body", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("invalid request body", err))
 			return
 		}
 
@@ -68,7 +58,7 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 		)
 		if err != nil {
 			log.Error().Msgf("failed to add post: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("could not add post", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not add post", err))
 			return
 		}
 
@@ -87,7 +77,7 @@ func putPostHandler(database database.Database) func(*gin.Context) {
 		err := decoder.Decode(&change_post_request)
 		if err != nil {
 			log.Warn().Msgf("could not get post from DB: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("invalid request body", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("invalid request body", err))
 			return
 		}
 
@@ -99,7 +89,7 @@ func putPostHandler(database database.Database) func(*gin.Context) {
 		)
 		if err != nil {
 			log.Error().Msgf("failed to change post: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("could not change post", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not change post", err))
 			return
 		}
 
@@ -114,25 +104,19 @@ func deletePostHandler(database database.Database) func(*gin.Context) {
 		var delete_post_binding DeletePostBinding
 		err := c.ShouldBindUri(&delete_post_binding)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, ErrorRes("no id provided to delete post", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("no id provided to delete post", err))
 			return
 		}
 
-		post_id, err := strconv.Atoi(delete_post_binding.Id)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, ErrorRes("invalid post id type", err))
-			return
-		}
-
-		err = database.DeletePost(post_id)
+		err = database.DeletePost(delete_post_binding.Id)
 		if err != nil {
 			log.Error().Msgf("failed to delete post: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("could not delete post", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not delete post", err))
 			return
 		}
 
 		c.JSON(http.StatusOK, PostIdResponse{
-			post_id,
+			delete_post_binding.Id,
 		})
 	}
 }

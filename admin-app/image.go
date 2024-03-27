@@ -3,7 +3,6 @@ package admin_app
 import (
 	"errors"
 	"fmt"
-	"io"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -17,47 +16,27 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type AddImageRequest struct {
-	Alt string `json:"alt"`
-}
-
 // TODO : need these endpoints
 // r.GET("/images/:id", getImageHandler(&database))
 // r.POST("/images", postImageHandler(&database))
 // r.DELETE("/images", deleteImageHandler(&database))
 
-func getImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
+func getImageHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var get_image_binding common.ImageIdBinding
 		if err := c.ShouldBindUri(&get_image_binding); err != nil {
-			c.JSON(http.StatusBadRequest, ErrorRes("could not get image id", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not get image id", err))
 			return
 		}
 
 		image, err := database.GetImage(get_image_binding.Id)
 		if err != nil {
 			log.Error().Msgf("failed to get image: %v", err)
-			c.JSON(http.StatusNotFound, ErrorRes("could not get image", err))
+			c.JSON(http.StatusNotFound, common.ErrorRes("could not get image", err))
 			return
 		}
 
-		filename := fmt.Sprintf("%s%s", image.Uuid, image.Ext)
-		image_path := filepath.Join(app_settings.ImageDirectory, filename)
-		file, err := os.Open(image_path)
-		if err != nil {
-			log.Error().Msgf("failed to load saved image: %v", err)
-			c.JSON(http.StatusNotFound, ErrorRes("image not found", err))
-			return
-		}
-
-		data, err := io.ReadAll(file)
-		if err != nil {
-			log.Error().Msgf("failed to load saved image: %v", err)
-			c.JSON(http.StatusNotFound, ErrorRes("image not found", err))
-			return
-		}
-
-		c.Data(http.StatusOK, GetContentTypeFromData(data), data)
+		c.JSON(http.StatusOK, image)
 	}
 }
 
@@ -67,7 +46,7 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 		form, err := c.MultipartForm()
 		if err != nil {
 			log.Error().Msgf("could not create multipart form: %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("request type must be `multipart-form`", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("request type must be `multipart-form`", err))
 			return
 		}
 
@@ -88,30 +67,25 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 		}
 
 		file := file_array[0]
-		if file == nil {
-			log.Error().Msgf("could not upload file: %v", err)
-			return
-		}
-
 		allowed_types := []string{"image/jpeg", "image/png", "image/gif"}
 		file_content_type := file.Header.Get("content-type")
 		if !slices.Contains(allowed_types, file_content_type) {
 			log.Error().Msgf("file type not supported")
-			c.JSON(http.StatusBadRequest, MsgErrorRes("file type not supported"))
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes("file type not supported"))
 			return
 		}
 
-		detected_content_type, err := GetContentType(file)
+		detected_content_type, err := getContentType(file)
 		if err != nil || detected_content_type != file_content_type {
 			log.Error().Msgf("the provided file does not match the provided content type")
-			c.JSON(http.StatusBadRequest, MsgErrorRes("provided file content is not allowed"))
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes("provided file content is not allowed"))
 			return
 		}
 
 		uuid, err := uuid.New()
 		if err != nil {
 			log.Error().Msgf("could not create the UUID: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorRes("cannot create unique identifier", err))
+			c.JSON(http.StatusInternalServerError, common.ErrorRes("cannot create unique identifier", err))
 			return
 		}
 
@@ -120,7 +94,7 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 		// check ext is supported
 		if ext == "" && slices.Contains(allowed_extensions, ext) {
 			log.Error().Msgf("file extension is not supported %v", err)
-			c.JSON(http.StatusBadRequest, ErrorRes("file extension is not supported", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("file extension is not supported", err))
 			return
 		}
 
@@ -129,7 +103,7 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 		err = c.SaveUploadedFile(file, image_path)
 		if err != nil {
 			log.Error().Msgf("could not save file: %v", err)
-			c.JSON(http.StatusInternalServerError, ErrorRes("failed to upload image", err))
+			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to upload image", err))
 			return
 		}
 		// End saving to filesystem
@@ -143,7 +117,7 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 				log.Error().Msgf("could not remove image: %v", err)
 				err = errors.Join(err, os_err)
 			}
-			c.JSON(http.StatusInternalServerError, ErrorRes("failed to save image", err))
+			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to save image", err))
 			return
 		}
 
@@ -158,14 +132,14 @@ func deleteImageHandler(app_settings common.AppSettings, database database.Datab
 		var delete_image_binding DeleteImageBinding
 		err := c.ShouldBindUri(&delete_image_binding)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, ErrorRes("no id provided to delete image", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("no id provided to delete image", err))
 			return
 		}
 
 		image, err := database.GetImage(delete_image_binding.Id)
 		if err != nil {
 			log.Error().Msgf("failed to delete image: %v", err)
-			c.JSON(http.StatusNotFound, ErrorRes("could not delete image", err))
+			c.JSON(http.StatusNotFound, common.ErrorRes("could not delete image", err))
 			return
 		}
 
@@ -180,7 +154,7 @@ func deleteImageHandler(app_settings common.AppSettings, database database.Datab
 		err = database.DeleteImage(delete_image_binding.Id)
 		if err != nil {
 			log.Error().Msgf("failed to delete image with id %s: %v", delete_image_binding.Id, err)
-			c.JSON(http.StatusNotFound, ErrorRes("could not delete image", err))
+			c.JSON(http.StatusNotFound, common.ErrorRes("could not delete image", err))
 			return
 		}
 
@@ -190,7 +164,7 @@ func deleteImageHandler(app_settings common.AppSettings, database database.Datab
 	}
 }
 
-func GetContentType(file_header *multipart.FileHeader) (string, error) {
+func getContentType(file_header *multipart.FileHeader) (string, error) {
 	// Check if the content matches the provided type.
 	image_file, err := file_header.Open()
 	if err != nil {
@@ -205,9 +179,9 @@ func GetContentType(file_header *multipart.FileHeader) (string, error) {
 		log.Error().Msgf("could not read into temp buffer")
 		return "", read_err
 	}
-	return GetContentTypeFromData(tmp_buffer), nil
+	return getContentTypeFromData(tmp_buffer), nil
 }
 
-func GetContentTypeFromData(data []byte) string {
+func getContentTypeFromData(data []byte) string {
 	return http.DetectContentType(data[:512])
 }

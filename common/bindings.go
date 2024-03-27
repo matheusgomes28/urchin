@@ -1,14 +1,17 @@
 package common
 
-type IdBinding struct {
+type IntIdBinding struct {
+	Id int `uri:"id" binding:"required"`
+}
+
+type StringIdBinding struct {
 	Id string `uri:"id" binding:"required"`
 }
 
-// TODO: Think this trough. Do we really need special bindings for every entity type?
 type PostIdBinding struct {
-	IdBinding
+	IntIdBinding
 }
 
 type ImageIdBinding struct {
-	IdBinding
+	StringIdBinding
 }

@@ -241,18 +241,17 @@ func TestGetImage(t *testing.T) {
 
 	assert.Equal(t, 200, get_recorder.Code)
 
-	assert.Equal(t, "image/png", get_recorder.Result().Header.Get("Content-Type"))
+	var image common.Image
+	err := json.Unmarshal(get_recorder.Body.Bytes(), &image)
+	assert.Nil(t, err)
+
+	assert.Equal(t, image.Uuid, response.Id)
 }
 
 func TestGetImageNoDatabaseEntry(t *testing.T) {
 	database_mock := mocks.DatabaseMock{
 		GetImageHandler: func(id string) (common.Image, error) {
-			return common.Image{
-				Uuid:    id,
-				Name:    "test",
-				AltText: "default",
-				Ext:     ".png",
-			}, nil
+			return common.Image{}, errors.New("Test")
 		},
 	}
 

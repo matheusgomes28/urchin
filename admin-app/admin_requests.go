@@ -7,7 +7,7 @@ import "github.com/matheusgomes28/urchin/common"
 // CRUD endpoints has their own structures to handle the http methods.
 
 type DeletePostBinding struct {
-	common.IdBinding
+	common.IntIdBinding
 }
 
 type AddPostRequest struct {
@@ -23,6 +23,10 @@ type ChangePostRequest struct {
 	Content string `json:"content"`
 }
 
+type AddImageRequest struct {
+	Alt string `json:"alt"`
+}
+
 type DeleteImageBinding struct {
-	common.IdBinding
+	common.StringIdBinding
 }

@@ -12,6 +12,7 @@ type DatabaseMock struct {
 	AddImageHandler    func(string, string, string, string) error
 	GetImageHandler    func(string) (common.Image, error)
 	DeleteImageHandler func(string) error
+	GetImagesHandler   func(int, int) ([]common.Image, error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -44,4 +45,8 @@ func (db DatabaseMock) GetImage(id string) (common.Image, error) {
 
 func (db DatabaseMock) DeleteImage(id string) error {
 	return db.DeleteImageHandler(id)
+}
+
+func (db DatabaseMock) GetImages(limit int, offset int) ([]common.Image, error) {
+	return db.GetImagesHandler(limit, offset)
 }

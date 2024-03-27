@@ -19,6 +19,7 @@ type Database interface {
 	AddImage(uuid string, name string, alt string, ext string) error
 	GetImage(uuid string) (common.Image, error)
 	DeleteImage(uuid string) error
+	GetImages(offset int, limit int) ([]common.Image, error)
 }
 
 type SqlDatabase struct {
@@ -197,6 +198,28 @@ func (db SqlDatabase) GetImage(image_id string) (image common.Image, err error) 
 func (db SqlDatabase) DeleteImage(image_id string) error {
 	_, err := db.Connection.Exec("DELETE FROM images WHERE uuid=?;", image_id)
 	return err
+}
+
+func (db SqlDatabase) GetImages(offset int, limit int) (all_images []common.Image, err error) {
+	query := "SELECT uuid, name, alt, ext FROM images LIMIT ? OFFSET ?;"
+
+	rows, err := db.Connection.Query(query, limit, offset)
+	if err != nil {
+		return make([]common.Image, 0), err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	for rows.Next() {
+		var image common.Image
+		if err = rows.Scan(&image.Uuid, &image.Name, &image.AltText, &image.Ext); err != nil {
+			return make([]common.Image, 0), err
+		}
+		all_images = append(all_images, image)
+	}
+
+	return all_images, nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
