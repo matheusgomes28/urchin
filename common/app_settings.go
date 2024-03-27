@@ -4,18 +4,24 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/BurntSushi/toml"
 )
 
+type CardSchema struct {
+	Name string `toml:"schema_name"`
+}
+
 type AppSettings struct {
-	DatabaseAddress  string `toml:"database_address"`
-	DatabasePort     int    `toml:"database_port"`
-	DatabaseUser     string `toml:"database_user"`
-	DatabasePassword string `toml:"database_password"`
-	DatabaseName     string `toml:"database_name"`
-	WebserverPort    int    `toml:"webserver_port"`
-	ImageDirectory   string `toml:"image_dir"`
+	DatabaseAddress  string       `toml:"database_address"`
+	DatabasePort     int          `toml:"database_port"`
+	DatabaseUser     string       `toml:"database_user"`
+	DatabasePassword string       `toml:"database_password"`
+	DatabaseName     string       `toml:"database_name"`
+	WebserverPort    int          `toml:"webserver_port"`
+	ImageDirectory   string       `toml:"image_dir"`
+	CardSchemas      []CardSchema `toml:"card_schema"`
 }
 
 func LoadSettings() (AppSettings, error) {
@@ -62,7 +68,7 @@ func LoadSettings() (AppSettings, error) {
 
 	image_directory := os.Getenv("URCHIN_IMAGE_DIRECTORY")
 	if len(image_directory) == 0 {
-		return AppSettings{}, fmt.Errorf("URCHIN_IMAGE_DIRECTORY is not defined\n")
+		return AppSettings{}, fmt.Errorf("URCHIN_IMAGE_DIRECTORY is not defined")
 	}
 
 	return AppSettings{
@@ -78,8 +84,19 @@ func LoadSettings() (AppSettings, error) {
 
 func ReadConfigToml(filepath string) (AppSettings, error) {
 	var config AppSettings
-	_, err := toml.DecodeFile(filepath, &config)
+	metadata, err := toml.DecodeFile(filepath, &config)
 	if err != nil {
+		return AppSettings{}, err
+	}
+
+	if undecoded_keys := metadata.Undecoded(); len(undecoded_keys) > 0 {
+		err := fmt.Errorf("could not decode keys: ")
+
+		for _, key := range undecoded_keys {
+			metadata.Keys()
+			err = fmt.Errorf("%v %v,", err, strings.Join(key, "."))
+		}
+
 		return AppSettings{}, err
 	}
 

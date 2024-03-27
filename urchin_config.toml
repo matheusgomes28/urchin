@@ -1,5 +1,6 @@
 # Address to the MariaDB database
-database_address = "localhost"
+# for local runs, change to "localhost"
+database_address = "mariadb"
 
 # User to access datbaase
 database_user = "urchin"
@@ -19,3 +20,9 @@ webserver_port = 8080
 
 # Directory to use for storing uploaded images.
 image_dir = "./images"
+
+[[card_schema]]
+schema_name = "schema1"
+
+[[card_schema]]
+schema_name = "schema2"

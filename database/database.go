@@ -4,19 +4,34 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 type Database interface {
+<<<<<<< HEAD
 	GetPosts(int, int) ([]common.Post, error)
+=======
+
+	// Post related stuff
+	GetPosts() ([]common.Post, error)
+>>>>>>> 446f776 (Adding basic support for flexible cards)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
 	DeletePost(id int) error
+
+	// Image related stuff
 	AddImage(uuid string, name string, alt string) error
+
+	// Card related stuff
+	AddCard(uuid string, image_location string, json_data string, schema_name string) error
+	GetCard(uuid int) (common.Card, error)
 }
 
 type SqlDatabase struct {
@@ -168,6 +183,103 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 	}
 
 	return nil
+}
+
+func (db SqlDatabase) AddCard(uuid string, image_location string, json_data string, schema_name string) (err error) {
+	// Check that the file exists and is a file
+	// not a directory. Ideally, check the ext
+	if image_location == "" {
+		return fmt.Errorf("cannot have image")
+	}
+	image_stat, err := os.Stat(image_location)
+	if errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("file does not exist: %s", image_location)
+	}
+	if err != nil {
+		return err
+	}
+	if image_stat.IsDir() {
+		return fmt.Errorf("given path is a directory: %s", image_location)
+	}
+
+	// Load the schema
+	// TODO : probably pass the schema data instead
+	if json_data == "" {
+		return fmt.Errorf("cannot have empty data")
+	}
+
+	if schema_name == "" {
+		return fmt.Errorf("cannot have an empty schema name")
+	}
+
+	_, err = validateJson(json_data, schema_name)
+	if err != nil {
+		return err
+	}
+
+	// Insert everything to the DB
+	tx, err := db.Connection.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if commit_err := tx.Commit(); commit_err != nil {
+			err = errors.Join(err, tx.Rollback(), commit_err)
+		}
+	}()
+
+	query := "INSERT INTO cards(uuid, image_location, json_data, json_schema) VALUES(?, ?, ?, ?);"
+	_, err = tx.Exec(query, uuid, image_location, json_data, schema_name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// / This function gets a post from the database
+// / with the given ID.
+func (db SqlDatabase) GetCard(uuid int) (card common.Card, err error) {
+	rows, err := db.Connection.Query("SELECT image_location, json_data, json_schema FROM cards WHERE uuid=?;", uuid)
+	if err != nil {
+		return common.Card{}, err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	rows.Next()
+	if err = rows.Scan(&card.ImageLocation, &card.JsonData, &card.SchemaName); err != nil {
+		return common.Card{}, err
+	}
+
+	// Validate the json
+	validateJson(card.JsonData, card.SchemaName)
+
+	return card, nil
+}
+
+func validateJson(json_data string, schema_name string) (bool, error) { 
+	schema_data, err := os.ReadFile(filepath.Join("schemas", fmt.Sprintf("%s.json", schema_name)))
+	if err != nil {
+		return false, err
+	}
+
+	schemaLoader := gojsonschema.NewBytesLoader(schema_data)
+	documentLoader := gojsonschema.NewStringLoader(json_data)
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	if err != nil {
+		return false, fmt.Errorf("could not read json_data: %v", err)
+	}
+	if !result.Valid() {
+		json_err := fmt.Errorf("invalid card json: ")
+		for _, e := range result.Errors() {
+			json_err = fmt.Errorf("%v %s", json_err, e)
+		}
+		return false, json_err
+	}
+
+	return true, nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {

@@ -6,3 +6,10 @@ type Post struct {
 	Excerpt string
 	Id      int
 }
+
+type Card struct {
+	Uuid          string
+	ImageLocation string
+	JsonData      string
+	SchemaName    string
+}
