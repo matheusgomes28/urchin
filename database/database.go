@@ -16,7 +16,10 @@ type Database interface {
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
 	DeletePost(id int) error
-	AddImage(uuid string, name string, alt string) error
+	AddImage(uuid string, name string, alt string, ext string) error
+	GetImage(uuid string) (common.Image, error)
+	DeleteImage(uuid string) error
+	GetImages(offset int, limit int) ([]common.Image, error)
 }
 
 type SqlDatabase struct {
@@ -140,8 +143,9 @@ func (db SqlDatabase) DeletePost(id int) error {
 // database.
 // name - file name saved to the disk
 // alt - the alternative text
+// ext - the file extension needed for loading the image
 // returns (uuid, nil) if succeeded, ("", err) otherwise
-func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error) {
+func (db SqlDatabase) AddImage(uuid string, name string, alt string, ext string) (err error) {
 	tx, err := db.Connection.Begin()
 	if err != nil {
 		return err
@@ -161,13 +165,61 @@ func (db SqlDatabase) AddImage(uuid string, name string, alt string) (err error)
 		return fmt.Errorf("cannot have empty alt text")
 	}
 
-	query := "INSERT INTO images(uuid, name, alt) VALUES(?, ?, ?);"
-	_, err = tx.Exec(query, uuid, name, alt)
+	if ext == "" {
+		return fmt.Errorf("cannot have empty extension text")
+	}
+
+	query := "INSERT INTO images(uuid, name, alt, ext) VALUES(?, ?, ?, ?);"
+	_, err = tx.Exec(query, uuid, name, alt, ext)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (db SqlDatabase) GetImage(image_id string) (image common.Image, err error) {
+	rows, err := db.Connection.Query("SELECT uuid, name, alt, ext FROM images WHERE uuid=?;", image_id)
+	if err != nil {
+		return common.Image{}, err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	rows.Next()
+	if err = rows.Scan(&image.Uuid, &image.Name, &image.AltText, &image.Ext); err != nil {
+		return common.Image{}, err
+	}
+
+	return image, nil
+}
+
+func (db SqlDatabase) DeleteImage(image_id string) error {
+	_, err := db.Connection.Exec("DELETE FROM images WHERE uuid=?;", image_id)
+	return err
+}
+
+func (db SqlDatabase) GetImages(offset int, limit int) (all_images []common.Image, err error) {
+	query := "SELECT uuid, name, alt, ext FROM images LIMIT ? OFFSET ?;"
+
+	rows, err := db.Connection.Query(query, limit, offset)
+	if err != nil {
+		return make([]common.Image, 0), err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	for rows.Next() {
+		var image common.Image
+		if err = rows.Scan(&image.Uuid, &image.Name, &image.AltText, &image.Ext); err != nil {
+			return make([]common.Image, 0), err
+		}
+		all_images = append(all_images, image)
+	}
+
+	return all_images, nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {

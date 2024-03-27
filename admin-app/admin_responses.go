@@ -1,0 +1,23 @@
+package admin_app
+
+type PostIdResponse struct {
+	Id int `json:"id"`
+}
+
+type GetPostResponse struct {
+	Id      int    `json:"id"`
+	Title   string `json:"title"`
+	Excerpt string `json:"excerpt"`
+	Content string `json:"content"`
+}
+
+type ImageIdResponse struct {
+	Id string `json:"id"`
+}
+
+type GetImageResponse struct {
+	Id        string `json:"id"`
+	Name      string `json:"name"`
+	AltText   string `json:"alt_text"`
+	Extension string `json:"extension"`
+}

@@ -35,7 +35,7 @@ func TestPostSuccess(t *testing.T) {
 
 	r := app.SetupRoutes(app_settings, database_mock)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/post/0", nil)
+	req, _ := http.NewRequest("GET", "/post/1", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)

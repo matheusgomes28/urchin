@@ -2,7 +2,6 @@ package app
 
 import (
 	"bytes"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
@@ -13,10 +12,6 @@ import (
 	"github.com/matheusgomes28/urchin/views"
 	"github.com/rs/zerolog/log"
 )
-
-type PostBinding struct {
-	Id string `uri:"id" binding:"required"`
-}
 
 func mdToHTML(md []byte) []byte {
 	// create markdown parser with extensions
@@ -33,20 +28,13 @@ func mdToHTML(md []byte) []byte {
 }
 
 func postHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
-	// localhost:8080/post/{id}
-
-	var post_binding PostBinding
+	var post_binding common.PostIdBinding
 	if err := c.ShouldBindUri(&post_binding); err != nil {
 		return nil, err
 	}
 
 	// Get the post with the ID
-	post_id, err := strconv.Atoi(post_binding.Id)
-	if err != nil {
-		return nil, err
-	}
-
-	post, err := database.GetPost(post_id)
+	post, err := database.GetPost(post_binding.Id)
 	if err != nil {
 		return nil, err
 	}

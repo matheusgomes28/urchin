@@ -7,9 +7,12 @@ import (
 )
 
 type DatabaseMock struct {
-	GetPostHandler  func(int) (common.Post, error)
-	GetPostsHandler func(int, int) ([]common.Post, error)
-	AddImageHandler func(string, string, string) error
+	GetPostHandler     func(int) (common.Post, error)
+	GetPostsHandler    func(int, int) ([]common.Post, error)
+	AddImageHandler    func(string, string, string, string) error
+	GetImageHandler    func(string) (common.Image, error)
+	DeleteImageHandler func(string) error
+	GetImagesHandler   func(int, int) ([]common.Image, error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -32,6 +35,18 @@ func (db DatabaseMock) DeletePost(id int) error {
 	return fmt.Errorf("not implemented")
 }
 
-func (db DatabaseMock) AddImage(id string, file_name string, alt_text string) error {
-	return db.AddImageHandler(id, file_name, alt_text)
+func (db DatabaseMock) AddImage(id string, file_name string, alt_text string, ext string) error {
+	return db.AddImageHandler(id, file_name, alt_text, ext)
+}
+
+func (db DatabaseMock) GetImage(id string) (common.Image, error) {
+	return db.GetImageHandler(id)
+}
+
+func (db DatabaseMock) DeleteImage(id string) error {
+	return db.DeleteImageHandler(id)
+}
+
+func (db DatabaseMock) GetImages(limit int, offset int) ([]common.Image, error) {
+	return db.GetImagesHandler(limit, offset)
 }

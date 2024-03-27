@@ -26,6 +26,11 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
+	addCachableHandler(r, "GET", "/images/:id", imageHandler, &cache, app_settings, database)
+	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
+
+	// This endpoint should be used to fetch the images from the backend
+	r.GET("/data/images/:id", getImageHandler(app_settings, database))
 
 	// Add the pagination route as a cacheable endpoint
 	addCachableHandler(r, "GET", "/page/:num", homeHandler, &cache, app_settings, database)
@@ -52,10 +57,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		if err != nil {
 			log.Error().Msgf("could not generate html: %v", err)
 			// TODO : Need a proper error page
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "could not render HTML",
-				"msg":   err.Error(),
-			})
+			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
 			return
 		}
 

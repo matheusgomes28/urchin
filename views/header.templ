@@ -1,15 +1,10 @@
 package views
 
-type Link struct {
-    Href string
-    Name string
-}
-
-templ MakeNavBar(links []Link) {
+templ MakeNavBar() {
     <header>
         <nav>
             <ul>
-                for _, link := range links {
+                for _, link := range GetUrchinLinks() {
                     <li><a href={templ.URL(link.Href)}>{ link.Name }</a></li> // Pass the links in here
                 }
             </ul>
