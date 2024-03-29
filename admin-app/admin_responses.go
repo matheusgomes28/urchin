@@ -16,7 +16,7 @@ type ImageIdResponse struct {
 }
 
 type GetImageResponse struct {
-	Id        string `json:"id"`
+	Id        string `json:"uuid"`
 	Name      string `json:"name"`
 	AltText   string `json:"alt_text"`
 	Extension string `json:"extension"`
