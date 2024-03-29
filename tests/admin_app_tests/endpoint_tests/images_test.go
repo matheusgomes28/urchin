@@ -5,18 +5,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"image"
 	"image/png"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"net/textproto"
 	"testing"
 
 	"github.com/fossoreslp/go-uuid-v4"
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/tests/helpers"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,20 +41,11 @@ func TestPostImage(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
-
-		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		err = png.Encode(part, helpers.CreateImage())
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -87,16 +77,12 @@ func TestPostImageNotAnImageFile(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
 		text := bytes.NewBufferString("This is some dumy text to check the content test")
 		_, err = io.Copy(part, text)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -122,21 +108,14 @@ func TestPostImageWrongFileContentType(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "application/json")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "application/json")
+		require.Nil(t, err)
+		require.Nil(t, err)
 
-		img := createImage()
-
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -162,20 +141,13 @@ func TestPostImageFailedToCreateDatabaseEntry(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -210,20 +182,13 @@ func TestGetImage(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	// TODO: We have to create the image first. Maybe there's a better way to do this?
@@ -315,20 +280,13 @@ func TestDeleteImage(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	// TODO: We have to create the image first. Maybe there's a better way to do this?
@@ -401,23 +359,4 @@ func TestDeleteImageNoImageFile(t *testing.T) {
 	r.ServeHTTP(delete_recorder, req)
 
 	assert.Equal(t, 200, delete_recorder.Code)
-}
-
-func createTestForm(writer *multipart.Writer, fieldname string, filename string, contentType string) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition",
-		fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldname, filename))
-	h.Set("Content-Type", contentType)
-	return writer.CreatePart(h)
-}
-
-// Creating an image in memory for testing: https://yourbasic.org/golang/create-image/
-func createImage() image.Image {
-	width := 1
-	height := 1
-
-	upLeft := image.Point{0, 0}
-	lowRight := image.Point{width, height}
-
-	return image.NewRGBA(image.Rectangle{upLeft, lowRight})
 }

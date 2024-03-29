@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/matheusgomes28/urchin/app"
-	"github.com/matheusgomes28/urchin/tests/system_tests/helpers"
+	"github.com/matheusgomes28/urchin/tests/helpers"
 	"github.com/pressly/goose/v3"
 )
 

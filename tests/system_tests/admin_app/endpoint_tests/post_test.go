@@ -1,4 +1,4 @@
-package admin_post_tests
+package admin_endpoint_tests
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
-	"github.com/matheusgomes28/urchin/tests/system_tests/helpers"
+	"github.com/matheusgomes28/urchin/tests/helpers"
 	"github.com/pressly/goose/v3"
 )
 
