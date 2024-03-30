@@ -5,3 +5,6 @@ tmp/
 
 tests/system_tests/helpers/migrations
 images/
+
+
+tests/helpers/migrations
