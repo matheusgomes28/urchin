@@ -64,7 +64,7 @@ func TestPostFailureStringKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 
 }
 
