@@ -2,6 +2,8 @@ package app
 
 import (
 	"bytes"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
@@ -36,6 +38,39 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	// Get the post with the ID
 	post, err := database.GetPost(post_binding.Id)
 	if err != nil {
+		return nil, err
+	}
+
+	// Generate HTML page
+	post.Content = string(mdToHTML([]byte(post.Content)))
+	post_view := views.MakePostPage(post.Title, post.Content)
+	html_buffer := bytes.NewBuffer(nil)
+	if err = post_view.Render(c, html_buffer); err != nil {
+		log.Error().Msgf("could not render: %v", err)
+	}
+
+	return html_buffer.Bytes(), nil
+}
+
+func updatedPostHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
+
+	// Get the post ID from the URL
+
+	postIDStr := c.Param("id")
+
+	// converting our postID string to an integer
+	postID, err := strconv.Atoi(postIDStr)
+
+	if err != nil || postID < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+
+		return nil, err
+	}
+
+	// Get the post with the ID
+	post, err := database.GetPost(postID)
+	if err != nil || post.Content == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post Not Found"})
 		return nil, err
 	}
 
