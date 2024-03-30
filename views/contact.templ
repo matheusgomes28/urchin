@@ -14,12 +14,7 @@ templ MakeContactPage() {
     </head>
 
     <body>
-        @MakeNavBar([]Link{
-            {Name: "Home", Href: "/"},
-            {Name: "About", Href: "/about"},
-            {Name: "Services", Href: "/services"},
-            {Name: "Contact", Href: "/contact"},
-        })
+        @MakeNavBar()
         <main>
             <div id="contact-form">
                 <h2>Contact Us</h2>

@@ -23,6 +23,8 @@ jobs:
       run: |
         make prepare_env
         go test -coverprofile=coverage.out -covermode=atomic ./... -v
+        cat coverage.out | grep -v "urchin/tests" > coverage_source_only.out
+        rm coverage.out
 
     - name: Upload coverage to Codecov 📓
       uses: codecov/codecov-action@v3

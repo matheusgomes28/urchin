@@ -1,6 +1,7 @@
 package endpoint_tests
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,7 +36,7 @@ func TestPostSuccess(t *testing.T) {
 
 	r := app.SetupRoutes(app_settings, database_mock)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/post/0", nil)
+	req, _ := http.NewRequest("GET", "/post/1", nil)
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -64,7 +65,11 @@ func TestPostFailureStringKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
+<<<<<<< HEAD
 	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+=======
+	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 
 }
 
@@ -79,19 +84,34 @@ func TestPostFailurePostDoesntExist(t *testing.T) {
 		WebserverPort:    8080,
 	}
 
+<<<<<<< HEAD
 	database_mock := mocks.DatabaseMock{}
+=======
+	database_mock := mocks.DatabaseMock{
+		GetPostHandler: func(int) (common.Post, error) {
+			return common.Post{}, fmt.Errorf("post doesn't exist")
+		},
+	}
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 
 	router := app.SetupRoutes(app_settings, database_mock)
 	responseRecorder := httptest.NewRecorder()
 
+<<<<<<< HEAD
 	request, err := http.NewRequest("GET", "/post/-1", nil)
+=======
+	request, err := http.NewRequest("GET", "/post/10000", nil)
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 
 	require.Nil(t, err)
 
 	router.ServeHTTP(responseRecorder, request)
 
 	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+<<<<<<< HEAD
 
+=======
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 }
 
 func TestPostFailureNegativeInvalidKey(t *testing.T) {
@@ -105,17 +125,32 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 		WebserverPort:    8080,
 	}
 
+<<<<<<< HEAD
 	database_mock := mocks.DatabaseMock{}
+=======
+	database_mock := mocks.DatabaseMock{
+		GetPostHandler: func(int) (common.Post, error) {
+			return common.Post{}, fmt.Errorf("post doesn't exist")
+		},
+	}
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 
 	router := app.SetupRoutes(app_settings, database_mock)
 	responseRecorder := httptest.NewRecorder()
 
+<<<<<<< HEAD
 	request, err := http.NewRequest("GET", "/post/10000", nil)
+=======
+	request, err := http.NewRequest("GET", "/post/-1", nil)
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 
 	require.Nil(t, err)
 
 	router.ServeHTTP(responseRecorder, request)
 
 	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+<<<<<<< HEAD
 
+=======
+>>>>>>> e28a20d04683848c00887850547c494c16315819
 }

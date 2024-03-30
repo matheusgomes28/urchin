@@ -1,7 +1,11 @@
 package views
 
+import (
+    "fmt"
+    . "github.com/matheusgomes28/urchin/common"
+)
 
-templ MakePostPage(title string, content string) {
+templ MakeImagePage(image Image) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -18,10 +22,12 @@ templ MakePostPage(title string, content string) {
         @MakeNavBar()
         <main>
             <article>
-                <h2>{ title }</h2>
-                <p>@templ.Raw(content)</p>
+            <h3>{ image.Name }</h3>
+            <img src={fmt.Sprintf("/data/images/%s", image.Uuid)} alt={image.AltText} />
+            <p>{ image.AltText }</p>
             </article>
         </main>
+        <a href={templ.URL("/images")}>Back</a>
     
         @MakeFooter()
     </body>

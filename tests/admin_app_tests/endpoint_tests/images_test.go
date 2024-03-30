@@ -5,19 +5,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"image"
-	"image/color"
 	"image/png"
 	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"net/textproto"
 	"testing"
 
+	"github.com/fossoreslp/go-uuid-v4"
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
+	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/tests/helpers"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type imageResponse struct {
@@ -26,7 +27,7 @@ type imageResponse struct {
 
 func TestPostImage(t *testing.T) {
 	database_mock := mocks.DatabaseMock{
-		AddImageHandler: func(id string, file_name string, alt_text string) error {
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
 			return nil
 		},
 	}
@@ -40,20 +41,11 @@ func TestPostImage(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
-
-		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		err = png.Encode(part, helpers.CreateImage())
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -71,7 +63,7 @@ func TestPostImage(t *testing.T) {
 
 func TestPostImageNotAnImageFile(t *testing.T) {
 	database_mock := mocks.DatabaseMock{
-		AddImageHandler: func(id string, file_name string, alt_text string) error {
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
 			return nil
 		},
 	}
@@ -85,16 +77,12 @@ func TestPostImageNotAnImageFile(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
 		text := bytes.NewBufferString("This is some dumy text to check the content test")
 		_, err = io.Copy(part, text)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -106,7 +94,7 @@ func TestPostImageNotAnImageFile(t *testing.T) {
 
 func TestPostImageWrongFileContentType(t *testing.T) {
 	database_mock := mocks.DatabaseMock{
-		AddImageHandler: func(id string, file_name string, alt_text string) error {
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
 			return nil
 		},
 	}
@@ -120,21 +108,14 @@ func TestPostImageWrongFileContentType(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "application/json")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "application/json")
+		require.Nil(t, err)
+		require.Nil(t, err)
 
-		img := createImage()
-
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -146,7 +127,7 @@ func TestPostImageWrongFileContentType(t *testing.T) {
 
 func TestPostImageFailedToCreateDatabaseEntry(t *testing.T) {
 	database_mock := mocks.DatabaseMock{
-		AddImageHandler: func(id string, file_name string, alt_text string) error {
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
 			return errors.New("test error")
 		},
 	}
@@ -160,20 +141,13 @@ func TestPostImageFailedToCreateDatabaseEntry(t *testing.T) {
 	go func() {
 		defer writer.Close()
 
-		part, err := createTestForm(writer, "file", "test.png", "image/png")
-		if err != nil {
-			t.Error(err)
-		}
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
 
-		img := createImage()
-		if err != nil {
-			t.Error(err)
-		}
+		img := helpers.CreateImage()
 
 		err = png.Encode(part, img)
-		if err != nil {
-			t.Error(err)
-		}
+		require.Nil(t, err)
 	}()
 
 	req, _ := http.NewRequest("POST", "/images", pr)
@@ -181,42 +155,208 @@ func TestPostImageFailedToCreateDatabaseEntry(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, 500, w.Code)
-
 }
 
-func createTestForm(writer *multipart.Writer, fieldname string, filename string, contentType string) (io.Writer, error) {
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Disposition",
-		fmt.Sprintf(`form-data; name="%s"; filename="%s"`, fieldname, filename))
-	h.Set("Content-Type", contentType)
-	return writer.CreatePart(h)
-}
+func TestGetImage(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
+			return nil
+		},
 
-// Creating an image in memory for testing: https://yourbasic.org/golang/create-image/
-func createImage() image.Image {
-	width := 200
-	height := 100
-
-	upLeft := image.Point{0, 0}
-	lowRight := image.Point{width, height}
-
-	img := image.NewRGBA(image.Rectangle{upLeft, lowRight})
-
-	// Colors are defined by Red, Green, Blue, Alpha uint8 values.
-	cyan := color.RGBA{100, 200, 200, 0xff}
-
-	// Set color for each pixel.
-	for x := 0; x < width; x++ {
-		for y := 0; y < height; y++ {
-			switch {
-			case x < width/2 && y < height/2: // upper left quadrant
-				img.Set(x, y, cyan)
-			case x >= width/2 && y >= height/2: // lower right quadrant
-				img.Set(x, y, color.White)
-			default:
-			}
-		}
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{
+				Uuid:    id,
+				Name:    "test",
+				AltText: "default",
+				Ext:     ".png",
+			}, nil
+		},
 	}
 
-	return img
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+	post_recorder := httptest.NewRecorder()
+
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
+
+	go func() {
+		defer writer.Close()
+
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
+
+		img := helpers.CreateImage()
+
+		err = png.Encode(part, img)
+		require.Nil(t, err)
+	}()
+
+	// TODO: We have to create the image first. Maybe there's a better way to do this?
+	req, _ := http.NewRequest("POST", "/images", pr)
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+	r.ServeHTTP(post_recorder, req)
+
+	var response imageResponse
+	_ = json.Unmarshal(post_recorder.Body.Bytes(), &response)
+
+	get_recorder := httptest.NewRecorder()
+	uri := fmt.Sprintf("/images/%s", response.Id)
+	req, _ = http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(get_recorder, req)
+
+	assert.Equal(t, 200, get_recorder.Code)
+
+	var image common.Image
+	err := json.Unmarshal(get_recorder.Body.Bytes(), &image)
+	assert.Nil(t, err)
+
+	assert.Equal(t, image.Uuid, response.Id)
+}
+
+func TestGetImageNoDatabaseEntry(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{}, errors.New("Test")
+		},
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+
+	get_recorder := httptest.NewRecorder()
+	uuid, _ := uuid.New()
+
+	uri := fmt.Sprintf("/images/%s", uuid.String())
+	req, _ := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(get_recorder, req)
+
+	assert.Equal(t, 404, get_recorder.Code)
+}
+
+func TestGetImageNoImageFile(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{}, errors.New("failed")
+		},
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+
+	get_recorder := httptest.NewRecorder()
+	uuid, _ := uuid.New()
+
+	uri := fmt.Sprintf("/images/%s", uuid.String())
+	req, _ := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(get_recorder, req)
+
+	assert.Equal(t, 404, get_recorder.Code)
+}
+
+func TestDeleteImage(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		AddImageHandler: func(id string, file_name string, alt_text string, ext string) error {
+			return nil
+		},
+
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{
+				Uuid:    id,
+				Name:    "test",
+				AltText: "default",
+				Ext:     ".png",
+			}, nil
+		},
+
+		DeleteImageHandler: func(string) error {
+			return nil
+		},
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+	post_recorder := httptest.NewRecorder()
+
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
+
+	go func() {
+		defer writer.Close()
+
+		part, err := helpers.CreateFormImagePart(writer, "file", "test.png", "image/png")
+		require.Nil(t, err)
+
+		img := helpers.CreateImage()
+
+		err = png.Encode(part, img)
+		require.Nil(t, err)
+	}()
+
+	// TODO: We have to create the image first. Maybe there's a better way to do this?
+	req, _ := http.NewRequest("POST", "/images", pr)
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+	r.ServeHTTP(post_recorder, req)
+
+	var response imageResponse
+	_ = json.Unmarshal(post_recorder.Body.Bytes(), &response)
+
+	delete_recorder := httptest.NewRecorder()
+	uri := fmt.Sprintf("/images/%s", response.Id)
+	req, _ = http.NewRequest("DELETE", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(delete_recorder, req)
+
+	assert.Equal(t, 200, delete_recorder.Code)
+
+	var image_id_response admin_app.ImageIdResponse
+
+	err := json.Unmarshal(delete_recorder.Body.Bytes(), &image_id_response)
+	require.Nil(t, err)
+
+	require.Equal(t, image_id_response.Id, response.Id)
+}
+
+func TestDeleteImageNoDatabaseEntry(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{}, errors.New("failed")
+		},
+
+		DeleteImageHandler: func(string) error {
+			return nil
+		},
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+	delete_recorder := httptest.NewRecorder()
+
+	uuid, _ := uuid.New()
+	uri := fmt.Sprintf("/images/%s", uuid.String())
+	req, _ := http.NewRequest("DELETE", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(delete_recorder, req)
+
+	assert.Equal(t, 404, delete_recorder.Code)
+}
+
+func TestDeleteImageNoImageFile(t *testing.T) {
+	database_mock := mocks.DatabaseMock{
+		GetImageHandler: func(id string) (common.Image, error) {
+			return common.Image{
+				Uuid:    id,
+				Name:    "test",
+				AltText: "default",
+				Ext:     ".png",
+			}, nil
+		},
+
+		DeleteImageHandler: func(string) error {
+			return nil
+		},
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database_mock)
+	delete_recorder := httptest.NewRecorder()
+
+	uuid, _ := uuid.New()
+	uri := fmt.Sprintf("/images/%s", uuid.String())
+	req, _ := http.NewRequest("DELETE", uri, bytes.NewBuffer([]byte{}))
+	r.ServeHTTP(delete_recorder, req)
+
+	assert.Equal(t, 200, delete_recorder.Code)
 }
