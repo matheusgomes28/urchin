@@ -3,7 +3,6 @@ package app
 import (
 	"bytes"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
@@ -31,20 +30,13 @@ func mdToHTML(md []byte) []byte {
 
 func postHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
 
-	// Get the post ID from the URL
-	postIDStr := c.Param("id")
+	var post_binding common.PostIdBinding
 
-	// converting our postID string to an integer
-	postID, err := strconv.Atoi(postIDStr)
+	err := c.ShouldBindUri(&post_binding)
 
-	if err != nil || postID < 0 {
+	if err != nil || post_binding.Id < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
 
-		return nil, err
-	}
-
-	var post_binding common.PostIdBinding
-	if err := c.ShouldBindUri(&post_binding); err != nil {
 		return nil, err
 	}
 
