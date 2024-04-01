@@ -1,6 +1,8 @@
 package views
 
-templ MakeContactPage() {
+import "github.com/matheusgomes28/urchin/common"
+
+templ MakeContactPage(links []common.Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -14,7 +16,7 @@ templ MakeContactPage() {
     </head>
 
     <body>
-        @MakeNavBar()
+        @MakeNavBar(links)
         <main>
             <div id="contact-form">
                 <h2>Contact Us</h2>

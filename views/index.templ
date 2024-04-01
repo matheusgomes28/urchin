@@ -5,7 +5,7 @@ import (
     . "github.com/matheusgomes28/urchin/common"
 )
 
-templ MakeIndex(posts []Post) {
+templ MakeIndex(posts []Post, links []Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -19,7 +19,7 @@ templ MakeIndex(posts []Post) {
     </head>
 
     <body>
-        @MakeNavBar()
+        @MakeNavBar(links)
         <main>
             for _, post := range posts {
                 <article>

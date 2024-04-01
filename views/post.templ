@@ -1,7 +1,9 @@
 package views
 
+import "github.com/matheusgomes28/urchin/common"
 
-templ MakePostPage(title string, content string) {
+
+templ MakePostPage(title string, content string, links []common.Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -15,7 +17,7 @@ templ MakePostPage(title string, content string) {
     </head>
 
     <body>
-        @MakeNavBar()
+        @MakeNavBar(links)
         <main>
             <article>
                 <h2>{ title }</h2>

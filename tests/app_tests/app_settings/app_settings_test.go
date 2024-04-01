@@ -36,6 +36,13 @@ func TestCorrectToml(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		WebserverPort:    99999,
 		DatabasePort:     666,
+		Links: []common.Link{
+			{Name: "Home", Href: "/", Title: "Homepage"},
+			{Name: "About", Href: "/about", Title: "About page"},
+			{Name: "Services", Href: "/services", Title: "Services page"},
+			{Name: "Images", Href: "/images", Title: "Images page"},
+			{Name: "Contact", Href: "/contact", Title: "Contacts page"},
+		},
 	}
 	bytes, err := toml.Marshal(expected)
 	assert.Nil(t, err)

@@ -36,7 +36,7 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 	}
 
 	// if not cached, create the cache
-	index_view := views.MakeImagesPage(images)
+	index_view := views.MakeImagesPage(images, app_settings.Links)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)
@@ -60,7 +60,7 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 	}
 
 	// if not cached, create the cache
-	index_view := views.MakeImagePage(image)
+	index_view := views.MakeImagePage(image, app_settings.Links)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)

@@ -16,6 +16,7 @@ type AppSettings struct {
 	DatabaseName     string `toml:"database_name"`
 	WebserverPort    int    `toml:"webserver_port"`
 	ImageDirectory   string `toml:"image_dir"`
+	Links            []Link `toml:"links"`
 }
 
 func LoadSettings() (AppSettings, error) {
@@ -62,7 +63,7 @@ func LoadSettings() (AppSettings, error) {
 
 	image_directory := os.Getenv("URCHIN_IMAGE_DIRECTORY")
 	if len(image_directory) == 0 {
-		return AppSettings{}, fmt.Errorf("URCHIN_IMAGE_DIRECTORY is not defined\n")
+		return AppSettings{}, fmt.Errorf("URCHIN_IMAGE_DIRECTORY is not defined")
 	}
 
 	return AppSettings{

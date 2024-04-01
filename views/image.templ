@@ -5,7 +5,7 @@ import (
     . "github.com/matheusgomes28/urchin/common"
 )
 
-templ MakeImagePage(image Image) {
+templ MakeImagePage(image Image, links []Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -19,7 +19,7 @@ templ MakeImagePage(image Image) {
     </head>
 
     <body>
-        @MakeNavBar()
+        @MakeNavBar(links)
         <main>
             <article>
             <h3>{ image.Name }</h3>
