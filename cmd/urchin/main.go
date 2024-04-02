@@ -17,24 +17,19 @@ func main() {
 	flag.Parse()
 
 	var app_settings common.AppSettings
-	if (*config_toml) != "" {
-		log.Info().Msgf("reading config file %s", *config_toml)
-		settings, err := common.ReadConfigToml(*config_toml)
-		if err != nil {
-			log.Error().Msgf("could not read config file: %v", err)
-			os.Exit(-1)
-		}
-
-		app_settings = settings
-	} else {
-		log.Info().Msgf("no config file, reading environment variables")
-		settings, err := common.LoadSettings()
-		if err != nil {
-			log.Error().Msgf("could not load settings: %v", err)
-			os.Exit(-1)
-		}
-		app_settings = settings
+	if (*config_toml) == "" {
+		log.Error().Msgf("config not specified (--config)")
+		os.Exit(-1)
 	}
+
+	log.Info().Msgf("reading config file %s", *config_toml)
+	settings, err := common.ReadConfigToml(*config_toml)
+	if err != nil {
+		log.Error().Msgf("could not read config file: %v", err)
+		os.Exit(-1)
+	}
+
+	app_settings = settings
 
 	db_connection, err := database.MakeSqlConnection(
 		app_settings.DatabaseUser,
