@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gomarkdown/markdown"
@@ -28,14 +29,22 @@ func mdToHTML(md []byte) []byte {
 }
 
 func postHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
+
 	var post_binding common.PostIdBinding
-	if err := c.ShouldBindUri(&post_binding); err != nil {
+
+	err := c.ShouldBindUri(&post_binding)
+
+	if err != nil || post_binding.Id < 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+
 		return nil, err
 	}
 
 	// Get the post with the ID
 	post, err := database.GetPost(post_binding.Id)
-	if err != nil {
+
+	if err != nil || post.Content == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post Not Found"})
 		return nil, err
 	}
 
