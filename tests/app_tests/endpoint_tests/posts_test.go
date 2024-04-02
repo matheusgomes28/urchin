@@ -65,7 +65,7 @@ func TestPostFailureStringKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 
 }
 
@@ -95,7 +95,7 @@ func TestPostFailurePostDoesntExist(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	require.Equal(t, http.StatusNotFound, responseRecorder.Code)
 }
 
 func TestPostFailureNegativeInvalidKey(t *testing.T) {
@@ -124,5 +124,5 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	require.Equal(t, http.StatusInternalServerError, responseRecorder.Code)
+	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 }
