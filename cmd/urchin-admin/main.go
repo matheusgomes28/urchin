@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	var app_settings common.AppSettings
-	if *config_toml != "" {
+	if *config_toml == "" {
 		log.Error().Msgf("config not specified (--config)")
 		os.Exit(-1)
 	}

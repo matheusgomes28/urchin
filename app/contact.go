@@ -59,7 +59,7 @@ func makeContactFormHandler() func(*gin.Context) {
 
 // TODO : This is a duplicate of the index handler... abstract
 func contactHandler(c *gin.Context, app_settings common.AppSettings, db database.Database) ([]byte, error) {
-	index_view := views.MakeContactPage(app_settings.Links)
+	index_view := views.MakeContactPage(app_settings.AppNavbar.Links)
 	html_buffer := bytes.NewBuffer(nil)
 	if err := index_view.Render(c, html_buffer); err != nil {
 		log.Error().Msgf("could not render: %v", err)

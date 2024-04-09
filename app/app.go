@@ -105,7 +105,7 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 	}
 
 	// if not cached, create the cache
-	index_view := views.MakeIndex(posts, settings.Links)
+	index_view := views.MakeIndex(posts, settings.AppNavbar.Links)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)

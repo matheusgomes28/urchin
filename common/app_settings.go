@@ -4,6 +4,10 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type Navbar struct {
+	Links []Link `toml:"links"`
+}
+
 type AppSettings struct {
 	DatabaseAddress  string `toml:"database_address"`
 	DatabasePort     int    `toml:"database_port"`
@@ -12,7 +16,7 @@ type AppSettings struct {
 	DatabaseName     string `toml:"database_name"`
 	WebserverPort    int    `toml:"webserver_port"`
 	ImageDirectory   string `toml:"image_dir"`
-	Links            []Link `toml:"links"`
+	AppNavbar        Navbar `toml:"navbar"`
 }
 
 func ReadConfigToml(filepath string) (AppSettings, error) {
