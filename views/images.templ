@@ -5,7 +5,7 @@ import (
     . "github.com/matheusgomes28/urchin/common"
 )
 
-templ MakeImagesPage(images []Image) {
+templ MakeImagesPage(images []Image, links []Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -39,7 +39,7 @@ templ MakeImagesPage(images []Image) {
     </head>
 
     <body>
-        @MakeNavBar()
+        @MakeNavBar(links)
         <main>
             <article>
                 if len(images) == 0 {

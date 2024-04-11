@@ -1,14 +1,16 @@
 package views
 
-templ MakeNavBar() {
-    <header>
-        <nav>
-            <ul>
-                for _, link := range GetUrchinLinks() {
-                    <li><a href={templ.URL(link.Href)}>{ link.Name }</a></li> // Pass the links in here
-                }
-            </ul>
-        </nav>
-    </header>
-    <br />
+import "github.com/matheusgomes28/urchin/common"
+
+templ MakeNavBar(links []common.Link) {
+	<header>
+		<nav>
+			<ul>
+				for _, link := range links {
+					<li><a href={ templ.URL(link.Href) }>{ link.Name }</a></li> // Pass the links in here
+				}
+			</ul>
+		</nav>
+	</header>
+	<br/>
 }
