@@ -20,14 +20,14 @@ type Shortcode struct {
 }
 
 type AppSettings struct {
-	DatabaseAddress  string `toml:"database_address"`
-	DatabasePort     int    `toml:"database_port"`
-	DatabaseUser     string `toml:"database_user"`
-	DatabasePassword string `toml:"database_password"`
-	DatabaseName     string `toml:"database_name"`
-	WebserverPort    int    `toml:"webserver_port"`
-	ImageDirectory   string `toml:"image_dir"`
-	AppNavbar        Navbar `toml:"navbar"`
+	DatabaseAddress  string      `toml:"database_address"`
+	DatabasePort     int         `toml:"database_port"`
+	DatabaseUser     string      `toml:"database_user"`
+	DatabasePassword string      `toml:"database_password"`
+	DatabaseName     string      `toml:"database_name"`
+	WebserverPort    int         `toml:"webserver_port"`
+	ImageDirectory   string      `toml:"image_dir"`
+	AppNavbar        Navbar      `toml:"navbar"`
 	Shortcodes       []Shortcode `toml:"shortcodes"`
 }
 
