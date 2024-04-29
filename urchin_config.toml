@@ -2,10 +2,10 @@
 database_address = "localhost"
 
 # User to access datbaase
-database_user = "urchin"
+database_user = "root"
 
 # Password for the database user
-database_password = "urchinpw"
+database_password = "root"
 
 # port
 database_port = 3306

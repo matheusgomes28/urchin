@@ -45,7 +45,7 @@ func TestCorrectToml(t *testing.T) {
 				{Name: "Contact", Href: "/contact", Title: "Contacts page"},
 			},
 		},
-		Shortcodes: []Shortcode{},
+		Shortcodes: []common.Shortcode{},
 	}
 	bytes, err := toml.Marshal(expected)
 	assert.Nil(t, err)
@@ -75,7 +75,7 @@ func TestMissingDatabaseAddress(t *testing.T) {
 		WebserverPort:    "99999",
 		AdminPort:        "99998",
 		DatabasePort:     "666",
-		Shortcodes:       []Shortcode{},
+		Shortcodes:       []common.Shortcode{},
 	}
 
 	bytes, err := toml.Marshal(missing_database_address)

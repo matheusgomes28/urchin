@@ -65,7 +65,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		if err != nil {
 			log.Error().Msgf("could not generate html: %v", err)
 			// TODO : Need a proper error page
-			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
+			// c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
 			return
 		}
 
