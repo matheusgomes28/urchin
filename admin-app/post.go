@@ -167,6 +167,10 @@ func checkRequiredData(addPostRequest AddPostRequest) error {
 // removing the given ranges
 func partitionString(text string, indexes [][]int) []string {
 
+	if len(text) == 0 {
+		return []string{}
+	}
+
 	partitions := make([]string, 0)
 	start := 0
 	for _, window := range indexes {
@@ -215,10 +219,15 @@ func transformContent(content string, shortcode_handlers map[string]*lua.LState)
 	regex, _ := regexp.Compile(`{{[\w.-]+(:[\w.-]+)+}}`)
 
 	shortcodes := regex.FindAllStringIndex(content, -1)
+	if len(shortcodes) == 0 {
+		return content, nil
+	}
+
 	partitions := partitionString(content, shortcodes)
 
 	builder := strings.Builder{}
 	i := 0
+
 	for i, shortcode := range shortcodes {
 		builder.WriteString(partitions[i])
 
