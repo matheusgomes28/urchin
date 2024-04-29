@@ -14,6 +14,7 @@ require (
 	github.com/pressly/goose/v3 v3.19.2
 	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.4
+	github.com/yuin/gopher-lua v1.1.1
 	github.com/zutto/shardedmap v0.0.0-20180201164343-415202d0910e
 )
 
@@ -57,7 +58,6 @@ require (
 	go.opentelemetry.io/otel v1.20.0 // indirect
 	go.opentelemetry.io/otel/trace v1.20.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	github.com/yuin/gopher-lua v1.1.1 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678 // indirect
