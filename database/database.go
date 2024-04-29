@@ -184,7 +184,7 @@ func (db SqlDatabase) GetImage(image_id string) (image common.Image, err error) 
 		return common.Image{}, err
 	}
 	defer func() {
-		err = errors.Join(rows.Close())
+		err = errors.Join(err, rows.Close())
 	}()
 
 	rows.Next()

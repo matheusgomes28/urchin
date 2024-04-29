@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -37,7 +38,7 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	if err != nil || post_binding.Id < 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
 
-		return nil, err
+		return nil, fmt.Errorf("invalid post id")
 	}
 
 	// Get the post with the ID

@@ -19,6 +19,7 @@ import (
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	lua "github.com/yuin/gopher-lua"
 )
 
 type imageResponse struct {
@@ -32,7 +33,7 @@ func TestPostImage(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -68,7 +69,7 @@ func TestPostImageNotAnImageFile(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -99,7 +100,7 @@ func TestPostImageWrongFileContentType(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -132,7 +133,7 @@ func TestPostImageFailedToCreateDatabaseEntry(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -173,7 +174,7 @@ func TestGetImage(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	post_recorder := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -220,7 +221,7 @@ func TestGetImageNoDatabaseEntry(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 
 	get_recorder := httptest.NewRecorder()
 	uuid, _ := uuid.New()
@@ -239,7 +240,7 @@ func TestGetImageNoImageFile(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 
 	get_recorder := httptest.NewRecorder()
 	uuid, _ := uuid.New()
@@ -271,7 +272,7 @@ func TestDeleteImage(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	post_recorder := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -323,7 +324,7 @@ func TestDeleteImageNoDatabaseEntry(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	delete_recorder := httptest.NewRecorder()
 
 	uuid, _ := uuid.New()
@@ -350,7 +351,7 @@ func TestDeleteImageNoImageFile(t *testing.T) {
 		},
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	delete_recorder := httptest.NewRecorder()
 
 	uuid, _ := uuid.New()

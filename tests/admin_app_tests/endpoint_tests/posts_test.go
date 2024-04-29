@@ -11,6 +11,7 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
+	lua "github.com/yuin/gopher-lua"
 )
 
 type postRequest struct {
@@ -36,7 +37,7 @@ var app_settings = common.AppSettings{
 func TestIndexPing(t *testing.T) {
 
 	database_mock := mocks.DatabaseMock{}
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	request := postRequest{
