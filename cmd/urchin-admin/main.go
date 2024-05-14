@@ -47,7 +47,7 @@ func main() {
 	}
 
 	r := admin_app.SetupRoutes(app_settings, database)
-	err = r.Run(fmt.Sprintf(":%d", app_settings.WebserverPort))
+	err = r.Run(fmt.Sprintf(":%d", app_settings.AdminPort))
 	if err != nil {
 		log.Error().Msgf("could not run app: %v", err)
 		os.Exit(-1)
