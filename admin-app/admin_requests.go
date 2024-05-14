@@ -28,5 +28,5 @@ type AddImageRequest struct {
 }
 
 type DeleteImageBinding struct {
-	common.StringIdBinding
+	Name string `uri:"name" binding:"required"`
 }

@@ -1,7 +1,6 @@
 package admin_app
 
 import (
-	"errors"
 	"fmt"
 	"mime/multipart"
 	"net/http"
@@ -20,26 +19,6 @@ import (
 // r.GET("/images/:id", getImageHandler(&database))
 // r.POST("/images", postImageHandler(&database))
 // r.DELETE("/images", deleteImageHandler(&database))
-
-func getImageHandler(database database.Database) func(*gin.Context) {
-	return func(c *gin.Context) {
-		var get_image_binding common.ImageIdBinding
-		if err := c.ShouldBindUri(&get_image_binding); err != nil {
-			c.JSON(http.StatusBadRequest, common.ErrorRes("could not get image id", err))
-			return
-		}
-
-		image, err := database.GetImage(get_image_binding.Id)
-		if err != nil {
-			log.Error().Msgf("failed to get image: %v", err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("could not get image", err))
-			return
-		}
-
-		c.JSON(http.StatusOK, image)
-	}
-}
-
 func postImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 10*1000000)
@@ -48,12 +27,6 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 			log.Error().Msgf("could not create multipart form: %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("request type must be `multipart-form`", err))
 			return
-		}
-
-		alt_text_array := form.Value["alt"]
-		alt_text := "unknown"
-		if len(alt_text_array) > 0 {
-			alt_text = alt_text_array[0]
 		}
 
 		// Begin saving the file to the filesystem
@@ -107,27 +80,13 @@ func postImageHandler(app_settings common.AppSettings, database database.Databas
 			return
 		}
 		// End saving to filesystem
-
-		// Save metadata into the DB
-		err = database.AddImage(uuid.String(), file.Filename, alt_text, ext)
-		if err != nil {
-			log.Error().Msgf("could not add image metadata to db: %v", err)
-			os_err := os.Remove(image_path)
-			if os_err != nil {
-				log.Error().Msgf("could not remove image: %v", err)
-				err = errors.Join(err, os_err)
-			}
-			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to save image", err))
-			return
-		}
-
 		c.JSON(http.StatusOK, ImageIdResponse{
 			Id: uuid.String(),
 		})
 	}
 }
 
-func deleteImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
+func deleteImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var delete_image_binding DeleteImageBinding
 		err := c.ShouldBindUri(&delete_image_binding)
@@ -136,30 +95,15 @@ func deleteImageHandler(app_settings common.AppSettings, database database.Datab
 			return
 		}
 
-		image, err := database.GetImage(delete_image_binding.Id)
-		if err != nil {
-			log.Error().Msgf("failed to delete image: %v", err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("could not delete image", err))
-			return
-		}
-
-		filename := fmt.Sprintf("%s%s", image.Uuid, image.Ext)
-		image_path := filepath.Join(app_settings.ImageDirectory, filename)
+		image_path := filepath.Join(app_settings.ImageDirectory, delete_image_binding.Name)
 		err = os.Remove(image_path)
 		if err != nil {
 			log.Warn().Msgf("could not delete stored image file: %v", err)
 			// No return because we have to remove the database entry nonetheless.
 		}
 
-		err = database.DeleteImage(delete_image_binding.Id)
-		if err != nil {
-			log.Error().Msgf("failed to delete image with id %s: %v", delete_image_binding.Id, err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("could not delete image", err))
-			return
-		}
-
 		c.JSON(http.StatusOK, ImageIdResponse{
-			delete_image_binding.Id,
+			delete_image_binding.Name,
 		})
 	}
 }

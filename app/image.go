@@ -2,11 +2,12 @@ package app
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
+	"slices"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -30,13 +31,44 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 
 	limit := 10 // or whatever limit you want
 	offset := max((pageNum-1)*limit, 0)
-	images, err := database.GetImages(offset, limit)
+
+	// Get all the files inside the image directory
+	files, err := os.ReadDir(app_settings.ImageDirectory)
 	if err != nil {
-		return nil, err
+		log.Error().Msgf("could not read files in image directory: %v", err)
+		return []byte{}, err
 	}
 
-	// if not cached, create the cache
-	index_view := views.MakeImagesPage(images, app_settings.AppNavbar.Links)
+	// Filter all the non-images out of the list
+	valid_images := make([]common.Image, 0)
+	valid_extensions := []string{".jpg", ".jpeg", ".png", ".gif"}
+	for n, file := range files {
+
+		// TODO : This is surely not the best way
+		//        to implement pagination in for loops
+		if n >= limit {
+			break
+		}
+
+		if n < offset {
+			continue
+		}
+
+		filename := file.Name()
+		ext := path.Ext(file.Name())
+		if slices.Contains(valid_extensions, ext) {
+
+			image := common.Image{
+				Uuid:    filename[:len(filename)-len(ext)],
+				Name:    filename,
+				AltText: "undefined", // TODO : perhaps remove this
+				Ext:     ext,
+			}
+			valid_images = append(valid_images, image)
+		}
+	}
+
+	index_view := views.MakeImagesPage(valid_images, app_settings.AppNavbar.Links)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)
@@ -54,16 +86,21 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 		return nil, err
 	}
 
-	image, err := database.GetImage(get_image_binding.Id)
-	if err != nil {
-		return nil, err
-	}
-
 	// if not cached, create the cache
+	filename := get_image_binding.Filename
+	ext := path.Ext(get_image_binding.Filename)
+	name := filename[:len(filename)-len(ext)]
+
+	image := common.Image{
+		Uuid:    name,
+		Name:    filename,
+		AltText: "undefined",
+		Ext:     ext,
+	}
 	index_view := views.MakeImagePage(image, app_settings.AppNavbar.Links)
 	html_buffer := bytes.NewBuffer(nil)
 
-	err = index_view.Render(c, html_buffer)
+	err := index_view.Render(c, html_buffer)
 	if err != nil {
 		log.Error().Msgf("Could not render index: %v", err)
 		return []byte{}, err
@@ -80,15 +117,8 @@ func getImageHandler(app_settings common.AppSettings, database database.Database
 			return
 		}
 
-		image, err := database.GetImage(get_image_binding.Id)
-		if err != nil {
-			log.Error().Msgf("failed to get image: %v", err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("could not get image", err))
-			return
-		}
-
-		filename := fmt.Sprintf("%s%s", image.Uuid, image.Ext)
-		image_path := filepath.Join(app_settings.ImageDirectory, filename)
+		// TODO : How do we get the filename?
+		image_path := filepath.Join(app_settings.ImageDirectory, get_image_binding.Filename)
 		file, err := os.Open(image_path)
 		if err != nil {
 			log.Error().Msgf("failed to load saved image: %v", err)

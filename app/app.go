@@ -26,11 +26,11 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
-	addCachableHandler(r, "GET", "/images/:id", imageHandler, &cache, app_settings, database)
+	addCachableHandler(r, "GET", "/images/:name", imageHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
 
 	// This endpoint should be used to fetch the images from the backend
-	r.GET("/data/images/:id", getImageHandler(app_settings, database))
+	r.GET("/data/images/:name", getImageHandler(app_settings, database))
 
 	// Add the pagination route as a cacheable endpoint
 	addCachableHandler(r, "GET", "/page/:num", homeHandler, &cache, app_settings, database)
