@@ -15,6 +15,7 @@ type AppSettings struct {
 	DatabasePassword string `toml:"database_password"`
 	DatabaseName     string `toml:"database_name"`
 	WebserverPort    int    `toml:"webserver_port"`
+	AdminPort        int    `toml:"admin_port"`
 	ImageDirectory   string `toml:"image_dir"`
 	AppNavbar        Navbar `toml:"navbar"`
 }

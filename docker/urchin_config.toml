@@ -17,6 +17,9 @@ database_name = "urchin"
 # port to run the webserver on
 webserver_port = 8080
 
+# port to run the admin app on
+admin_port = 8081
+
 # Directory to use for storing uploaded images.
 image_dir = "./images"
 

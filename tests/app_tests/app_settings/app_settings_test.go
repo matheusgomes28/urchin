@@ -64,12 +64,14 @@ func TestMissingDatabaseAddress(t *testing.T) {
 		DatabasePassword string `toml:"database_password"`
 		DatabaseName     string `toml:"database_name"`
 		WebserverPort    string `toml:"webserver_port"`
+		AdminPort        string `toml:"admin_port"`
 		DatabasePort     string `toml:"database_port"`
 	}{
 		DatabaseUser:     "test_database_user",
 		DatabasePassword: "test_database_password",
 		DatabaseName:     "test_database_name",
 		WebserverPort:    "99999",
+		AdminPort:        "99998",
 		DatabasePort:     "666",
 	}
 
@@ -90,12 +92,14 @@ func TestMissingDatabaseUser(t *testing.T) {
 		DatabasePassword string `toml:"database_password"`
 		DatabaseName     string `toml:"database_name"`
 		WebserverPort    string `toml:"webserver_port"`
+		AdminPort        string `toml:"admin_port"`
 		DatabasePort     string `toml:"database_port"`
 	}{
 		DatabaseAddress:  "test_database_address",
 		DatabasePassword: "test_database_password",
 		DatabaseName:     "test_database_name",
 		WebserverPort:    "99999",
+		AdminPort:        "99998",
 		DatabasePort:     "666",
 	}
 
@@ -115,12 +119,14 @@ func TestMissingDatabasePassword(t *testing.T) {
 		DatabaseUser    string `toml:"database_user"`
 		DatabaseName    string `toml:"database_name"`
 		WebserverPort   string `toml:"webserver_port"`
+		AdminPort       string `toml:"admin_port"`
 		DatabasePort    string `toml:"database_port"`
 	}{
 		DatabaseAddress: "test_database_address",
 		DatabaseUser:    "test_database_user",
 		DatabaseName:    "test_database_name",
 		WebserverPort:   "99999",
+		AdminPort:       "99998",
 		DatabasePort:    "666",
 	}
 
@@ -140,12 +146,14 @@ func TestMissingDatabaseName(t *testing.T) {
 		DatabaseUser     string `toml:"database_user"`
 		DatabasePassword string `toml:"database_password"`
 		WebserverPort    string `toml:"webserver_port"`
+		AdminPort        string `toml:"webserver_port"`
 		DatabasePort     string `toml:"database_port"`
 	}{
 		DatabaseAddress:  "test_database_address",
 		DatabaseUser:     "test_database_user",
 		DatabasePassword: "test_database_password",
 		WebserverPort:    "99999",
+		AdminPort:        "99998",
 		DatabasePort:     "666",
 	}
 
@@ -191,12 +199,14 @@ func TestMissingDatabasePort(t *testing.T) {
 		DatabasePassword string `toml:"database_password"`
 		DatabaseName     string `toml:"database_name"`
 		WebserverPort    string `toml:"webserver_port"`
+		AdminPort        string `toml:"admin_port"`
 	}{
 		DatabaseAddress:  "test_database_address",
 		DatabaseUser:     "test_database_user",
 		DatabasePassword: "test_database_password",
 		DatabaseName:     "test_database_name",
 		WebserverPort:    "99999",
+		AdminPort:        "99998",
 	}
 
 	bytes, err := toml.Marshal(missing_database_address)
@@ -217,6 +227,7 @@ func TestWrongDatabasePortValueType(t *testing.T) {
 		DatabaseName     string `toml:"database_name"`
 		DatabasePort     string `toml:"database_port"`
 		WebserverPort    int    `toml:"webserver_port"`
+		AdminPort        int    `toml:"admin_port"`
 	}{
 		DatabaseAddress:  "test_database_address",
 		DatabaseUser:     "test_database_user",
@@ -224,6 +235,7 @@ func TestWrongDatabasePortValueType(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		DatabasePort:     "String Should Not Work",
 		WebserverPort:    99999,
+		AdminPort:        99998,
 	}
 
 	bytes, err := toml.Marshal(missing_database_address)
@@ -244,6 +256,7 @@ func TestWrongwebserverPortValueType(t *testing.T) {
 		DatabaseName     string `toml:"database_name"`
 		DatabasePort     int    `toml:"database_port"`
 		WebserverPort    string `toml:"webserver_port"`
+		AdminPort        string `toml:"admin_port"`
 	}{
 		DatabaseAddress:  "test_database_address",
 		DatabaseUser:     "test_database_user",
@@ -251,6 +264,7 @@ func TestWrongwebserverPortValueType(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		DatabasePort:     10,
 		WebserverPort:    "99999",
+		AdminPort:        "99998",
 	}
 
 	bytes, err := toml.Marshal(missing_database_address)
