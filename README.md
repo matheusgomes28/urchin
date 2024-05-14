@@ -23,23 +23,40 @@ commands.
 
 Ensure you have Golang installed on your system before proceeding with the installation.
 
-```bash
-go get -u github.com/username/urchin
-```
+## Running Urchin
 
-## Example - Running the App
+Urchin is developed with Golang, so make sure you have a recent enough
+version of the compiler and you also follow the instructions in the
+following sections.
 
-First, ensure you have the neccesary libraries to run the application
+### Build Requirements
+
+If you're runnig Urchin locally, you should install all the requirements needed
+to build the application. Here's a list of all the dependencies needed:
+
+- Goose for database migrations: `go install github.com/pressly/goose/v3/cmd/goose@v3.18.0`
+- Templ for code generation: `go install github.com/a-h/templ/cmd/templ@v0.2.543`
+- (optionally) Air for live reloading: `go install github.com/cosmtrek/air@v1.49.0`
+
+Ensure that you have the binaries in the `$GOBIN` directory somewhere in your path,
+so you can call these tools from the terminal.
+
+Alternatively, if your platform supports `make`, run the following command from the
+project repo:
+
 ```bash
 make install-tools
 ```
 
-Following that, make sure you run the Goose migrations for the database.
+### Database Migrations
+
+Once the requirements are installed, make sure you run the Goose migrations for the database.
 We recommend creating a database called `urchin` and running the following
 command:
 
 ```bash
-GOOSE_DRIVER="mysql" GOOSE_DBSTRING="root:root@/gocms" goose up
+cd migrations
+GOOSE_DRIVER="mysql" GOOSE_DBSTRING="root:root@/urchin" goose up
 ```
 
 Replace the database connection string with the appropriate string
@@ -48,17 +65,21 @@ dependending on where your database is.
 After you've replaced the default template files with your prefered
 template, simply build and start the app with the following commands.
 
+### Building and Running Urchin
+
+If your platform has support for `Makefiles`, simply call `make`:
+
 ```bash
-go build
-./urchin
+make build
+./tmp/urchin --config urchin_config.toml
 ```
 
-This will start Urchin on `http://localhost:8080`. You can customize
-the configuration by providing the necessary environment variables.
+This will start Urchin on `http://localhost:8080`. You can change the
+configuration by editing the `urchin_config.toml` file.
 
 For more information, see the [configuration settings](#configuration).
 
-## Example - Running with Docker Compose
+## Running with Docker Compose
 
 To run with `docker-compose`, use the following
 command:
@@ -71,6 +92,27 @@ This will start two containers: one containing the `urchin` app,
 serving on port `8080`, and another one serving the `mariadb`
 database internally. This will also run the migrations automatically
 to setup the database!
+
+## Development
+
+If you want to debug the application, you can use `docker compose`
+to startup just the `mariadb` container, then hook Urchin to your
+favourite debugger (e.g. Vscode).
+
+To startup the `mariadb` database, run the following command from
+the project root:
+
+```sh
+docker compose -f docker/mariadb.yml up
+```
+
+Wait a little bit for the database container to start, then run the
+migration steps:
+
+```sh
+cd migrations
+GOOSE_DRIVER="mysql" GOOSE_DBSTRING="root:root@/urchin" goose up
+```
 
 ## Architecture
 
