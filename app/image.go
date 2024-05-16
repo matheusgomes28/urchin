@@ -2,11 +2,8 @@ package app
 
 import (
 	"bytes"
-	"io"
-	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"slices"
 	"strconv"
 
@@ -107,36 +104,4 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 	}
 
 	return html_buffer.Bytes(), nil
-}
-
-func getImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
-	return func(c *gin.Context) {
-		var get_image_binding common.ImageIdBinding
-		if err := c.ShouldBindUri(&get_image_binding); err != nil {
-			c.JSON(http.StatusBadRequest, common.ErrorRes("could not get image id", err))
-			return
-		}
-
-		// TODO : How do we get the filename?
-		image_path := filepath.Join(app_settings.ImageDirectory, get_image_binding.Filename)
-		file, err := os.Open(image_path)
-		if err != nil {
-			log.Error().Msgf("failed to load saved image: %v", err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("image not found", err))
-			return
-		}
-
-		data, err := io.ReadAll(file)
-		if err != nil {
-			log.Error().Msgf("failed to load saved image: %v", err)
-			c.JSON(http.StatusNotFound, common.ErrorRes("image not found", err))
-			return
-		}
-
-		c.Data(http.StatusOK, getContentTypeFromData(data), data)
-	}
-}
-
-func getContentTypeFromData(data []byte) string {
-	return http.DetectContentType(data[:512])
 }

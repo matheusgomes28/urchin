@@ -16,7 +16,6 @@ import (
 )
 
 // TODO : need these endpoints
-// r.GET("/images/:id", getImageHandler(&database))
 // r.POST("/images", postImageHandler(&database))
 // r.DELETE("/images", deleteImageHandler(&database))
 func postImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
