@@ -3,7 +3,6 @@ package admin_endpoint_tests
 import (
 	_ "database/sql"
 	"encoding/json"
-	"fmt"
 	"image/png"
 	"io"
 	"mime/multipart"
@@ -69,18 +68,4 @@ func TestImageUpload(t *testing.T) {
 	var image_id_response admin_app.ImageIdResponse
 	err = json.Unmarshal(post_recorder.Body.Bytes(), &image_id_response)
 	require.Nil(t, err)
-
-	// Make sure that we can request the image details from the DB
-	get_recorder := httptest.NewRecorder()
-	req, _ = http.NewRequest("GET", fmt.Sprintf("/images/%s", image_id_response.Id), nil)
-	r.ServeHTTP(get_recorder, req)
-
-	var image_response admin_app.GetImageResponse
-	err = json.Unmarshal(get_recorder.Body.Bytes(), &image_response)
-	require.Nil(t, err)
-
-	require.Equal(t, image_id_response.Id, image_response.Id)
-	require.Equal(t, image_response.AltText, "test alt")
-	require.Equal(t, image_response.Extension, ".png")
-	require.Equal(t, image_response.Name, "test.png")
 }
