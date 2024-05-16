@@ -29,8 +29,8 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/images/:name", imageHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
 
-	// This endpoint should be used to fetch the images from the backend
-	r.GET("/data/images/:name", getImageHandler(app_settings, database))
+	// Static endpoint for image serving
+	r.Static("/images/data", app_settings.ImageDirectory)
 
 	// Add the pagination route as a cacheable endpoint
 	addCachableHandler(r, "GET", "/page/:num", homeHandler, &cache, app_settings, database)
@@ -38,6 +38,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	// DO not cache as it needs to handlenew form values
 	r.POST("/contact-send", makeContactFormHandler())
 
+	// Where all the static files (css, js, etc) are served from
 	r.Static("/static", "./static")
 	return r
 }
