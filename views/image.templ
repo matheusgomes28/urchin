@@ -23,7 +23,7 @@ templ MakeImagePage(image Image, links []Link) {
         <main>
             <article>
             <h3>{ image.Name }</h3>
-            <img src={fmt.Sprintf("/data/images/%s", image.Name)} alt={image.AltText} />
+            <img src={fmt.Sprintf("/images/data/%s", image.Name)} alt={image.AltText} />
             <p>{ image.AltText }</p>
             </article>
         </main>
