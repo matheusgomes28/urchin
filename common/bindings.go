@@ -13,5 +13,6 @@ type PostIdBinding struct {
 }
 
 type ImageIdBinding struct {
-	StringIdBinding
+	// This is the uuid of an image to be retrieved
+	Filename string `uri:"name" binding:"required"`
 }

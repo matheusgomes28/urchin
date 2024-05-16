@@ -46,9 +46,9 @@ templ MakeImagesPage(images []Image, links []Link) {
                     <h3>No images uploaded.</h3>
                 } else {
                     for _, image := range images {
-                        <a href={templ.URL("/images/" + image.Uuid)}>
+                        <a href={templ.URL("/images/" + image.Name)}>
                             <div>
-                                <img src={fmt.Sprintf("/data/images/%s", image.Uuid)} alt={image.AltText} />
+                                <img src={fmt.Sprintf("/data/images/%s", image.Name)} alt={image.AltText} />
                                 <span>{image.Name}</span>
                             </div>
                         </a>
