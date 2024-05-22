@@ -88,6 +88,7 @@ func GetAppSettings(app_num int) common.AppSettings {
 		DatabasePassword: "",
 		DatabaseName:     "urchin",
 		WebserverPort:    8080,
+		CacheEnabled:     false,
 	}
 
 	return app_settings

@@ -47,10 +47,12 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 
 	handler := func(c *gin.Context) {
 		// if the endpoint is cached
-		cached_endpoint, err := (*cache).Get(c.Request.RequestURI)
-		if err == nil {
-			c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.Contents)
-			return
+		if app_settings.CacheEnabled {
+			cached_endpoint, err := (*cache).Get(c.Request.RequestURI)
+			if err == nil {
+				c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.Contents)
+				return
+			}
 		}
 
 		// Before handler call (retrieve from cache)
@@ -63,9 +65,11 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		}
 
 		// After handler  (add to cache)
-		err = (*cache).Store(c.Request.RequestURI, html_buffer)
-		if err != nil {
-			log.Warn().Msgf("could not add page to cache: %v", err)
+		if app_settings.CacheEnabled {
+			err = (*cache).Store(c.Request.RequestURI, html_buffer)
+			if err != nil {
+				log.Warn().Msgf("could not add page to cache: %v", err)
+			}
 		}
 		c.Data(http.StatusOK, "text/html; charset=utf-8", html_buffer)
 	}
