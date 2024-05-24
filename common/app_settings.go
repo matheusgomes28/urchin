@@ -17,6 +17,7 @@ type AppSettings struct {
 	WebserverPort    int    `toml:"webserver_port"`
 	AdminPort        int    `toml:"admin_port"`
 	ImageDirectory   string `toml:"image_dir"`
+	CacheEnabled     bool   `toml:"cache_enabled"`
 	AppNavbar        Navbar `toml:"navbar"`
 }
 

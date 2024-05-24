@@ -23,6 +23,9 @@ admin_port = 8081
 # Directory to use for storing uploaded images.
 image_dir = "./images"
 
+# Enable/disable endpoint caching
+cache_enabled = true
+
 [navbar]
 links = [
     { name = "Home", href = "/", title = "Homepage" },

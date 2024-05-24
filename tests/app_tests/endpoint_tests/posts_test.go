@@ -21,6 +21,7 @@ func TestPostSuccess(t *testing.T) {
 		DatabasePassword: "root",
 		DatabaseName:     "urchin",
 		WebserverPort:    8080,
+		CacheEnabled:     false,
 	}
 
 	database_mock := mocks.DatabaseMock{
@@ -107,6 +108,7 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 		DatabasePassword: "root",
 		DatabaseName:     "urchin",
 		WebserverPort:    8080,
+		CacheEnabled:     false,
 	}
 
 	database_mock := mocks.DatabaseMock{
