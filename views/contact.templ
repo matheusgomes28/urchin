@@ -2,7 +2,7 @@ package views
 
 import "github.com/matheusgomes28/urchin/common"
 
-templ MakeContactPage(links []common.Link) {
+templ MakeContactPage(links []common.Link, recaptcha_sitekey string) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -13,6 +13,9 @@ templ MakeContactPage(links []common.Link) {
         <link rel="stylesheet" href="/static/simple.min.css" />
         <script src="/static/htmx.min.js"></script>
         <script src="/static/client-side-templates.js"></script>
+        if len(recaptcha_sitekey) > 0 {
+            <script src="https://www.google.com/recaptcha/api.js"></script>
+        }
     </head>
 
     <body>
@@ -20,18 +23,42 @@ templ MakeContactPage(links []common.Link) {
         <main>
             <div id="contact-form">
                 <h2>Contact Us</h2>
-                <form action="#" method="post" hx-post="/contact-send" hx-target="#contact-form">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" required /><br/><br/>
+                    if len(recaptcha_sitekey) > 0 {
+                        <form id="demo-form" method="post" hx-post="/contact-send" hx-target="#contact-form" hx-trigger="verified" >
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" required /><br/><br/>
 
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required/><br/><br/>
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required/><br/><br/>
 
-                    <label for="message">Message:</label><br/>
-                    <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
+                            <label for="message">Message:</label><br/>
+                            <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
 
-                    <input type="submit" value="Submit" />
-                </form>
+                                <button class="g-recaptcha" 
+                                    data-sitekey={recaptcha_sitekey}
+                                    data-callback='onSubmit' 
+                                    data-action='submit'>Submit</button>
+                                <script>
+                                    function onSubmit(){
+                                        const event = new Event('verified');
+                                        const elem = document.querySelector("#demo-form");
+                                        elem.dispatchEvent(event);
+                                    }
+                                </script>
+                        </form>
+                    } else {
+                        <form id="demo-form" method="post" hx-post="/contact-send" hx-target="#contact-form" >
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" required /><br/><br/>
+
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required/><br/><br/>
+
+                            <label for="message">Message:</label><br/>
+                            <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
+                            <input type="submit" value="Submit" />
+                        </form>
+                    }
             </div>
         </main>
         @MakeFooter()

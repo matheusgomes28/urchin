@@ -26,6 +26,11 @@ image_dir = "./images"
 # Enable/disable endpoint cache
 cache_enabled = true
 
+# Recaptcha settings
+recaptcha_sitekey = "6LecCewpAAAAAK7QS2SwuyCIDzwlyXMs4J1Z5LBq"
+recaptcha_secret = "6LecCewpAAAAAPP8Aaxh6jWaDE1xG_MBQa1OOs8f"
+
+
 [navbar]
 links = [
     { name = "Home", href = "/", title = "Homepage" },
