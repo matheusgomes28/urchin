@@ -15,7 +15,7 @@ type Database interface {
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
-	DeletePost(id int) error
+	DeletePost(id int) (int, error)
 }
 
 type SqlDatabase struct {
@@ -127,12 +127,18 @@ func (db SqlDatabase) ChangePost(id int, title string, excerpt string, content s
 // / This function changes a post based on the values
 // / provided. Note that empty strings will mean that
 // / the value will not be updated.
-func (db SqlDatabase) DeletePost(id int) error {
-	if _, err := db.Connection.Exec("DELETE FROM posts WHERE id=?;", id); err != nil {
-		return err
+func (db SqlDatabase) DeletePost(id int) (int, error) {
+	var res, err = db.Connection.Exec("DELETE FROM posts where id=?", id)
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	rows_affected, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(rows_affected), nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {

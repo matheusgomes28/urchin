@@ -27,6 +27,6 @@ func (db DatabaseMock) ChangePost(id int, title string, excerpt string, content 
 	return nil
 }
 
-func (db DatabaseMock) DeletePost(id int) error {
-	return fmt.Errorf("not implemented")
+func (db DatabaseMock) DeletePost(id int) (int, error) {
+	return 0, fmt.Errorf("not implemented")
 }

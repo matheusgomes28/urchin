@@ -108,10 +108,16 @@ func deletePostHandler(database database.Database) func(*gin.Context) {
 			return
 		}
 
-		err = database.DeletePost(delete_post_binding.Id)
+		rows_affected, err := database.DeletePost(delete_post_binding.Id)
 		if err != nil {
 			log.Error().Msgf("failed to delete post: %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("could not delete post", err))
+			return
+		}
+
+		if rows_affected != 1 {
+			log.Error().Msgf("no post found with id `%d`", delete_post_binding.Id)
+			c.JSON(http.StatusNotFound, common.MsgErrorRes("no post found"))
 			return
 		}
 
