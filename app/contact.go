@@ -16,6 +16,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Change this in case Google decides to deprecate
+// the reCAPTCHA validation endpoint
 const RECAPTCHA_VERIFY_URL string = "https://www.google.com/recaptcha/api/siteverify"
 
 type RecaptchaResponse struct {
@@ -24,13 +26,6 @@ type RecaptchaResponse struct {
 	Timestamp string  `json:"challenge_ts"`
 	Hostname  string  `json:"hostname"`
 }
-
-/*
-  "success": true|false,
-  "challenge_ts": timestamp,  // timestamp of the challenge load (ISO format yyyy-MM-dd'T'HH:mm:ssZZ)
-  "hostname": string,         // the hostname of the site where the reCAPTCHA was solved
-  "error-codes": [...]        // optional
-*/
 
 func verifyRecaptcha(recaptcha_secret string, recaptcha_response string) error {
 	// Validate that the recaptcha response was actually
@@ -62,6 +57,28 @@ func verifyRecaptcha(recaptcha_secret string, recaptcha_response string) error {
 	return nil
 }
 
+func validateEmail(email string) error {
+	_, err := mail.ParseAddress(email)
+	if err != nil {
+		return fmt.Errorf("could not parse email: %s", email)
+	}
+
+	return nil
+}
+
+func renderErrorPage(c *gin.Context, email string, err error) error {
+	if err = render(c, http.StatusOK, views.MakeContactFailure(email, err.Error())); err != nil {
+		log.Error().Msgf("could not render error page: %v", err)
+	}
+	return err
+}
+
+func logError(err error) {
+	if err != nil {
+		log.Error().Msgf("%v", err)
+	}
+}
+
 func makeContactFormHandler(app_settings common.AppSettings) func(*gin.Context) {
 	return func(c *gin.Context) {
 		if err := c.Request.ParseForm(); err != nil {
@@ -77,25 +94,21 @@ func makeContactFormHandler(app_settings common.AppSettings) func(*gin.Context) 
 		message := c.Request.FormValue("message")
 		recaptcha_response := c.Request.FormValue("g-recaptcha-response")
 
-		// Make the request to Google's API
+		// Make the request to Google's API only if user
+		// configured recatpcha settings
 		if (len(app_settings.RecaptchaSecret) > 0) && (len(app_settings.RecaptchaSiteKey) > 0) {
 			err := verifyRecaptcha(app_settings.RecaptchaSecret, recaptcha_response)
 			if err != nil {
-				log.Error().Msgf("could not validate recaptcha %v", err)
-				if err = render(c, http.StatusOK, views.MakeContactFailure("could not validate recaptcha", err.Error())); err != nil {
-					log.Error().Msgf("could not render %v", err)
-				}
+				log.Error().Msgf("%v", err)
+				defer logError(renderErrorPage(c, email, err))
 				return
 			}
 		}
 
-		// Parse email
-		_, err := mail.ParseAddress(email)
+		err := validateEmail(email)
 		if err != nil {
-			log.Error().Msgf("could not parse email: %v", err)
-			if err = render(c, http.StatusOK, views.MakeContactFailure(email, err.Error())); err != nil {
-				log.Error().Msgf("could not render: %v", err)
-			}
+			log.Error().Msgf("%v", err)
+			defer logError(renderErrorPage(c, email, err))
 			return
 		}
 
@@ -103,6 +116,7 @@ func makeContactFormHandler(app_settings common.AppSettings) func(*gin.Context) 
 		if len(name) > 200 {
 			if err = render(c, http.StatusOK, views.MakeContactFailure(email, "name too long (200 chars max)")); err != nil {
 				log.Error().Msgf("could not render: %v", err)
+				logError(renderErrorPage(c, email, err))
 			}
 			return
 		}
@@ -110,6 +124,7 @@ func makeContactFormHandler(app_settings common.AppSettings) func(*gin.Context) 
 		if len(message) > 10000 {
 			if err = render(c, http.StatusOK, views.MakeContactFailure(email, "message too long (1000 chars max)")); err != nil {
 				log.Error().Msgf("could not render: %v", err)
+				logError(renderErrorPage(c, email, err))
 			}
 			return
 		}
