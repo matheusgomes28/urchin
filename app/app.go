@@ -36,7 +36,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/page/:num", homeHandler, &cache, app_settings, database)
 
 	// DO not cache as it needs to handlenew form values
-	r.POST("/contact-send", makeContactFormHandler())
+	r.POST("/contact-send", makeContactFormHandler(app_settings))
 
 	// Where all the static files (css, js, etc) are served from
 	r.Static("/static", "./static")

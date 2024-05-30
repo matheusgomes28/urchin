@@ -18,6 +18,8 @@ type AppSettings struct {
 	AdminPort        int    `toml:"admin_port"`
 	ImageDirectory   string `toml:"image_dir"`
 	CacheEnabled     bool   `toml:"cache_enabled"`
+	RecaptchaSiteKey string `toml:"recaptcha_sitekey,omitempty"`
+	RecaptchaSecret  string `toml:"recaptcha_secret,omitempty"`
 	AppNavbar        Navbar `toml:"navbar"`
 }
 
