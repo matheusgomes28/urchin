@@ -1,14 +1,14 @@
 package mocks
 
 import (
-	"fmt"
-
 	"github.com/matheusgomes28/urchin/common"
 )
 
 type DatabaseMock struct {
-	GetPostHandler  func(int) (common.Post, error)
-	GetPostsHandler func(int, int) ([]common.Post, error)
+	GetPostHandler    func(int) (common.Post, error)
+	GetPostsHandler   func(int, int) ([]common.Post, error)
+	AddPostHandler    func(string, string, string) (int, error)
+	DeletePostHandler func(int) (int, error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -20,7 +20,7 @@ func (db DatabaseMock) GetPost(post_id int) (common.Post, error) {
 }
 
 func (db DatabaseMock) AddPost(title string, excerpt string, content string) (int, error) {
-	return 0, nil
+	return db.AddPostHandler(title, excerpt, content)
 }
 
 func (db DatabaseMock) ChangePost(id int, title string, excerpt string, content string) error {
@@ -28,5 +28,5 @@ func (db DatabaseMock) ChangePost(id int, title string, excerpt string, content 
 }
 
 func (db DatabaseMock) DeletePost(id int) (int, error) {
-	return 0, fmt.Errorf("not implemented")
+	return db.DeletePostHandler(id)
 }
