@@ -25,5 +25,5 @@ func ErrorRes(msg string, err error) ErrorResponse {
 // Supported responses for urchin shared between app and admin-app.
 type ErrorResponse struct {
 	Msg string `json:"msg"`
-	Err string `json:"error"`
+	Err string `json:"error,omitempty"`
 }
