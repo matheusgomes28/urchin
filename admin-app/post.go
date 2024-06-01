@@ -2,7 +2,9 @@ package admin_app
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
@@ -48,6 +50,13 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 		if err != nil {
 			log.Warn().Msgf("invalid post request: %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("invalid request body", err))
+			return
+		}
+
+		err = checkRequiredData(add_post_request)
+		if err != nil {
+			log.Error().Msgf("failed to add post required data is missing: %v", err)
+			c.JSON(http.StatusBadRequest, common.ErrorRes("missing required data", err))
 			return
 		}
 
@@ -125,4 +134,20 @@ func deletePostHandler(database database.Database) func(*gin.Context) {
 			delete_post_binding.Id,
 		})
 	}
+}
+
+func checkRequiredData(addPostRequest AddPostRequest) error {
+	if strings.TrimSpace(addPostRequest.Title) == "" {
+		return fmt.Errorf("missing required data 'Title'")
+	}
+
+	if strings.TrimSpace(addPostRequest.Excerpt) == "" {
+		return fmt.Errorf("missing required data 'Excerpt'")
+	}
+
+	if strings.TrimSpace(addPostRequest.Content) == "" {
+		return fmt.Errorf("missing required data 'Content'")
+	}
+
+	return nil
 }

@@ -14,16 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type postRequest struct {
-	Title   string `json:"title"`
-	Excerpt string `json:"excerpt"`
-	Content string `json:"content"`
-}
-
-type postResponse struct {
-	Id int `json:"id"`
-}
-
 var app_settings = common.AppSettings{
 	DatabaseAddress:  "localhost",
 	DatabasePort:     3006,
@@ -32,37 +22,6 @@ var app_settings = common.AppSettings{
 	DatabaseName:     "urchin",
 	WebserverPort:    8080,
 	ImageDirectory:   "../../../images",
-}
-
-func TestIndexPing(t *testing.T) {
-	databaseMock := mocks.DatabaseMock{
-		AddPostHandler: func(string, string, string) (int, error) {
-			return 0, nil
-		},
-	}
-
-	r := admin_app.SetupRoutes(app_settings, databaseMock)
-	w := httptest.NewRecorder()
-
-	request := postRequest{
-		Title:   "",
-		Excerpt: "",
-		Content: "",
-	}
-	request_body, err := json.Marshal(request)
-	assert.Nil(t, err)
-
-	req, _ := http.NewRequest("POST", "/posts", bytes.NewReader(request_body))
-	req.Header.Add("content-type", "application/json")
-	r.ServeHTTP(w, req)
-
-	assert.Equal(t, 200, w.Code)
-
-	var response postResponse
-	err = json.Unmarshal(w.Body.Bytes(), &response)
-	assert.Nil(t, err)
-
-	assert.Equal(t, response.Id, 0)
 }
 
 func TestPostPostSuccess(t *testing.T) {
@@ -86,7 +45,7 @@ func TestPostPostSuccess(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 200, responseRecorder.Code)
+	assert.Equal(t, http.StatusOK, responseRecorder.Code)
 	var response admin_app.PostIdResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
@@ -114,12 +73,14 @@ func TestPostPostWithoutTitle(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 200, responseRecorder.Code)
-	var response admin_app.PostIdResponse
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
 
-	assert.NotNil(t, response.Id)
+	assert.Equal(t, response.Msg, "missing required data")
+	assert.NotNil(t, response.Err)
+	assert.Contains(t, response.Err, "'Title'")
 }
 
 func TestPostPostWithoutExcerpt(t *testing.T) {
@@ -142,12 +103,14 @@ func TestPostPostWithoutExcerpt(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 200, responseRecorder.Code)
-	var response admin_app.PostIdResponse
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
 
-	assert.NotNil(t, response.Id)
+	assert.Equal(t, response.Msg, "missing required data")
+	assert.NotNil(t, response.Err)
+	assert.Contains(t, response.Err, "'Excerpt'")
 }
 
 func TestPostPostWithoutContent(t *testing.T) {
@@ -170,12 +133,14 @@ func TestPostPostWithoutContent(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 200, responseRecorder.Code)
-	var response admin_app.PostIdResponse
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
 
-	assert.NotNil(t, response.Id)
+	assert.Equal(t, response.Msg, "missing required data")
+	assert.NotNil(t, response.Err)
+	assert.Contains(t, response.Err, "'Content'")
 }
 
 func TestPostPostNoBody(t *testing.T) {
@@ -188,7 +153,7 @@ func TestPostPostNoBody(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 400, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
@@ -207,7 +172,7 @@ func TestPostPostInvalidPostRequest(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 400, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
@@ -237,7 +202,7 @@ func TestPostPostFailedSave(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 400, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
@@ -260,7 +225,7 @@ func TestDeletePostSuccess(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 200, responseRecorder.Code)
+	assert.Equal(t, http.StatusOK, responseRecorder.Code)
 	var response admin_app.PostIdResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
@@ -282,7 +247,7 @@ func TestDeletePostFailedDelete(t *testing.T) {
 
 	router.ServeHTTP(responseRecorder, request)
 
-	assert.Equal(t, 400, responseRecorder.Code)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 	var response common.ErrorResponse
 	err := json.Unmarshal(responseRecorder.Body.Bytes(), &response)
 	assert.Nil(t, err)
