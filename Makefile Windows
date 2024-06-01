@@ -6,7 +6,7 @@ URCHIN_DIR=./cmd/urchin
 URCHIN_ADMIN_DIR=./cmd/urchin-admin
 
 # Name of the binary
-BINARY_NAME=urchin
+BINARY_NAME=urchin.exe
 ADMIN_BINARY_NAME=urchin-admin
 
 all: build test
