@@ -3,10 +3,10 @@ testdata_dir = "testdata"
 tmp_dir = "tmp"
 
 [build]
-  cmd = "make build"
+  cmd = "go build -v -o .\\tmp\\urchin.exe .\\cmd\\urchin"
   args_bin = []
-  bin = "./tmp/urchin"
-  full_bin = "./tmp/urchin --config urchin_config.toml"
+  bin = ".\\tmp\\urchin.exe"
+  full_bin = ".\\tmp\\urchin.exe --config urchin_config.toml.exe"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
