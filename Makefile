@@ -1,6 +1,7 @@
 # Go parameters
 GOCMD=go
 TEMPL=templ
+TAILWIND=tailwindcss-linux-x64
 BUILD_DIR=./tmp
 URCHIN_DIR=./cmd/urchin
 URCHIN_ADMIN_DIR=./cmd/urchin-admin
@@ -16,6 +17,9 @@ prepare_env:
 
 build: prepare_env
 	$(TEMPL) generate
+	$(TAILWIND) -i ./static/style.css -o ./static/output.css -m
+	$(GOCMD) build -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
+	$(GOCMD) build -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
 
