@@ -3,7 +3,7 @@ package views
 import "github.com/matheusgomes28/urchin/common"
 
 
-templ MakePostPage(title string, content string, links []common.Link) {
+templ MakePage(title string, content string, links []common.Link) {
     <!DOCTYPE html>
     <html lang="en">
 
@@ -19,10 +19,7 @@ templ MakePostPage(title string, content string, links []common.Link) {
     <body>
         @MakeNavBar(links)
         <main>
-            <article>
-                <h1>{ title }</h1>
-                @templ.Raw(content)
-            </article>
+            @templ.Raw(content)
         </main>
     
         @MakeFooter()

@@ -6,6 +6,12 @@ import "github.com/matheusgomes28/urchin/common"
 // organize the data in a simpler way. Every domain object supporting
 // CRUD endpoints has their own structures to handle the http methods.
 
+type AddPageRequest struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Link    string `json:"link"`
+}
+
 type DeletePostBinding struct {
 	common.IntIdBinding
 }
