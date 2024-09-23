@@ -11,14 +11,13 @@ import (
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
-	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
 )
 
 // TODO : need these endpoints
 // r.POST("/images", postImageHandler(&database))
 // r.DELETE("/images", deleteImageHandler(&database))
-func postImageHandler(app_settings common.AppSettings, database database.Database) func(*gin.Context) {
+func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 	return func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 10*1000000)
 		form, err := c.MultipartForm()

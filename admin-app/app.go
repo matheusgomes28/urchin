@@ -16,7 +16,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.PUT("/posts", putPostHandler(database))
 	r.DELETE("/posts/:id", deletePostHandler(database))
 
-	r.POST("/images", postImageHandler(app_settings, database))
+	r.POST("/images", postImageHandler(app_settings))
 	r.DELETE("/images/:name", deleteImageHandler(app_settings))
 
 	return r
