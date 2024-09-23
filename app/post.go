@@ -14,6 +14,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func serveErrorPage(c *gin.Context, error_msg string, error_code int, app_settings common.AppSettings) error {
+	// Generate HTML page
+	log.Error().Msgf("running the serveErrorPage")
+	error_page := views.MakeErrorPage(error_msg, app_settings.AppNavbar.Links)
+
+	// TODO : is there a better function to serve the bytes?
+	if err := render(c, error_code, error_page); err == nil {
+		log.Error().Msgf("could not render: %v", err)
+	}
+
+	return nil
+}
+
 func mdToHTML(md []byte) []byte {
 	// create markdown parser with extensions
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
@@ -35,7 +48,11 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	err := c.ShouldBindUri(&post_binding)
 
 	if err != nil || post_binding.Id < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+
+		err = serveErrorPage(c, "requested invalid post ID", http.StatusBadRequest, app_settings)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid post ID"})
+		}
 
 		return nil, err
 	}
@@ -44,7 +61,10 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	post, err := database.GetPost(post_binding.Id)
 
 	if err != nil || post.Content == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Post Not Found"})
+		err = serveErrorPage(c, "given post not found", http.StatusNotFound, app_settings)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Post Not Found"})
+		}
 		return nil, err
 	}
 
