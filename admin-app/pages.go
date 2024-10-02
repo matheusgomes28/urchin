@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -29,10 +28,15 @@ func postPageHandler(database database.Database) func(*gin.Context) {
 
 		decoder := json.NewDecoder(c.Request.Body)
 		err := decoder.Decode(&add_page_request)
-
 		if err != nil {
 			log.Warn().Msgf("invalid page request: %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("invalid request body", err))
+			return
+		}
+
+		err = checkRequiredPageData(add_page_request)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes("invalid page data"))
 			return
 		}
 
@@ -129,7 +133,7 @@ func checkRequiredPageData(add_page_request AddPageRequest) error {
 		return fmt.Errorf("missing required data 'Content'")
 	}
 
-	err := validateLinkRegex(add_page_request.Link)
+	err := validateLink(add_page_request.Link)
 	if err != nil {
 		return err
 	}
@@ -137,14 +141,17 @@ func checkRequiredPageData(add_page_request AddPageRequest) error {
 	return nil
 }
 
-func validateLinkRegex(link string) error {
-	match, err := regexp.MatchString("^[a-zA-Z0-9_\\-]+$", link)
-	if err != nil {
-		return fmt.Errorf("could not match the string: %v", err)
-	}
+func validateLink(link string) error {
+	for _, char := range link {
+		char_val := int(char)
+		is_uppercase := (char_val >= 65) && (char_val <= 90)
+		is_lowercase := (char_val >= 97) && (char_val <= 122)
+		is_sign := (char == '-') || (char == '_')
 
-	if !match {
-		return fmt.Errorf("could not match the string")
+		if !(is_uppercase || is_lowercase || is_sign) {
+			// TODO : what is this conversion?!
+			return fmt.Errorf("invalid character in link %s", string(rune(char)))
+		}
 	}
 
 	return nil
