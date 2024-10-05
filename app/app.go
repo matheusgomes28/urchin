@@ -29,6 +29,10 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/images/:name", imageHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
 
+	// Pages will be querying the page content from the unique
+	// link given at the creation of the page step
+	addCachableHandler(r, "GET", "/pages/:link", pageHandler, &cache, app_settings, database)
+
 	// Static endpoint for image serving
 	r.Static("/images/data", app_settings.ImageDirectory)
 
@@ -40,6 +44,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 
 	// Where all the static files (css, js, etc) are served from
 	r.Static("/static", "./static")
+
 	return r
 }
 
@@ -50,6 +55,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		if app_settings.CacheEnabled {
 			cached_endpoint, err := (*cache).Get(c.Request.RequestURI)
 			if err == nil {
+				log.Info().Msgf("cache hit for page: %s", c.Request.RequestURI)
 				c.Data(http.StatusOK, "text/html; charset=utf-8", cached_endpoint.Contents)
 				return
 			}

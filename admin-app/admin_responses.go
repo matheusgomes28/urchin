@@ -1,5 +1,10 @@
 package admin_app
 
+type PageResponse struct {
+	Id   int    `json:"id"`
+	Link string `json:"link"`
+}
+
 type PostIdResponse struct {
 	Id int `json:"id"`
 }
