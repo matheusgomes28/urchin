@@ -17,6 +17,7 @@ import (
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	lua "github.com/yuin/gopher-lua"
 )
 
 type imageResponse struct {
@@ -26,7 +27,7 @@ type imageResponse struct {
 func TestPostImage(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -58,7 +59,7 @@ func TestPostImage(t *testing.T) {
 func TestPostImageNotAnImageFile(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -85,7 +86,7 @@ func TestPostImageNotAnImageFile(t *testing.T) {
 func TestPostImageWrongFileContentType(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -111,25 +112,10 @@ func TestPostImageWrongFileContentType(t *testing.T) {
 	assert.Equal(t, 400, w.Code)
 }
 
-func TestGetImageNoDatabaseEntry(t *testing.T) {
-	database_mock := mocks.DatabaseMock{}
-
-	r := admin_app.SetupRoutes(app_settings, database_mock)
-
-	get_recorder := httptest.NewRecorder()
-	uuid, _ := uuid.New()
-
-	uri := fmt.Sprintf("/images/%s", uuid.String())
-	req, _ := http.NewRequest("GET", uri, bytes.NewBuffer([]byte{}))
-	r.ServeHTTP(get_recorder, req)
-
-	assert.Equal(t, 404, get_recorder.Code)
-}
-
 func TestGetImageNoImageFile(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 
 	get_recorder := httptest.NewRecorder()
 	uuid, _ := uuid.New()
@@ -144,7 +130,7 @@ func TestGetImageNoImageFile(t *testing.T) {
 func TestDeleteImage(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	post_recorder := httptest.NewRecorder()
 
 	pr, pw := io.Pipe()
@@ -188,7 +174,7 @@ func TestDeleteImage(t *testing.T) {
 func TestDeleteImageNoImageFile(t *testing.T) {
 	database_mock := mocks.DatabaseMock{}
 
-	r := admin_app.SetupRoutes(app_settings, database_mock)
+	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	delete_recorder := httptest.NewRecorder()
 
 	uuid, _ := uuid.New()

@@ -167,7 +167,7 @@ func (db SqlDatabase) GetPage(link string) (common.Page, error) {
 		return common.Page{}, err
 	}
 	defer func() {
-		err = errors.Join(rows.Close())
+		err = errors.Join(err, rows.Close())
 	}()
 
 	page := common.Page{}
