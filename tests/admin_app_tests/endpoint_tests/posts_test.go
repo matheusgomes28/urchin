@@ -31,7 +31,7 @@ func TestPostPostSuccess(t *testing.T) {
 	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
 	w := httptest.NewRecorder()
 
-	request := postRequest{
+	request := common.Pos{
 		Title:   "",
 		Excerpt: "",
 		Content: "",
