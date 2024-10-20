@@ -11,7 +11,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/require"
-	lua "github.com/yuin/gopher-lua"
 
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/tests/helpers"
@@ -43,7 +42,7 @@ func TestPostExists(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := admin_app.SetupRoutes(app_settings, database, make(map[string]*lua.LState))
+	r := admin_app.SetupRoutes(app_settings, database)
 	request_bytes, err := json.Marshal(add_post_request)
 	require.Nil(t, err)
 	req, _ := http.NewRequest("POST", "/posts", bytes.NewBuffer(request_bytes))

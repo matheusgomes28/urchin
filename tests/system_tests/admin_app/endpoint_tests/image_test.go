@@ -12,7 +12,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/require"
-	lua "github.com/yuin/gopher-lua"
 
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/tests/helpers"
@@ -56,7 +55,7 @@ func TestImageUpload(t *testing.T) {
 
 	// Execute multiform request
 	post_recorder := httptest.NewRecorder()
-	r := admin_app.SetupRoutes(app_settings, database, make(map[string]*lua.LState))
+	r := admin_app.SetupRoutes(app_settings, database)
 	require.Nil(t, err)
 
 	req, _ := http.NewRequest("POST", "/images", pr)

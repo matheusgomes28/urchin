@@ -12,7 +12,6 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/tests/mocks"
 	"github.com/stretchr/testify/assert"
-	lua "github.com/yuin/gopher-lua"
 )
 
 var app_settings = common.AppSettings{
@@ -26,15 +25,10 @@ var app_settings = common.AppSettings{
 }
 
 func TestPostPostSuccess(t *testing.T) {
-
-	database_mock := mocks.DatabaseMock{}
-	r := admin_app.SetupRoutes(app_settings, database_mock, make(map[string]*lua.LState))
-	w := httptest.NewRecorder()
-
-	request := common.Pos{
-		Title:   "",
-		Excerpt: "",
-		Content: "",
+	databaseMock := mocks.DatabaseMock{
+		AddPostHandler: func(string, string, string) (int, error) {
+			return 0, nil
+		},
 	}
 
 	postData := admin_app.AddPostRequest{
