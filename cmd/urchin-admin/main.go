@@ -9,8 +9,27 @@ import (
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
+	"github.com/matheusgomes28/urchin/plugins"
 	"github.com/rs/zerolog/log"
+	lua "github.com/yuin/gopher-lua"
 )
+
+func loadShortcodeHandlers(shortcodes []common.Shortcode) (map[string]*lua.LState, error) {
+	shortcode_handlers := make(map[string]*lua.LState, 0)
+	for _, shortcode := range shortcodes {
+		// Read the LUA state
+		state := lua.NewState()
+		err := state.DoFile(shortcode.Plugin)
+		// TODO : check that the function HandleShortcode(args)
+		//        exists and returns the correct type
+		if err != nil {
+			return map[string]*lua.LState{}, fmt.Errorf("could not load shortcode %s: %v", shortcode.Name, err)
+		}
+		shortcode_handlers[shortcode.Name] = state
+	}
+
+	return shortcode_handlers, nil
+}
 
 func main() {
 	// sets zerolog as the main logger
@@ -46,8 +65,29 @@ func main() {
 		os.Exit(-1)
 	}
 
-	r := admin_app.SetupRoutes(app_settings, database)
-	err = r.Run(fmt.Sprintf(":%d", app_settings.AdminPort))
+	shortcode_handlers, err := loadShortcodeHandlers(app_settings.Shortcodes)
+	if err != nil {
+		log.Error().Msgf("%v", err)
+		os.Exit(-1)
+	}
+
+	// TODO : we probably want to refactor loadShortcodeHandler
+	// TODO : into loadPluginHandlers instead
+
+	post_hook := plugins.PostHook{}
+	image_plugin := plugins.Plugin{
+		ScriptName: "img",
+		Id:         "img-plugin",
+	}
+	post_hook.Register(image_plugin)
+
+	// img, _ := shortcode_handlers["img"]
+	hooks_map := map[string]plugins.Hook{
+		"add_post": post_hook,
+	}
+
+	r := admin_app.SetupRoutes(app_settings, database, shortcode_handlers, hooks_map)
+	err = r.Run(fmt.Sprintf(":%d", app_settings.WebserverPort))
 	if err != nil {
 		log.Error().Msgf("could not run app: %v", err)
 		os.Exit(-1)
