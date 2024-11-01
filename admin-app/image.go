@@ -6,13 +6,20 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"slices"
 
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
 )
+
+var allowed_extensions = map[string]bool{
+	".jpeg": true, ".jpg": true, ".png": true,
+}
+
+var allowed_content_types = map[string]bool{
+	"image/jpeg": true, "image/png": true, "image/gif": true,
+}
 
 // TODO : need these endpoints
 // r.POST("/images", postImageHandler(&database))
@@ -38,9 +45,9 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 		}
 
 		file := file_array[0]
-		allowed_types := []string{"image/jpeg", "image/png", "image/gif"}
 		file_content_type := file.Header.Get("content-type")
-		if !slices.Contains(allowed_types, file_content_type) {
+		_, ok := allowed_content_types[file_content_type]
+		if !ok {
 			log.Error().Msgf("file type not supported")
 			c.JSON(http.StatusBadRequest, common.MsgErrorRes("file type not supported"))
 			return
@@ -60,10 +67,10 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 			return
 		}
 
-		allowed_extensions := []string{"jpeg", "jpg", "png"}
 		ext := filepath.Ext(file.Filename)
 		// check ext is supported
-		if ext == "" && slices.Contains(allowed_extensions, ext) {
+		_, ok = allowed_extensions[ext]
+		if ext == "" || !ok {
 			log.Error().Msgf("file extension is not supported %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("file extension is not supported", err))
 			return

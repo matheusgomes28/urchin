@@ -48,7 +48,7 @@ templ MakeImagesPage(images []Image, links []Link) {
                     for _, image := range images {
                         <a href={templ.URL("/images/" + image.Name)}>
                             <div>
-                                <img src={fmt.Sprintf("/images/data/%s", image.Name)} alt={image.AltText} />
+                                <img src={fmt.Sprintf("/images/data/%s", image.Name)} />
                                 <span>{image.Name}</span>
                             </div>
                         </a>
