@@ -23,6 +23,7 @@ RUN apt-get update \
     make \
     pkg-config \
     wget \
+    curl \
     && wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz -P golang-install \
     && cd golang-install \
     && rm -rf /usr/local/go && tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz \

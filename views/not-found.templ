@@ -1,0 +1,11 @@
+package views
+
+import "github.com/matheusgomes28/urchin/common"
+
+templ makeNotFound() {
+  <h1 class="text-2xl text-bold">Oops - Resource cannot be found 🙁</h1>
+}
+
+templ MakeNotFoundPage(links []common.Link) {
+  @MakeLayout("Not Found", links, makeNotFound())
+}

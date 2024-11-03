@@ -1,7 +1,6 @@
 package app
 
 import (
-	"bytes"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -70,11 +69,6 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 
 	// Generate HTML page
 	post.Content = string(mdToHTML([]byte(post.Content)))
-	post_view := views.MakePostPage(post.Title, post.Content, app_settings.AppNavbar.Links)
-	html_buffer := bytes.NewBuffer(nil)
-	if err = post_view.Render(c, html_buffer); err != nil {
-		log.Error().Msgf("could not render: %v", err)
-	}
 
-	return html_buffer.Bytes(), nil
+	return renderHtml(c, views.MakePostPage(post.Title, post.Content, app_settings.AppNavbar.Links))
 }

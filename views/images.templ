@@ -1,64 +1,30 @@
 package views
 
 import (
-    "fmt"
-    . "github.com/matheusgomes28/urchin/common"
+  "fmt"
+  . "github.com/matheusgomes28/urchin/common"
 )
 
+templ makeImages(images []Image) {
+  if len(images) == 0 {
+    <div class="block">
+      <h3 class="text-3xl font-bold">No images uploaded</h3>
+    </div>
+  } else {
+    <div class="grid grid-cols-5 gap-4 sm:grid-cols-3 sm:gap-2">
+      for _, image := range images {
+        <a class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2"
+          href={templ.URL("/images/" + image.Name)}>
+          <img class="w-full h-48 object-cover" src={fmt.Sprintf("/images/data/%s", image.Name)} />
+          <div class="p-2">
+            <h2 class="text-sm font-semibold truncate">{image.Name}</h2>
+          </div>
+        </a>
+      }
+    </div>
+  }
+}
+
 templ MakeImagesPage(images []Image, links []Link) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8" />
-        <title>Menu and Contact Form</title>
-        <!-- Minified version -->
-        <link rel="stylesheet" href="/static/simple.min.css" />
-        <script src="/static/htmx.min.js"></script>
-        <script src="/static/client-side-templates.js"></script>
-        <style>
-            div {
-                margin: 5px 0;
-                padding: 10px;
-                border: 1px solid rgb(245, 174, 8);
-                display: inline-flex;
-                width: 100%;
-            }
-
-            img {
-                max-width: 120px;
-                max-height: 120px;
-            }
-
-            span {
-                font-size: 1.5rem;
-                font-weight: bold;
-                margin: 20px 10px;
-            }
-        </style>
-    </head>
-
-    <body>
-        @MakeNavBar(links)
-        <main>
-            <article>
-                if len(images) == 0 {
-                    <h3>No images uploaded.</h3>
-                } else {
-                    for _, image := range images {
-                        <a href={templ.URL("/images/" + image.Name)}>
-                            <div>
-                                <img src={fmt.Sprintf("/images/data/%s", image.Name)} />
-                                <span>{image.Name}</span>
-                            </div>
-                        </a>
-                    }
-                }
-            </article>
-        </main>
-    
-        @MakeFooter()
-    </body>
-
-    </html>
+  @MakeLayout("Images", links, makeImages(images))
 }

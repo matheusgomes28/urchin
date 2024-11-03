@@ -1,6 +1,6 @@
 package views
 
 templ MakeContactFailure(email string, err string) {
-    <h2 style="color: #720d0d">Failed to send message from { email }!</h2>
-    <p>Your message could not be sent. Error: { err }</p>
+  <h2 class="text-2xl text-bold text-red-800 mb-4">Failed to send message from { email }!</h2>
+  <p class="text-xl text-bold">Your message could not be sent. Error: <span class="text-extrabold">{ err }</span></p>
 }
