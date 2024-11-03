@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"os"
 	"path"
-	"slices"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +13,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// Since there are no builtin sets in go, we are using a map to improve the performance when checking for valid extensions
+// by creating a map with the valid extensions as keys and using an existence check.
+var valid_extensions = map[string]bool{
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+	".gif":  true,
+}
+
 func imagesHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
 	// TODO: Implement rendering.
-	pageNum := 0 // Default to page 0
+	pageNum := 1 // Default to page 0
 	if pageNumQuery := c.Param("num"); pageNumQuery != "" {
 		num, err := strconv.Atoi(pageNumQuery)
 		if err == nil && num > 0 {
@@ -27,7 +35,7 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 	}
 
 	limit := 10 // or whatever limit you want
-	offset := max((pageNum-1)*limit, 0)
+	offset := (pageNum - 1) * limit
 
 	// Get all the files inside the image directory
 	files, err := os.ReadDir(app_settings.ImageDirectory)
@@ -38,9 +46,7 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 
 	// Filter all the non-images out of the list
 	valid_images := make([]common.Image, 0)
-	valid_extensions := []string{".jpg", ".jpeg", ".png", ".gif"}
 	for n, file := range files {
-
 		// TODO : This is surely not the best way
 		//        to implement pagination in for loops
 		if n >= limit {
@@ -53,16 +59,19 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 
 		filename := file.Name()
 		ext := path.Ext(file.Name())
-		if slices.Contains(valid_extensions, ext) {
-
-			image := common.Image{
-				Uuid:    filename[:len(filename)-len(ext)],
-				Name:    filename,
-				AltText: "undefined", // TODO : perhaps remove this
-				Ext:     ext,
-			}
-			valid_images = append(valid_images, image)
+		// Checking for the existence of a value in a map takes O(1) and therefore it's faster than
+		// iterating over a string slice
+		_, ok := valid_extensions[ext]
+		if !ok {
+			continue
 		}
+
+		image := common.Image{
+			Uuid: filename[:len(filename)-len(ext)],
+			Name: filename,
+			Ext:  ext,
+		}
+		valid_images = append(valid_images, image)
 	}
 
 	index_view := views.MakeImagesPage(valid_images, app_settings.AppNavbar.Links)
@@ -89,10 +98,9 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 	name := filename[:len(filename)-len(ext)]
 
 	image := common.Image{
-		Uuid:    name,
-		Name:    filename,
-		AltText: "undefined",
-		Ext:     ext,
+		Uuid: name,
+		Name: filename,
+		Ext:  ext,
 	}
 	index_view := views.MakeImagePage(image, app_settings.AppNavbar.Links)
 	html_buffer := bytes.NewBuffer(nil)
