@@ -1,35 +1,15 @@
 package views
 
 import (
-    "fmt"
-    . "github.com/matheusgomes28/urchin/common"
+  "fmt"
+  . "github.com/matheusgomes28/urchin/common"
 )
 
+templ makeImage(image Image) {
+  <h3>{ image.Name }</h3>
+  <img src={fmt.Sprintf("/images/data/%s", image.Name)} />
+}
+
 templ MakeImagePage(image Image, links []Link) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8" />
-        <title>Menu and Contact Form</title>
-        <!-- Minified version -->
-        <link rel="stylesheet" href="/static/simple.min.css" />
-        <script src="/static/htmx.min.js"></script>
-        <script src="/static/client-side-templates.js"></script>
-    </head>
-
-    <body>
-        @MakeNavBar(links)
-        <main>
-            <article>
-            <h3>{ image.Name }</h3>
-            <img src={fmt.Sprintf("/images/data/%s", image.Name)} />
-            </article>
-        </main>
-        <a href={templ.URL("/images")}>Back</a>
-    
-        @MakeFooter()
-    </body>
-
-    </html>
+  @MakeLayout(image.Name, links, makeImage(image))
 }

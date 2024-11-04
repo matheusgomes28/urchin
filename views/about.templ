@@ -1,0 +1,9 @@
+package views
+
+import (
+  . "github.com/matheusgomes28/urchin/common"
+)
+
+templ MakeAboutPage(links []Link) {
+  @MakeLayout("About", links, makeUnderConstruction())
+}

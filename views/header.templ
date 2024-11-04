@@ -2,15 +2,57 @@ package views
 
 import "github.com/matheusgomes28/urchin/common"
 
+templ makeDarkModeButton() {
+	<button id="theme-toggle" class="text-gray-300 inline-block focus:outline-none">
+		<svg id="light-icon" class="w-[30px] h-[30px] dark:block hidden">
+			<circle cx="15" cy="15" r="6" fill="currentColor" />
+			<line id="ray" stroke="currentColor" storke-width="2" stroke-linecap="round" x1="15" y1="1" x2="15" y2="4">
+			</line>
+			<use href="#ray" transform="rotate(45 15 15)" />
+			<use href="#ray" transform="rotate(90 15 15)" />
+			<use href="#ray" transform="rotate(135 15 15)" />
+			<use href="#ray" transform="rotate(180 15 15)" />
+			<use href="#ray" transform="rotate(225 15 15)" />
+			<use href="#ray" transform="rotate(270 15 15)" />
+			<use href="#ray" transform="rotate(315 15 15)" />
+		</svg>
+		<svg id="dark-icon" class="dark:hidden block w-[30px] h-[30px] rotate-[315deg]">
+			<path fill="currentColor" d="M 23, 5 A 12 12 0 1 0 23, 25  A 12 12 0 0 1 23, 5" />
+		</svg>
+	</button>
+}
+
 templ MakeNavBar(links []common.Link) {
 	<header>
-		<nav>
-			<ul>
+		<nav class="fixed bg-gray-800 p-4 top-0 w-full inline">
+			<div class="container mx-auto flex justify-between items-center">
+				<div class="flex content-center">
+					// <img src="/static/assets/favicon.ico" class="w-[50px] h-[50px] mr-2" />
+					<a href="/" class="text-white text-4xl font-bold align-center">Urchin</a>
+				</div>
+				<div class="flex justify-end items-center">
+					<div class="hidden md:flex space-x-4 items-center">
+						for _, link := range links {
+						<a class="text-gray-100 dark:text-gray-100 hover:text-gray-400 w-auto h-fit inline-block p-3 text-center leading-4 font-bold transition duration-300 ease-in"
+							href={ templ.URL(link.Href) }>{ link.Name }</a>
+						}
+					</div>
+					@makeDarkModeButton()
+					<div class="md:hidden">
+						<button id="menu-toggle" class="text-gray-100 dark:text-gray-100 hover:text-gray-400 focus:outline-none">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+							</svg>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="mobile-menu" class="hidden md:hidden">
 				for _, link := range links {
-					<li><a href={ templ.URL(link.Href) }>{ link.Name }</a></li> // Pass the links in here
+				<a class="text-gray-100 dark:text-gray-100 hover:text-gray-400 block px-2 py-1" href={ templ.URL(link.Href) }>{
+					link.Name }</a>
 				}
-			</ul>
+			</div>
 		</nav>
 	</header>
-	<br/>
 }

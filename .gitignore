@@ -9,3 +9,9 @@ images/
 
 
 tests/helpers/migrations
+
+# The name of the TailwindCSS CLI
+tailwindcss
+
+# Generated TailwindCSS styles
+static/css/style.css

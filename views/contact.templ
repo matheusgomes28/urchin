@@ -3,73 +3,56 @@ package views
 import "github.com/matheusgomes28/urchin/common"
 
 templ MakeContactFormWithRecaptcha(recaptcha_sitekey string) {
-    <form id="demo-form" method="post" hx-post="/contact-send" hx-target="#contact-form" hx-trigger="verified" >
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required /><br/><br/>
+  <form id="demo-form" class="space-y-4 p-12" method="post" hx-post="/contact-send" hx-target="#contact-form" hx-trigger="verified">
+    <label for="name" class="block text-md font-medium">Name:</label>
+    <input id="name" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" type="text" name="name" required />
+    
+    <label for="email" class="block text-md font-medium">Email:</label>
+    <input id="email" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" type="email" name="email" required />
+    
+    <label for="message" class="block text-md font-medium">Message:</label>
+    <textarea id="message" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" name="message" rows="4" cols="50" required></textarea>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required/><br/><br/>
-
-        <label for="message">Message:</label><br/>
-        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
-
-            <button class="g-recaptcha" 
-                data-sitekey={recaptcha_sitekey}
-                data-callback='onSubmit' 
-                data-action='submit'>Submit</button>
-            <script>
-                function onSubmit(){
-                    const event = new Event('verified');
-                    const elem = document.querySelector("#demo-form");
-                    elem.dispatchEvent(event);
-                }
-            </script>
-    </form>
+    <div class="text-center">
+        <button class="g-recaptcha text-gray-700 dark:text-gray-900 w-fit inline-flex justify-center py-2 px-4 border border-transparent shadow-md text-sm font-medium rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-200 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 fous:ring-pastel-blue-300" data-sitekey={recaptcha_sitekey} data-callback='onSubmit' data-action='submit'>
+        Submit
+        </button>
+    </div>
+  </form>
 }
 
 templ MakeContactForm() {
-    <form id="demo-form" method="post" hx-post="/contact-send" hx-target="#contact-form" >
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required /><br/><br/>
+  <form id="demo-form" class="space-y-4 p-12" method="post" hx-post="/contact-send" hx-target="#contact-form">
+    <label for="name" class="block text-md font-medium">Name:</label>
+    <input id="name" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" type="text" name="name" required />
+    
+    <label for="email" class="block text-md font-medium">Email:</label>
+    <input id="email" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" type="email" name="email" required />
+    
+    <label for="message" class="block text-md font-medium">Message:</label>
+    <textarea id="message" class="mt-1 block w-full px-3 py-2 border border-pastel-blue dark:border-pastel-blue-900 rounded-md shadow-md focus:outline-none focus:ring-pastel-blue-500 focus:border-pastel-blue-500" name="message" rows="4" cols="50" required></textarea>
+    <div class="text-center">
+        <button type="submit" class="text-gray-700 dark:text-gray-900 w-fit inline-flex justify-center py-2 px-4 border border-transparent shadow-md text-sm font-medium rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-200 dark:hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 fous:ring-pastel-blue-300">
+            Send Message
+        </button>
+    </div>
+  </form>
+}
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required/><br/><br/>
-
-        <label for="message">Message:</label><br/>
-        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br /><br />
-        <input type="submit" value="Submit" />
-    </form>
+templ makeContact(recaptcha_sitekey string) {
+  <div id="contact-form" class="rounded-lg shadow-md w-full">
+    <h2 class="text-4xl font-bold mb-6 text-center">Contact Us</h2>
+    if len(recaptcha_sitekey) > 0 {
+      @MakeContactFormWithRecaptcha(recaptcha_sitekey)
+    } else {
+      @MakeContactForm()
+    }
+  </div>
+  if len(recaptcha_sitekey) > 0 {
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+  }
 }
 
 templ MakeContactPage(links []common.Link, recaptcha_sitekey string) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8" />
-        <title>Menu and Contact Form</title>
-        <!-- Minified version -->
-        <link rel="stylesheet" href="/static/simple.min.css" />
-        <script src="/static/htmx.min.js"></script>
-        <script src="/static/client-side-templates.js"></script>
-        if len(recaptcha_sitekey) > 0 {
-            <script src="https://www.google.com/recaptcha/api.js"></script>
-        }
-    </head>
-
-    <body>
-        @MakeNavBar(links)
-        <main>
-            <div id="contact-form">
-                <h2>Contact Us</h2>
-                    if len(recaptcha_sitekey) > 0 {
-                        @MakeContactFormWithRecaptcha(recaptcha_sitekey)
-                    } else {
-                        @MakeContactForm()
-                    }
-            </div>
-        </main>
-        @MakeFooter()
-    </body>
-    </html>
+  @MakeLayout("Menu and Contact Form", links, makeContact(recaptcha_sitekey))
 }

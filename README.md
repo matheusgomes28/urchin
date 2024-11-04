@@ -4,7 +4,7 @@ Urchin is a headless CMS (Content Management System) written in Golang, designed
 create a website or blog, with any template you like, in only a few
 commands.
 
-![Really no head?](static/nohead.gif "So no head meme?")
+![Really no head?](static/assets/nohead.gif "So no head meme?")
 
 ## Features 🚀
 
@@ -122,7 +122,7 @@ The plan is to have two main applications: the public facing application
 to serve the content through a website, and the admin application that
 can be hidden, where users can modify the settings, add posts, pages, etc.
 
-![diagram of urchin's architecture](static/urchin-architecture.png "Urchin Application Architecture")
+![diagram of urchin's architecture](static/assets/urchin-architecture.png "Urchin Application Architecture")
 
 In the above image, you can see the two applications running alongside,
 and they share a database connection where the data is actually stored.

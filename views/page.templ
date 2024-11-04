@@ -4,26 +4,5 @@ import "github.com/matheusgomes28/urchin/common"
 
 
 templ MakePage(title string, content string, links []common.Link) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8" />
-        <title>{ title }</title>
-        <!-- Minified version -->
-        <link rel="stylesheet" href="/static/simple.min.css" />
-        <script src="/static/htmx.min.js"></script>
-        <script src="/static/client-side-templates.js"></script>
-    </head>
-
-    <body>
-        @MakeNavBar(links)
-        <main>
-            @templ.Raw(content)
-        </main>
-    
-        @MakeFooter()
-    </body>
-
-    </html>
+    @MakeLayout(title, links, templ.Raw(content))
 }

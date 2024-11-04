@@ -1,37 +1,28 @@
 package views
 
 import (
-    "fmt"
-    . "github.com/matheusgomes28/urchin/common"
+  "fmt"
+  . "github.com/matheusgomes28/urchin/common"
 )
 
+templ makePosts(posts []Post) {
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols3 gap-6">
+    for _, post := range posts {
+    <article class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md overflow-hidden">
+      <div class="p-4">
+        <h2 class="text-2xl font-bold mb-4">{ post.Title }</h2>
+        <p class="text-gray-900 dark:text-gray-100 mb-4 block overflow-hidden truncate">
+          { post.Excerpt }
+        </p>
+        <a class="text-blue-700 dark:text-blue-300 hover:underline mt-8" href={ templ.URL("/post/" + fmt.Sprintf("%d", post.Id)) }>
+          Read More
+        </a>
+      </div>
+    </article>
+    }
+  </div>
+}
+
 templ MakeIndex(posts []Post, links []Link) {
-    <!DOCTYPE html>
-    <html lang="en">
-
-    // This should go into Make HTML Headers
-    <head>
-        <meta charset="UTF-8" />
-        <title>Home Page</title>
-        <link rel="stylesheet" href="/static/simple.min.css" />
-        <script src="/static/htmx.min.js"></script>
-        <script src="/static/client-side-templates.js"></script>
-    </head>
-
-    <body>
-        @MakeNavBar(links)
-        <main>
-            for _, post := range posts {
-                <article>
-                    <h2>{ post.Title }</h2>
-                    <p>
-                        { post.Excerpt }
-                        <a href={ templ.URL("/post/" + fmt.Sprintf("%d", post.Id)) }> read more...</a>
-                    </p>
-                </article>
-            }
-        </main>
-    @MakeFooter()
-    </body>
-    </html>
+    @MakeLayout("Home Page", links, makePosts(posts))
 }
