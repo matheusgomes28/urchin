@@ -6,10 +6,12 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 	"github.com/matheusgomes28/urchin/views"
+  "github.com/matheusgomes28/urchin/views/tailwind"
 	"github.com/rs/zerolog/log"
 )
 
@@ -20,6 +22,8 @@ type Generator = func(*gin.Context, common.AppSettings, database.Database) ([]by
 func SetupRoutes(app_settings common.AppSettings, database database.Database) *gin.Engine {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
+
+	r.GET("/tailwind", makeHomeHandler(app_settings, database, tailwind.MakeIndex))
 
 	// All cache-able endpoints
 	cache := MakeCache(4, time.Minute*10, &TimeValidator{})
@@ -48,6 +52,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	return r
 }
 
+
 func addCachableHandler(e *gin.Engine, method string, endpoint string, generator Generator, cache *Cache, app_settings common.AppSettings, db database.Database) {
 
 	handler := func(c *gin.Context) {
@@ -63,12 +68,14 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 
 		// Before handler call (retrieve from cache)
 		html_buffer, err := generator(c, app_settings, db)
+
 		if err != nil {
 			log.Error().Msgf("could not generate html: %v", err)
 			// TODO : Need a proper error page
 			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
 			return
 		}
+
 
 		// After handler  (add to cache)
 		if app_settings.CacheEnabled {
