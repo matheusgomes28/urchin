@@ -44,7 +44,6 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 
 	// Where all the static files (css, js, etc) are served from
 	r.Static("/static", "./static")
-
 	return r
 }
 
