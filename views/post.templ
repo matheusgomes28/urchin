@@ -3,10 +3,10 @@ package views
 import "github.com/matheusgomes28/urchin/common"
 
 templ makePost(title string, content string) {
-<div class="prose lg:prose-xl dark:prose-invert items-center w-full dark:prose-pre:bg-gray-300 dark:prose-pre:text-gray-900">
+<article class="prose lg:prose-xl dark:prose-invert items-center w-full dark:prose-pre:bg-gray-300 dark:prose-pre:text-gray-900">
   <h1>{ title }</h1>
   @templ.Raw(content)
-</div>
+</article>
 }
 
 templ MakePostPage(title string, content string, links []common.Link) {
