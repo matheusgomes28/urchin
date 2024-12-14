@@ -35,7 +35,8 @@ install-tools:
 
 install-tailwindcss:
 	if [ ! -f tailwindcss ]; then \
-		wget -q https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 \
+		wget -q https://github.com/tailwindlabs/tailwindcss/releases/download/v3.4.16/tailwindcss-linux-x64 \
+			&& echo "33f254b54c8754f16efbe2be1de38ca25192630dc36f164595a770d4bbf4d893  tailwindcss-linux-x64" | sha256sum -c \
 			&& chmod +x tailwindcss-linux-x64 \
 			&& mv tailwindcss-linux-x64 tailwindcss; \
 	fi
