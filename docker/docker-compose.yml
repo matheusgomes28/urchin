@@ -1,6 +1,6 @@
 services:
   urchin_app:
-    image: mattgomes28/urchin-golang:0.3
+    image: mattgomes28/urchin-golang:0.4
     ports:
       - "8080:8080"
     volumes:
@@ -18,7 +18,7 @@ services:
       - common-net
 
   urchin_admin_app:
-    image: mattgomes28/urchin-golang:0.3
+    image: mattgomes28/urchin-golang:0.4
     ports:
       - "8081:8081"
     volumes:

@@ -1,0 +1,9 @@
+/* Loading tailwind builtins. All custom rules have to be added in here. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  background: #E5E5E5;
+}

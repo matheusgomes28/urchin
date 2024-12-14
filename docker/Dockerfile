@@ -32,7 +32,6 @@ RUN apt-get update \
     && wget https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh -P golangci-install \ 
     && sh ./golangci-install/install.sh -b /usr/local/bin v1.56.2 \
     && rm -rf ./golangci-install \
-    && apt-get remove -y wget \
     && apt-get clean \  
     && apt-get autoremove -y \
     && apt-get autoremove --purge -y \

@@ -102,14 +102,6 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 		Name: filename,
 		Ext:  ext,
 	}
-	index_view := views.MakeImagePage(image, app_settings.AppNavbar.Links)
-	html_buffer := bytes.NewBuffer(nil)
 
-	err := index_view.Render(c, html_buffer)
-	if err != nil {
-		log.Error().Msgf("Could not render index: %v", err)
-		return []byte{}, err
-	}
-
-	return html_buffer.Bytes(), nil
+	return renderHtml(c, views.MakeImagePage(image, app_settings.AppNavbar.Links))
 }
