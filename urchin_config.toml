@@ -38,4 +38,5 @@ links = [
     { name = "Services", href = "/services", title = "Services page" },
     { name = "Images", href = "/images", title = "Images page" },
     { name = "Contact", href = "/contact", title = "Contacts page" },
+    { name = "Products", href = "/Products", title = "Product cards page"},
 ]

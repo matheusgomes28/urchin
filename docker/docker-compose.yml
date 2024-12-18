@@ -38,6 +38,8 @@ services:
   mariadb:
     image: mariadb:11.2.3-jammy
     container_name: mariadb
+    ports:
+      - "3336:3306"
     env_file:
       - ../.dev.env
     healthcheck:
