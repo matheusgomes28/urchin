@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
 )
@@ -18,6 +19,7 @@ type Database interface {
 	DeletePost(id int) (int, error)
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
+	AddCard(title string, image string, schema string, content string) (string, error)
 }
 
 type SqlDatabase struct {
@@ -177,6 +179,28 @@ func (db SqlDatabase) GetPage(link string) (common.Page, error) {
 	}
 
 	return page, nil
+}
+
+// / This function adds the card metadata to the cards table.
+// / Returns the uuid as a string if successful, otherwise error
+// / won't be null
+func (db SqlDatabase) AddCard(title string, image string, schema string, content string) (string, error) {
+
+	// TODO : Generate a uuid
+	uuid := uuid.New().String()
+
+	_, err := db.Connection.Exec("INSERT INTO cards(uuid, image_location, json_data, json_schema) VALUES(?, ?, ?, ?)", uuid, image, content, schema)
+	if err != nil {
+		return "", err
+	}
+
+	return common.Card{
+		Id:      uuid,
+		Title:   title,
+		Image:   image,
+		Schema:  schema,
+		Content: content,
+	}, nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
