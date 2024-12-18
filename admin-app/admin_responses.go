@@ -9,6 +9,14 @@ type PostIdResponse struct {
 	Id int `json:"id"`
 }
 
+type CardIdResponse struct {
+	Id string `json:"id"`
+}
+
+type CardSchemaResponse struct {
+	Id string `json:"uuid"`
+}
+
 type GetPostResponse struct {
 	Id      int    `json:"id"`
 	Title   string `json:"title"`
