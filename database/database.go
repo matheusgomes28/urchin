@@ -3,7 +3,10 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
 )
@@ -16,6 +19,8 @@ type Database interface {
 	DeletePost(id int) (int, error)
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
+	AddCard(title string, image string, schema string, content string) (string, error)
+	AddCardSchema(json_id string, json_schema string, json_title string, schema string) (string, error)
 }
 
 type SqlDatabase struct {
@@ -175,4 +180,63 @@ func (db SqlDatabase) GetPage(link string) (common.Page, error) {
 	}
 
 	return page, nil
+}
+
+// / This function adds the card metadata to the cards table.
+// / Returns the uuid as a string if successful, otherwise error
+// / won't be null
+func (db SqlDatabase) AddCard(title string, image string, schema string, content string) (string, error) {
+
+	uuid := uuid.New().String()
+
+	_, err := db.Connection.Exec("INSERT INTO cards(uuid, image_location, json_data, json_schema) VALUES(?, ?, ?, ?)", uuid, image, content, schema)
+	if err != nil {
+		return "", err
+	}
+
+	return uuid, nil
+}
+
+func (db SqlDatabase) AddCardSchema(json_id string, json_schema string, json_title string, schema string) (string, error) {
+	uuid := uuid.New().String()
+
+	_, err := db.Connection.Exec(
+		"INSERT INTO card_schemas(uuid, json_id, json_schema, json_title, schema, card_ids) VALUES(?, ?, ?, ?)",
+		uuid,
+		json_id,
+		json_schema,
+		json_title,
+		schema,
+		"[]")
+
+	if err != nil {
+		return "", err
+	}
+
+	return uuid, nil
+}
+
+func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
+
+	/// TODO : let user specify the DB
+	connection_str := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, address, port, database)
+	db, err := sql.Open("mysql", connection_str)
+	if err != nil {
+		return SqlDatabase{}, err
+	}
+
+	if err := db.Ping(); err != nil {
+		return SqlDatabase{}, err
+	}
+	// See "Important settings" section.
+	db.SetConnMaxLifetime(time.Second * 5)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
+
+	return SqlDatabase{
+		Address:    address,
+		Port:       port,
+		User:       user,
+		Connection: db,
+	}, nil
 }

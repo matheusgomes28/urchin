@@ -1,0 +1,62 @@
+package views
+
+import "github.com/matheusgomes28/urchin/common"
+
+templ makeCard(title string, slogan string) {
+  <a href="#" class="relative block rounded-tr-3xl border border-gray-100">
+    <span
+      class="absolute -right-px -top-px rounded-bl-3xl rounded-tr-3xl bg-gray-700 px-6 py-4 font-medium uppercase tracking-widest text-white"
+    >
+      {slogan}
+    </span>
+
+    <!-- TODO : Take the image as param -->
+    <img
+      src="https://images.unsplash.com/photo-1485955900006-10f4d324d411?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      alt=""
+      class="h-80 w-full rounded-tr-3xl object-cover"
+    />
+
+    <div class="p-4 text-center">
+      <strong class="text-xl font-medium text-gray-900 dark:text-gray-100"> {title} </strong>
+
+      <p class="mt-2 text-pretty text-gray-700 dark:text-gray-100">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Amet officia rem vel voluptatum in
+        eum vitae aliquid at sed dignissimos.
+      </p>
+
+      <span
+        class="mt-4 block rounded-md border border-indigo-900 bg-indigo-900 px-5 py-3 text-sm font-medium uppercase tracking-widest text-white transition-colors dark:text-gray-100 hover:bg-white hover:text-indigo-900"
+      >
+        Learn More
+      </span>
+    </div>
+  </a>
+}
+
+templ makeCardGrid() {
+  <div class="grid grid-cols-3 gap-4 content-center justify-center items-center">
+    <div class="max-w-sm">
+      @makeCard("Card One", "Save 10%")
+    </div>
+    <div class="max-w-sm">
+      @makeCard("Card One", "Save 10%")
+    </div>
+    <div class="max-w-sm">
+      @makeCard("Card One", "Save 10%")
+    </div>
+    <div class="max-w-sm">
+      @makeCard("Card One", "Save 10%")
+    </div>
+    <div class="max-w-sm">
+      @makeCard("Card One", "Save 10%")
+    </div>
+  </div>
+}
+
+templ MakeProductPage(links []common.Link) {
+@MakeLayout("Product Page", links, makeCardGrid())
+
+// TODO : for each product coming from the database
+// TODO : we're going to create a card for it
+}
