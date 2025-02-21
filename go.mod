@@ -11,6 +11,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.8.0
 	github.com/gomarkdown/markdown v0.0.0-20231222211730-1d6d20845b47
+	github.com/google/uuid v1.6.0
 	github.com/ncruces/go-sqlite3 v0.25.0
 	github.com/pelletier/go-toml/v2 v2.0.8
 	github.com/pressly/goose/v3 v3.19.2

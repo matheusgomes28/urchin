@@ -12,7 +12,7 @@ type DatabaseMock struct {
 	AddPageHandler        func(string, string, string) (int, error)
 	GetPageHandler        func(string) (common.Page, error)
 	AddCardHandler        func(string, string, string, string) (string, error)
-	AddChardSchemaHandler func(string, string, string, string) (string, error)
+	AddChardSchemaHandler func(string, string, string) (string, error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -47,6 +47,6 @@ func (db DatabaseMock) AddCard(title string, image string, schema string, conten
 	return db.AddCardHandler(title, image, schema, content)
 }
 
-func (db DatabaseMock) AddCardSchema(json_id string, json_schema string, json_title string, schema string) (string, error) {
-	return db.AddChardSchemaHandler(json_id, json_schema, json_title, schema)
+func (db DatabaseMock) AddCardSchema(json_id string, json_schema string, json_title string) (string, error) {
+	return db.AddChardSchemaHandler(json_id, json_schema, json_title)
 }

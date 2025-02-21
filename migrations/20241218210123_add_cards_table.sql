@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE cards (
-  uuid VARCHAR(36) PRIMARY KEY DEFAULT UUID(),
+  uuid BINARY(16) PRIMARY KEY NOT NULL,
   image_location TEXT NOT NULL,
   json_data TEXT NOT NULL,
   json_schema TEXT NOT NULL
