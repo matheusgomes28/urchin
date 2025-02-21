@@ -46,7 +46,6 @@ func postSchemaHandler(database database.Database) func(*gin.Context) {
 			add_schema_request.JsonId,
 			add_schema_request.JsonSchema,
 			add_schema_request.JsonTitle,
-			add_schema_request.Schema,
 		)
 		if err != nil {
 			log.Error().Msgf("failed to add card schema: %v", err)
@@ -69,9 +68,6 @@ func checkSchemaValues(add_schema_request AddCardSchemaRequest) bool {
 		return false
 	}
 	if add_schema_request.JsonTitle == "" {
-		return false
-	}
-	if add_schema_request.Schema == "" {
 		return false
 	}
 
