@@ -20,7 +20,7 @@ type Database interface {
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
 	AddCard(title string, image string, schema string, content string) (string, error)
-	AddCardSchema(json_id string, json_schema string, json_title string, schema string) (string, error)
+	AddCardSchema(json_id string, json_schema string, json_title string) (string, error)
 }
 
 type SqlDatabase struct {
@@ -197,16 +197,15 @@ func (db SqlDatabase) AddCard(title string, image string, schema string, content
 	return uuid, nil
 }
 
-func (db SqlDatabase) AddCardSchema(json_id string, json_schema string, json_title string, schema string) (string, error) {
+func (db SqlDatabase) AddCardSchema(json_id string, json_schema string, json_title string) (string, error) {
 	uuid := uuid.New().String()
 
 	_, err := db.Connection.Exec(
-		"INSERT INTO card_schemas(uuid, json_id, json_schema, json_title, schema, card_ids) VALUES(?, ?, ?, ?)",
+		"INSERT INTO card_schemas(uuid, json_id, json_schema, json_title, card_ids) VALUES(?, ?, ?, ?)",
 		uuid,
 		json_id,
 		json_schema,
 		json_title,
-		schema,
 		"[]")
 
 	if err != nil {

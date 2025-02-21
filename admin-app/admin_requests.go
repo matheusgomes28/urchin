@@ -50,5 +50,4 @@ type AddCardSchemaRequest struct {
 	JsonId     string `json:"$id"`
 	JsonSchema string `json:"$schema"`
 	JsonTitle  string `json:"title"`
-	Schema     string `json:"schema"`
 }
