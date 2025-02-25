@@ -19,8 +19,9 @@ type Database interface {
 	DeletePost(id int) (int, error)
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
-	AddCard(title string, image string, schema string, content string) (string, error)
-	AddCardSchema(json_id string, json_schema string, json_title string) (string, error)
+	AddCard(image string, schema string, content string) (string, error)
+	AddCardSchema(json_schema string, json_title string) (string, error)
+	GetCardSchema(uuid string) (string, error)
 }
 
 type SqlDatabase struct {
@@ -185,25 +186,33 @@ func (db SqlDatabase) GetPage(link string) (common.Page, error) {
 // / This function adds the card metadata to the cards table.
 // / Returns the uuid as a string if successful, otherwise error
 // / won't be null
-func (db SqlDatabase) AddCard(title string, image string, schema string, content string) (string, error) {
+func (db SqlDatabase) AddCard(image string, schema string, content string) (string, error) {
+
+	// TODO : Batch to add the card first
+	// TODO : And then add the card ID to the schema card ids
+	// TODO : Or we rollback
 
 	uuid := uuid.New().String()
 
-	_, err := db.Connection.Exec("INSERT INTO cards(uuid, image_location, json_data, json_schema) VALUES(?, ?, ?, ?)", uuid, image, content, schema)
+	_, err := db.Connection.Exec("INSERT INTO cards(uuid, image_location, json_data, json_schema) VALUES(UuidToBin(?), ?, ?, ?)", uuid, image, content, schema)
 	if err != nil {
 		return "", err
 	}
 
+	// TODO : We want to get the card schema ids
+	// TODO : parse it here, and add this card ID to the
+	// TODO : list of IDS.
+
 	return uuid, nil
 }
 
-func (db SqlDatabase) AddCardSchema(json_id string, json_schema string, json_title string) (string, error) {
+func (db SqlDatabase) AddCardSchema(json_schema string, json_title string) (string, error) {
 	uuid := uuid.New().String()
 
 	_, err := db.Connection.Exec(
-		"INSERT INTO card_schemas(uuid, json_id, json_schema, json_title, card_ids) VALUES(?, ?, ?, ?)",
+		"INSERT INTO card_schemas(uuid, json_id, json_schema, json_title, card_ids) VALUES(UuidToBin(?), ?, ?, ?, ?)",
 		uuid,
-		json_id,
+		"some_id",
 		json_schema,
 		json_title,
 		"[]")
@@ -213,6 +222,23 @@ func (db SqlDatabase) AddCardSchema(json_id string, json_schema string, json_tit
 	}
 
 	return uuid, nil
+}
+
+func (db SqlDatabase) GetCardSchema(id string) (json_data string, err error) {
+	rows, err := db.Connection.Query("SELECT json_schema FROM card_schemas WHERE uuid=UuidToBin(?);", id)
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	rows.Next()
+	if err = rows.Scan(&json_data); err != nil {
+		return "", err
+	}
+
+	return json_data, nil
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {

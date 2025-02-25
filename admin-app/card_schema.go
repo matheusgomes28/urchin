@@ -2,10 +2,12 @@ package admin_app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kaptinlin/jsonschema"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
@@ -33,17 +35,17 @@ func postSchemaHandler(database database.Database) func(*gin.Context) {
 
 		err = json.Unmarshal(body, &add_schema_request)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, common.MsgErrorRes("could not unmarshal json into request"))
+			error_msg := fmt.Errorf("could not unmarshall json request: %v", err)
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes(error_msg.Error()))
 			return
 		}
 
-		if !checkSchemaValues(add_schema_request) {
-			c.JSON(http.StatusBadRequest, common.MsgErrorRes("invalid schema inputs"))
+		if err = checkSchemaValues(add_schema_request); err != nil {
+			c.JSON(http.StatusBadRequest, common.MsgErrorRes(err.Error()))
 			return
 		}
 
 		id, err := database.AddCardSchema(
-			add_schema_request.JsonId,
 			add_schema_request.JsonSchema,
 			add_schema_request.JsonTitle,
 		)
@@ -59,17 +61,21 @@ func postSchemaHandler(database database.Database) func(*gin.Context) {
 	}
 }
 
-func checkSchemaValues(add_schema_request AddCardSchemaRequest) bool {
+func checkSchemaValues(add_schema_request AddCardSchemaRequest) error {
 
-	if add_schema_request.JsonId == "" {
-		return false
-	}
 	if add_schema_request.JsonSchema == "" {
-		return false
+		return fmt.Errorf("`schema` cannot be empty")
 	}
 	if add_schema_request.JsonTitle == "" {
-		return false
+		return fmt.Errorf("`title` cannot be empty")
 	}
 
-	return true
+	schema_compiler := jsonschema.NewCompiler()
+	_, err := schema_compiler.Compile([]byte(add_schema_request.JsonSchema))
+
+	if err != nil {
+		return fmt.Errorf("`schema` is invalid: %v", err)
+	}
+
+	return nil
 }

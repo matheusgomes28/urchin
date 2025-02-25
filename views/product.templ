@@ -34,10 +34,10 @@ templ makeCard(title string, slogan string) {
   </a>
 }
 
-templ makeCardGrid() {
+templ makeCardGrid(card_data map[string]interface{}) {
   <div class="grid grid-cols-3 gap-4 content-center justify-center items-center">
     <div class="max-w-sm">
-      @makeCard("Card One", "Save 10%")
+      @makeCard(card_data["title"].(string), card_data["slogan"].(string))
     </div>
     <div class="max-w-sm">
       @makeCard("Card One", "Save 10%")
@@ -54,8 +54,9 @@ templ makeCardGrid() {
   </div>
 }
 
-templ MakeProductPage(links []common.Link) {
-@MakeLayout("Product Page", links, makeCardGrid())
+
+templ MakeProductPage(links []common.Link, card_data map[string]interface{}) {
+@MakeLayout("Product Page", links, makeCardGrid(card_data))
 
 // TODO : for each product coming from the database
 // TODO : we're going to create a card for it

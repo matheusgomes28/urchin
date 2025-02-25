@@ -2,17 +2,17 @@
 database_address = "localhost"
 
 # User to access datbaase
-database_user = "urchin"
+database_user = "root"
 
 # Password for the database user
-database_password = "urchinpw"
+database_password = "root"
 
 # port
 database_port = 3306
 
 # name of database where urchin's
 # migrations was installed
-database_name = "urchin"
+database_name = "gocms"
 
 # port to run the webserver on
 webserver_port = 8080

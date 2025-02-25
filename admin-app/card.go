@@ -2,9 +2,11 @@ package admin_app
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kaptinlin/jsonschema"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 	"github.com/rs/zerolog/log"
@@ -36,15 +38,29 @@ func postCardHandler(database database.Database) func(*gin.Context) {
 		// 	return
 		// }
 
+		// Check that the schema exists
+		json_schema, err := database.GetCardSchema(add_card_request.Schema)
+		if err != nil {
+			log.Error().Msgf("card schema does not exist: %v", err)
+			c.JSON(http.StatusBadRequest, common.ErrorRes("card schema does not exist", err))
+			return
+		}
+
+		err = validateCardAgainstSchema(add_card_request.Content, json_schema)
+		if err != nil {
+			log.Error().Msgf(err.Error())
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not add card", err))
+			return
+		}
+
 		id, err := database.AddCard(
-			add_card_request.Title,
 			add_card_request.Image,
 			add_card_request.Schema,
 			add_card_request.Content,
 		)
 		if err != nil {
 			log.Error().Msgf("failed to add card: %v", err)
-			c.JSON(http.StatusBadRequest, common.ErrorRes("could not add post", err))
+			c.JSON(http.StatusBadRequest, common.ErrorRes("could not add card", err))
 			return
 		}
 
@@ -52,4 +68,26 @@ func postCardHandler(database database.Database) func(*gin.Context) {
 			id,
 		})
 	}
+}
+
+func validateCardAgainstSchema(card_data string, json_schema string) error {
+
+	// Parse the schema here
+	schema_compiler := jsonschema.NewCompiler()
+	schema, err := schema_compiler.Compile([]byte(json_schema))
+
+	if err != nil {
+		return fmt.Errorf("failed to compile the json_schema from db: %v", err)
+	}
+
+	json_map := make(map[string]interface{})
+	json.Unmarshal([]byte(card_data), &json_map)
+
+	result := schema.Validate(json_map)
+	if !result.IsValid() {
+		details, _ := json.MarshalIndent(result.ToList(), "", "  ")
+		return fmt.Errorf("failed to check vard data against schema: %v", string(details))
+	}
+
+	return nil
 }
