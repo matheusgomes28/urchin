@@ -11,8 +11,9 @@ type DatabaseMock struct {
 	DeletePostHandler     func(int) (int, error)
 	AddPageHandler        func(string, string, string) (int, error)
 	GetPageHandler        func(string) (common.Page, error)
-	AddCardHandler        func(string, string, string, string) (string, error)
-	AddChardSchemaHandler func(string, string, string) (string, error)
+	AddCardHandler        func(string, string, string) (string, error)
+	AddChardSchemaHandler func(string, string) (string, error)
+	GetCardSchemaHandler  func(uuid string) (common.CardSchema, error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -43,10 +44,14 @@ func (db DatabaseMock) GetPage(link string) (common.Page, error) {
 	return db.GetPageHandler(link)
 }
 
-func (db DatabaseMock) AddCard(title string, image string, schema string, content string) (string, error) {
-	return db.AddCardHandler(title, image, schema, content)
+func (db DatabaseMock) AddCard(image string, schema string, content string) (string, error) {
+	return db.AddCardHandler(image, schema, content)
 }
 
-func (db DatabaseMock) AddCardSchema(json_id string, json_schema string, json_title string) (string, error) {
-	return db.AddChardSchemaHandler(json_id, json_schema, json_title)
+func (db DatabaseMock) AddCardSchema(json_schema string, json_title string) (string, error) {
+	return db.AddChardSchemaHandler(json_schema, json_title)
+}
+
+func (db DatabaseMock) GetCardSchema(uuid string) (common.CardSchema, error) {
+	return db.GetCardSchemaHandler(uuid)
 }
