@@ -39,14 +39,14 @@ func postCardHandler(database database.Database) func(*gin.Context) {
 		// }
 
 		// Check that the schema exists
-		json_schema, err := database.GetCardSchema(add_card_request.Schema)
+		schema, err := database.GetCardSchema(add_card_request.Schema)
 		if err != nil {
 			log.Error().Msgf("card schema does not exist: %v", err)
 			c.JSON(http.StatusBadRequest, common.ErrorRes("card schema does not exist", err))
 			return
 		}
 
-		err = validateCardAgainstSchema(add_card_request.Content, json_schema)
+		err = validateCardAgainstSchema(add_card_request.Content, schema.Schema)
 		if err != nil {
 			log.Error().Msgf(err.Error())
 			c.JSON(http.StatusBadRequest, common.ErrorRes("could not add card", err))
@@ -81,7 +81,10 @@ func validateCardAgainstSchema(card_data string, json_schema string) error {
 	}
 
 	json_map := make(map[string]interface{})
-	json.Unmarshal([]byte(card_data), &json_map)
+	err = json.Unmarshal([]byte(card_data), &json_map)
+	if err != nil {
+		return fmt.Errorf("failed to parse card json : %v", err)
+	}
 
 	result := schema.Validate(json_map)
 	if !result.IsValid() {
