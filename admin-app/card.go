@@ -12,6 +12,54 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func getCardHandler(database database.Database) func(*gin.Context) {
+	return func(c *gin.Context) {
+		// var add_card_request AddCardRequest
+		// if c.Request.Body == nil {
+		// 	c.JSON(http.StatusBadRequest, common.MsgErrorRes("no request body provided"))
+		// 	return
+		// }
+		// decoder := json.NewDecoder(c.Request.Body)
+		// err := decoder.Decode(&add_card_request)
+
+		// if err != nil {
+		// 	log.Warn().Msgf("invalid post request: %v", err)
+		// 	c.JSON(http.StatusBadRequest, common.ErrorRes("invalid request body", err))
+		// 	return
+		// }
+
+		// // Check that the schema exists
+		// schema, err := database.GetCardSchema(add_card_request.Schema)
+		// if err != nil {
+		// 	log.Error().Msgf("card schema does not exist: %v", err)
+		// 	c.JSON(http.StatusBadRequest, common.ErrorRes("card schema does not exist", err))
+		// 	return
+		// }
+
+		// err = validateCardAgainstSchema(add_card_request.Content, schema.Schema)
+		// if err != nil {
+		// 	log.Error().Msgf(err.Error())
+		// 	c.JSON(http.StatusBadRequest, common.ErrorRes("could not add card", err))
+		// 	return
+		// }
+
+		// id, err := database.AddCard(
+		// 	add_card_request.Image,
+		// 	add_card_request.Schema,
+		// 	add_card_request.Content,
+		// )
+		// if err != nil {
+		// 	log.Error().Msgf("failed to add card: %v", err)
+		// 	c.JSON(http.StatusBadRequest, common.ErrorRes("could not add card", err))
+		// 	return
+		// }
+
+		// c.JSON(http.StatusOK, CardIdResponse{
+		// 	id,
+		// })
+	}
+}
+
 func postCardHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var add_card_request AddCardRequest

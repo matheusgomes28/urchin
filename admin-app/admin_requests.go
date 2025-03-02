@@ -49,6 +49,12 @@ type AddCardRequest struct {
 	Content string `json:"data"`
 }
 
+type GetCardRequest struct {
+	Schema string `json:"schema"`
+	Limit  string `json:"limit"`
+	Page   string `json:"page"`
+}
+
 type AddCardSchemaRequest struct {
 	JsonTitle  string `json:"title"`
 	JsonSchema string `json:"schema"`
