@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -13,14 +14,17 @@ import (
 )
 
 type Database interface {
-	GetPosts(int, int) ([]common.Post, error)
+	GetPosts(limit int, offset int) ([]common.Post, error)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
 	DeletePost(id int) (int, error)
+
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
+
 	AddCard(image string, schema string, content string) (string, error)
+	GetCards(schema_uuid string, limit int, offset int) ([]common.Card, error)
 	AddCardSchema(json_schema string, json_title string) (string, error)
 	GetCardSchema(uuid string) (common.CardSchema, error)
 }
@@ -221,6 +225,55 @@ func (db SqlDatabase) AddCard(image string, schema_uuid string, content string) 
 	}
 
 	return uuid, nil
+}
+
+func (db SqlDatabase) GetCards(schema_uuid string, limit int, page int) (all_cards []common.Card, err error) {
+
+	// TODO : need to get the card within the current schema
+	schema, err := db.GetCardSchema(schema_uuid)
+	if err != nil {
+		return []common.Card{}, err
+	}
+
+	// Some hand-rolled logic to paginate
+	// we want the first "limit" cards after the "page * limit"
+	// cards, if available.
+
+	if len(schema.Cards) <= (page * limit) {
+		return []common.Card{}, fmt.Errorf("no cards available for the pagination given")
+	}
+
+	window := schema.Cards[(page * limit):]
+
+	// gets the right UuidToBin(?), UuidToBin(?), ..., UuidToBin(?) for the IN clause
+	ids_query := strings.Repeat("?, ", len(window))
+	ids_query = ids_query[:len(ids_query)-2]
+
+	// Convert slice to interface{} slice for passing to Query
+	args := make([]interface{}, len(window))
+	for i, v := range window {
+		args[i] = v
+	}
+
+	query := fmt.Sprintf("SELECT UuidFromBin(uuid), image_location, json_data, json_schema FROM cards WHERE uuid IN (%s);", window)
+	rows, err := db.Connection.Query(query, args...)
+
+	if err != nil {
+		return []common.Card{}, err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	for rows.Next() {
+		var card common.Card
+		if err = rows.Scan(&card.Id, &card.Image, &card.Content, &card.Schema); err != nil {
+			return []common.Card{}, err
+		}
+		all_cards = append(all_cards, card)
+	}
+
+	return all_cards, nil
 }
 
 func (db SqlDatabase) AddCardSchema(json_schema string, json_title string) (string, error) {
