@@ -22,6 +22,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.POST("/pages", postPageHandler(database))
 
 	r.GET("/cards/:schema", getCardHandler(database))
+	r.GET("/cards/:schema/:limit/:page", getCardHandler(database))
 	r.POST("/cards", postCardHandler(database))
 	r.POST("/card-schemas", postSchemaHandler(database))
 

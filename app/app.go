@@ -25,7 +25,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	cache := MakeCache(4, time.Minute*10, &TimeValidator{})
 	addCachableHandler(r, "GET", "/", homeHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/contact", contactHandler, &cache, app_settings, database)
-	addCachableHandler(r, "GET", "/products", productHandler, &cache, app_settings, database)
+	addCachableHandler(r, "GET", "/products/:schema", productHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/about", aboutHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/services", servicesHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
