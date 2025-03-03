@@ -50,9 +50,9 @@ type AddCardRequest struct {
 }
 
 type GetCardRequest struct {
-	Schema string `json:"schema"`
-	Limit  string `json:"limit"`
-	Page   string `json:"page"`
+	Schema string `uri:"schema" binding:"required"`
+	Limit  uint32 `uri:"limit"`
+	Page   uint32 `uri:"page"`
 }
 
 type AddCardSchemaRequest struct {
