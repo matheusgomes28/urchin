@@ -24,7 +24,7 @@ type Database interface {
 	GetPage(link string) (common.Page, error)
 
 	AddCard(image string, schema string, content string) (string, error)
-	GetCards(schema_uuid string, limit int, offset int) ([]common.Card, error)
+	GetCards(schema_uuid string, limit int, page int) ([]common.Card, error)
 	AddCardSchema(json_schema string, json_title string) (string, error)
 	GetCardSchema(uuid string) (common.CardSchema, error)
 }
@@ -243,10 +243,10 @@ func (db SqlDatabase) GetCards(schema_uuid string, limit int, page int) (all_car
 		return []common.Card{}, fmt.Errorf("no cards available for the pagination given")
 	}
 
-	window := schema.Cards[(page * limit):]
+	window := schema.Cards[(page * limit):min(len(schema.Cards), (page+1)*limit)]
 
 	// gets the right UuidToBin(?), UuidToBin(?), ..., UuidToBin(?) for the IN clause
-	ids_query := strings.Repeat("?, ", len(window))
+	ids_query := strings.Repeat("UuidToBin(?), ", len(window))
 	ids_query = ids_query[:len(ids_query)-2]
 
 	// Convert slice to interface{} slice for passing to Query
@@ -255,7 +255,7 @@ func (db SqlDatabase) GetCards(schema_uuid string, limit int, page int) (all_car
 		args[i] = v
 	}
 
-	query := fmt.Sprintf("SELECT UuidFromBin(uuid), image_location, json_data, json_schema FROM cards WHERE uuid IN (%s);", window)
+	query := fmt.Sprintf("SELECT UuidFromBin(uuid), image_location, json_data, json_schema FROM cards WHERE uuid IN (%s);", ids_query)
 	rows, err := db.Connection.Query(query, args...)
 
 	if err != nil {
