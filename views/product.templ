@@ -16,7 +16,7 @@ templ makeCard(title string, slogan string, excerpt string, image string) {
 
     <!-- TODO : Take the image as param -->
     <img
-      src={ fmt.Sprintf("%s", image) }
+      src={ fmt.Sprintf("/images/data/%s", image) }
       alt=""
       class="h-80 w-full rounded-tr-3xl object-cover"
     />
