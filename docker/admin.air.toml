@@ -5,8 +5,8 @@ tmp_dir = "tmp"
 [build]
   cmd = "make build"
   args_bin = []
-  bin = "./tmp/urchin"
-  full_bin = "bash -c 'if [ \"$URCHIN_ADMIN\" = \"true\" ]; then ./tmp/urchin-admin --config ./docker/urchin_config.toml; else ./tmp/urchin --config ./docker/urchin_config.toml; fi'"
+  bin = "./tmp/urchin-admin"
+  full_bin = "bash ./docker/run-admin-app.sh"
   delay = 1000
   exclude_dir = ["assets", "tmp", "vendor", "testdata"]
   exclude_file = []
@@ -43,4 +43,4 @@ tmp_dir = "tmp"
 
 [screen]
   clear_on_rebuild = false
-  keep_scroll = true
+  keep_scroll = true 
