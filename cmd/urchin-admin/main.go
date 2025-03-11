@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
@@ -33,6 +34,16 @@ func main() {
 		os.Exit(-2)
 	}
 	app_settings = settings
+
+	// Check for environment variable override for the HTTP port
+	if portStr := os.Getenv("URCHIN_HTTP_PORT"); portStr != "" {
+		if port, err := strconv.Atoi(portStr); err == nil {
+			log.Info().Msgf("using HTTP port from environment: %d", port)
+			app_settings.AdminPort = port
+		} else {
+			log.Warn().Msgf("invalid URCHIN_HTTP_PORT value '%s', using config file value: %d", portStr, app_settings.AdminPort)
+		}
+	}
 
 	database, err := database.MakeSqlConnection(
 		app_settings.DatabaseUser,
