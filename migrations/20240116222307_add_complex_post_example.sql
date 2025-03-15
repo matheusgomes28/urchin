@@ -1,14 +1,14 @@
 -- +goose Up
 -- +goose StatementBegin
 INSERT INTO posts(title, content, excerpt) VALUES(
-    'My Very First Post',
-    '# Urchin 🐚
+    'My Second Post',
+    '# CMS FOR GO
 
-Urchin is a headless CMS (Content Management System) written in Golang, designed to be fast, efficient, and easily extensible. It allows you to
+CMS FOR GO is a headless CMS (Content Management System) written in Golang, designed to be fast, efficient, and easily extensible. It allows you to
 create a website or blog, with any template you like, in only a few
 commands.
 
-## Features 🚀
+## Features 
 
 - **Headless Architecture:** Adding pages, posts, or forms should all
   be done with easy requests to the API.
@@ -21,7 +21,7 @@ commands.
 Ensure you have Golang installed on your system before proceeding with the installation.
 
 ```bash
-go get -u github.com/username/urchin
+go get -u github.com/username/CMSGO
 ```
 
 ## Example - Running the App
@@ -31,17 +31,17 @@ template, simply build and start the app with the following commands.
 
 ```bash
 go build
-./urchin
+./cms-for-go
 ```
 
-This will start Urchin on `http://localhost:8080`. You can customize
+This will start CMS FOR GO on `http://localhost:8080`. You can customize
 the configuration by providing the necessary environment variables.
 
 For more information, see the [configuration settings](#configuration).
 
 ## Dependencies
 
-Urchin relies on the following Golang dependencies:
+CMSGO relies on the following Golang dependencies:
 
 - [Gin](github.com/gin-gonic/gin) as the web framework for Golang.
 - [ZeroLog](https://github.com/rs/zerolog) for logging.
@@ -54,19 +54,19 @@ it makes integrating `envfile`s quite easy.
 
 The following list outlines the environment variables needed.
 
-- `URCHIN_DATABASE_ADDRESS` should contain the database addres,
+- `CMSGO_DATABASE_ADDRESS` should contain the database addres,
   e.g. `localhost`.
-- `URCHIN_DATABASE_PORT` should be the connection port to the
+- `CMSGO_DATABASE_PORT` should be the connection port to the
   database. For example `3306`.
-- `URCHIN_DATABASE_USER` is the database username.
-- `URCHIN_DATABASE_PASSWORD` needs to contain the database
+- `CMSGO_DATABASE_USER` is the database username.
+- `CMSGO_DATABASE_PASSWORD` needs to contain the database
   password for the given user.
 
 ## License
 
-Urchin is released under the MIT License. See LICENSE (TODO) for
+CMS FOR GO is released under the MIT License. See LICENSE (TODO) for
 details. Feel free to fork, modify, and use it in your projects!',
-'This is Urchin! This post is an example of how markdown can be rendered as a post.');
+'This is CMS FOR GO! This post is an example of how markdown can be rendered as a post.');
 -- +goose StatementEnd
 
 -- +goose Down
