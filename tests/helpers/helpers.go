@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"context"
 	_ "database/sql"
 	"embed"
 	"fmt"
@@ -9,10 +8,6 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
-	"github.com/dolthub/go-mysql-server/server"
-	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 )
@@ -22,46 +17,10 @@ import (
 //go:embed migrations/*.sql
 var EmbedMigrations embed.FS
 
-func RunDatabaseServer(app_settings common.AppSettings) {
-	pro := CreateTestDatabase(app_settings.DatabaseName)
-	engine := sqle.NewDefault(pro)
-	engine.Analyzer.Catalog.MySQLDb.AddRootAccount()
-
-	session := memory.NewSession(sql.NewBaseSession(), pro)
-	ctx := sql.NewContext(context.Background(), sql.WithSession(session))
-	ctx.SetCurrentDatabase(app_settings.DatabaseName)
-
-	config := server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("%s:%d", app_settings.DatabaseAddress, app_settings.DatabasePort),
-	}
-	s, err := server.NewServer(config, engine, memory.NewSessionBuilder(pro), nil)
-	if err != nil {
-		panic(err)
-	}
-	if err = s.Start(); err != nil {
-		panic(err)
-	}
-}
-
-func CreateTestDatabase(name string) *memory.DbProvider {
-	db := memory.NewDatabase(name)
-	db.BaseDatabase.EnablePrimaryKeyIndexes()
-
-	pro := memory.NewDBProvider(db)
-	return pro
-}
-
 func WaitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 
 	for range 400 {
-		database, err := database.MakeSqlConnection(
-			app_settings.DatabaseUser,
-			app_settings.DatabasePassword,
-			app_settings.DatabaseAddress,
-			app_settings.DatabasePort,
-			app_settings.DatabaseName,
-		)
+		database, err := database.MakeMysqlConnection(app_settings.DatabaseUser, app_settings.DatabasePassword, app_settings.DatabaseAddress, app_settings.DatabasePort, app_settings.DatabaseName)
 
 		if err == nil {
 			return database, nil
@@ -80,12 +39,12 @@ func WaitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 // TODO : Find a way to assign a unique port at compile
 //
 //	time
-func GetAppSettings(app_num int) common.AppSettings {
+func GetAppSettings() common.AppSettings {
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",
-		DatabasePort:     3336 + app_num, // Initial port
+		DatabasePort:     3306,
 		DatabaseUser:     "root",
-		DatabasePassword: "",
+		DatabasePassword: "root",
 		DatabaseName:     "urchin",
 		WebserverPort:    8080,
 		CacheEnabled:     false,

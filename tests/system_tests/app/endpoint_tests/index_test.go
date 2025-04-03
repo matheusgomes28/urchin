@@ -17,9 +17,9 @@ import (
 func TestIndexPagePing(t *testing.T) {
 
 	// This is gonna be the in-memory mysql
-	app_settings := helpers.GetAppSettings(1)
-	go helpers.RunDatabaseServer(app_settings)
+	app_settings := helpers.GetAppSettings()
 	database, err := helpers.WaitForDb(app_settings)
+
 	require.Nil(t, err)
 	goose.SetBaseFS(helpers.EmbedMigrations)
 
@@ -39,11 +39,13 @@ func TestIndexPagePing(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 }
 
+// TODO : Uncomment this
 func TestIndexPagePostExists(t *testing.T) {
 	// This is gonna be the in-memory mysql
-	app_settings := helpers.GetAppSettings(2)
-	go helpers.RunDatabaseServer(app_settings)
+	app_settings := helpers.GetAppSettings()
+
 	database, err := helpers.WaitForDb(app_settings)
+
 	require.Nil(t, err)
 	goose.SetBaseFS(helpers.EmbedMigrations)
 
