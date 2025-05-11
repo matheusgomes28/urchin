@@ -1,6 +1,10 @@
 name: Tests
 
-on: [workflow_call]
+on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
   linters:
@@ -27,4 +31,7 @@ jobs:
         rm coverage.out
 
     - name: Upload coverage to Codecov 📓
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v5
+      with:
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
