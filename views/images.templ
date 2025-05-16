@@ -11,18 +11,36 @@ templ makeImages(images []Image) {
       <h3 class="text-3xl font-bold">No images uploaded</h3>
     </div>
   } else {
-    <div class="grid grid-cols-5 gap-4 sm:grid-cols-3 sm:gap-2">
-      for _, image := range images {
-        <a class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2"
-          href={templ.URL("/images/" + image.Name)}>
-          <img class="w-full h-48 object-cover" src={fmt.Sprintf("/images/data/%s", image.Name)} />
+    <!-- Modal -->
+    <dialog id="modal" class="p-6 rounded-lg shadow-lg max-w-4xl border border-pastel-blue dark:border-pastel-blue-900 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    // <dialog onclick="modal.close()" id="modal" class="p-8 max-w-lg border border-indigo-300 rounded-2xl hover:shadow-xl hover:shadow-indigo-50 flex flex-col items-center">
+      <img id="modal-image" src="https://loremflickr.com/800/600/girl" class="shadow rounded-lg overflow-hidden border"/>
+      
+      <div class="mt-8">
+        <h4 id="modal-title" class="font-bold text-xl">Unser Title</h4>
+        <p id="modal-excerpt" class="mt-2 text-gray-600">
+          Unset Excerpt
+        </p>
+        <div class="mt-5">
+          <button type="button" onclick="modal.close()" class="inline-flex items-center rounded-md border border-transparent bg-gray-800 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-gray-900">Close</button>
+        </div>
+      </div>
+    </dialog>
+  }
+
+  <div class="grid grid-cols-5 gap-4 sm:grid-cols-3 sm:gap-2">
+    for _, image := range images {
+      <!-- <a class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2"
+        href={templ.URL("/images/" + image.Name)}> -->
+        <div class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2">
+          <img class="w-full h-48 object-cover" src={fmt.Sprintf("/images/data/%s", image.Name)} onclick={ templ.JSFuncCall("showImageModal", image.Name, "My Image Excerpt", fmt.Sprintf("images/data/%s", image.Name)) } />
           <div class="p-2">
             <h2 class="text-sm font-semibold truncate">{image.Name}</h2>
           </div>
-        </a>
-      }
-    </div>
-  }
+        </div>
+      <!-- </a> -->
+    }
+  </div>
 }
 
 templ MakeImagesPage(images []Image, links []Link) {
