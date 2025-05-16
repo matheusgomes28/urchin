@@ -30,7 +30,7 @@ clean:
 # TODO: For now we support only the linux version of tailwindcss, has to be updated in the future to support Windows and MacOS as well.
 install-tools:
 	go install github.com/pressly/goose/v3/cmd/goose@v3.18.0
-	go install github.com/a-h/templ/cmd/templ@v0.2.543 
+	go install github.com/a-h/templ/cmd/templ@v0.3.865
 	go install github.com/cosmtrek/air@v1.49.0 
 
 install-tailwindcss:
