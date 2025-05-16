@@ -9,27 +9,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/matheusgomes28/urchin/app"
 	"github.com/matheusgomes28/urchin/tests/helpers"
-	"github.com/pressly/goose/v3"
 	"github.com/stretchr/testify/require"
 )
 
 func TestPostExists(t *testing.T) {
-
-	// This is gonna be the in-memory mysql
+	// Usual db setup
 	app_settings := helpers.GetAppSettings()
-	database, err := helpers.WaitForDb(app_settings)
+	cleanup, db, err := helpers.SetupDb(app_settings)
 	require.Nil(t, err)
-	goose.SetBaseFS(helpers.EmbedMigrations)
+	defer func() { require.Nil(t, cleanup()) }()
 
-	if err := goose.SetDialect("mysql"); err != nil {
-		require.Nil(t, err)
-	}
-
-	if err := goose.Up(database.Connection, "migrations"); err != nil {
-		require.Nil(t, err)
-	}
-
-	r := app.SetupRoutes(app_settings, database)
+	r := app.SetupRoutes(app_settings, db)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/post/1", nil)
 	r.ServeHTTP(w, req)

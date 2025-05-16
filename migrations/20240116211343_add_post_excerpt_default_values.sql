@@ -6,5 +6,5 @@ UPDATE posts SET excerpt = 'Lorem ipsum dolor sit amet, consectetur adipiscing e
 -- +goose Down
 -- +goose StatementBegin
 -- 
-UPDATE posts SET excerpt = NULL;
+UPDATE posts SET excerpt = 'unimplemented excerpt';
 -- +goose StatementEnd
