@@ -11,27 +11,19 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/stretchr/testify/require"
-
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/tests/helpers"
-	"github.com/pressly/goose/v3"
+	"github.com/test-go/testify/require"
 )
 
 func TestImageUpload(t *testing.T) {
 
-	// This is gonna be the in-memory mysql
-	app_settings := helpers.GetAppSettings(30)
-	go helpers.RunDatabaseServer(app_settings)
-	database, err := helpers.WaitForDb(app_settings)
+	// Database starting code, cleanup will
+	// reset migrations
+	app_settings := helpers.GetAppSettings()
+	cleanup, db, err := helpers.SetupDb(app_settings)
 	require.Nil(t, err)
-	goose.SetBaseFS(helpers.EmbedMigrations)
-
-	err = goose.SetDialect("mysql")
-	require.Nil(t, err)
-
-	err = goose.Up(database.Connection, "migrations")
-	require.Nil(t, err)
+	defer func() { require.Nil(t, cleanup()) }()
 
 	// Multipart image form creation
 	pr, pw := io.Pipe()
@@ -55,7 +47,7 @@ func TestImageUpload(t *testing.T) {
 
 	// Execute multiform request
 	post_recorder := httptest.NewRecorder()
-	r := admin_app.SetupRoutes(app_settings, database)
+	r := admin_app.SetupRoutes(app_settings, db)
 	require.Nil(t, err)
 
 	req, _ := http.NewRequest("POST", "/images", pr)

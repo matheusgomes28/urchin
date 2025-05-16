@@ -10,29 +10,18 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/stretchr/testify/require"
-
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/tests/helpers"
-	"github.com/pressly/goose/v3"
+	"github.com/test-go/testify/require"
 )
 
 func TestPostExists(t *testing.T) {
 
-	// This is gonna be the in-memory mysql
-	app_settings := helpers.GetAppSettings(20)
-	go helpers.RunDatabaseServer(app_settings)
-	database, err := helpers.WaitForDb(app_settings)
+	// Usual database setup
+	app_settings := helpers.GetAppSettings()
+	cleanup, db, err := helpers.SetupDb(app_settings)
 	require.Nil(t, err)
-	goose.SetBaseFS(helpers.EmbedMigrations)
-
-	if err := goose.SetDialect("mysql"); err != nil {
-		require.Nil(t, err)
-	}
-
-	if err := goose.Up(database.Connection, "migrations"); err != nil {
-		require.Nil(t, err)
-	}
+	defer func() { require.Nil(t, cleanup()) }()
 
 	// Send the post in
 	add_post_request := admin_app.AddPostRequest{
@@ -42,7 +31,7 @@ func TestPostExists(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := admin_app.SetupRoutes(app_settings, database)
+	r := admin_app.SetupRoutes(app_settings, db)
 	request_bytes, err := json.Marshal(add_post_request)
 	require.Nil(t, err)
 	req, _ := http.NewRequest("POST", "/posts", bytes.NewBuffer(request_bytes))

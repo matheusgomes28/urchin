@@ -1,18 +1,14 @@
 package helpers
 
 import (
-	"context"
 	_ "database/sql"
 	"embed"
 	"fmt"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/pressly/goose/v3"
 
-	sqle "github.com/dolthub/go-mysql-server"
-	"github.com/dolthub/go-mysql-server/memory"
-	"github.com/dolthub/go-mysql-server/server"
-	"github.com/dolthub/go-mysql-server/sql"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
 )
@@ -22,46 +18,11 @@ import (
 //go:embed migrations/*.sql
 var EmbedMigrations embed.FS
 
-func RunDatabaseServer(app_settings common.AppSettings) {
-	pro := CreateTestDatabase(app_settings.DatabaseName)
-	engine := sqle.NewDefault(pro)
-	engine.Analyzer.Catalog.MySQLDb.AddRootAccount()
+func waitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 
-	session := memory.NewSession(sql.NewBaseSession(), pro)
-	ctx := sql.NewContext(context.Background(), sql.WithSession(session))
-	ctx.SetCurrentDatabase(app_settings.DatabaseName)
-
-	config := server.Config{
-		Protocol: "tcp",
-		Address:  fmt.Sprintf("%s:%d", app_settings.DatabaseAddress, app_settings.DatabasePort),
-	}
-	s, err := server.NewServer(config, engine, memory.NewSessionBuilder(pro), nil)
-	if err != nil {
-		panic(err)
-	}
-	if err = s.Start(); err != nil {
-		panic(err)
-	}
-}
-
-func CreateTestDatabase(name string) *memory.DbProvider {
-	db := memory.NewDatabase(name)
-	db.BaseDatabase.EnablePrimaryKeyIndexes()
-
-	pro := memory.NewDBProvider(db)
-	return pro
-}
-
-func WaitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
-
+	var err error = nil
 	for range 400 {
-		database, err := database.MakeSqlConnection(
-			app_settings.DatabaseUser,
-			app_settings.DatabasePassword,
-			app_settings.DatabaseAddress,
-			app_settings.DatabasePort,
-			app_settings.DatabaseName,
-		)
+		database, err := database.MakeMysqlConnection(app_settings.DatabaseUser, app_settings.DatabasePassword, app_settings.DatabaseAddress, app_settings.DatabasePort, app_settings.DatabaseName)
 
 		if err == nil {
 			return database, nil
@@ -70,26 +31,45 @@ func WaitForDb(app_settings common.AppSettings) (database.SqlDatabase, error) {
 		time.Sleep(25 * time.Millisecond)
 	}
 
-	return database.SqlDatabase{}, fmt.Errorf("database did not start")
+	return database.SqlDatabase{}, fmt.Errorf("database did not start: %v", err)
 }
 
-// GetAppSettings gets the settings for the http servers
-// taking into account a unique port. Very hacky way to
-// get a unique port: manually have to pass a new number
-// for every test...
-// TODO : Find a way to assign a unique port at compile
-//
-//	time
-func GetAppSettings(app_num int) common.AppSettings {
+func GetAppSettings() common.AppSettings {
 	app_settings := common.AppSettings{
 		DatabaseAddress:  "localhost",
-		DatabasePort:     3336 + app_num, // Initial port
+		DatabasePort:     3306,
 		DatabaseUser:     "root",
-		DatabasePassword: "",
-		DatabaseName:     "urchin",
+		DatabasePassword: "root",
+		DatabaseName:     "test",
 		WebserverPort:    8080,
 		CacheEnabled:     false,
 	}
 
 	return app_settings
+}
+
+func SetupDb(app_settings common.AppSettings) (cleanup func() error, db database.SqlDatabase, err error) {
+
+	db, err = waitForDb(app_settings)
+	if err != nil {
+		return nil, database.SqlDatabase{}, fmt.Errorf("could not ping database: %v", err)
+	}
+
+	goose.SetBaseFS(EmbedMigrations)
+
+	err = goose.SetDialect("mysql")
+	if err != nil {
+		return nil, database.SqlDatabase{}, fmt.Errorf("could not set the sql dialect: %v", err)
+	}
+
+	err = goose.Up(db.Connection, "migrations")
+	if err != nil {
+		return nil, database.SqlDatabase{}, fmt.Errorf("could not run migrations: %v", err)
+	}
+
+	cleanup = func() error {
+		return goose.Reset(db.Connection, "migrations")
+	}
+
+	return cleanup, db, nil
 }

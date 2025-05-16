@@ -34,7 +34,7 @@ func main() {
 	}
 	app_settings = settings
 
-	database, err := database.MakeSqlConnection(
+	database, err := database.MakeMysqlConnection(
 		app_settings.DatabaseUser,
 		app_settings.DatabasePassword,
 		app_settings.DatabaseAddress,

@@ -9,11 +9,12 @@ on:
 jobs:
   linters:
     name: Tests 🧪
-
+    env:
+      ImageOS: ubuntu20
     runs-on: ubuntu-latest
     container:
       image: mattgomes28/urchin-golang:0.6
-      options: --user 1001
+      options: --user 0
 
     steps:
     - uses: actions/checkout@v4
@@ -23,10 +24,22 @@ jobs:
         templ generate
       shell: bash
     
+    - name: Installing Mariadb 💾
+      env:
+        MYSQL: "mysql -u root -proot"
+      run: |
+        apt update
+        apt install mariadb-server -y
+        service mariadb start
+        mysqladmin -u root password "root"
+        echo "Mysql command prefix: ${MYSQL}"
+        ${MYSQL} -e "CREATE DATABASE test"
+        ${MYSQL} -e "FLUSH PRIVILEGES"
+
     - name: Running Go Tests 🧪
       run: |
         make prepare_env
-        go test -coverprofile=coverage.out -covermode=atomic ./... -v
+        go test -p=1 -coverprofile=coverage.out -covermode=atomic ./... -v
         cat coverage.out | grep -v "urchin/tests" > coverage_source_only.out
         rm coverage.out
 
