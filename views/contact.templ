@@ -54,5 +54,5 @@ templ makeContact(recaptcha_sitekey string) {
 }
 
 templ MakeContactPage(links []common.Link, recaptcha_sitekey string) {
-  @MakeLayout("Menu and Contact Form", links, makeContact(recaptcha_sitekey))
+  @MakeLayout("Menu and Contact Form", links, makeContact(recaptcha_sitekey), []string{})
 }

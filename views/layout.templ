@@ -5,7 +5,7 @@ import (
 )
 
 
-templ MakeLayout(title string, links []Link, content templ.Component) {
+templ MakeLayout(title string, links []Link, content templ.Component, scripts []string) {
   <!DOCTYPE html>
   <html lang="en">
   // This should go into Make HTML Headers
@@ -13,9 +13,16 @@ templ MakeLayout(title string, links []Link, content templ.Component) {
   <head>
     <meta charset="UTF-8" />
     <title>{ title }</title>
+    
+    <!-- Core script loaded everywhere -->
     <script src="/static/scripts/htmx.min.js"></script>
     <script src="/static/scripts/client-side-templates.js"></script>
     <script src="/static/scripts/application.js" defer></script>
+
+    <!-- Scripts on per page basis -->
+    for _, script := range scripts {
+      <script src={ templ.URL(script) } defer></script>
+    }
     <link rel="icon" href="/static/assets/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="/static/css/style.css" />
   </head>

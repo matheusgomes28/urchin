@@ -2,9 +2,12 @@ package app
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
@@ -20,6 +23,39 @@ var valid_extensions = map[string]bool{
 	".jpeg": true,
 	".png":  true,
 	".gif":  true,
+}
+
+// This function assumes that the image file
+// exists and is a valid image
+func populateImageMetadata(filename string, app_settings common.AppSettings) common.Image {
+
+	ext := path.Ext(filename)
+	name := strings.TrimSuffix(filename, ext)
+	metadata_file := path.Join(app_settings.ImageDirectory, fmt.Sprintf("%s.json", name))
+	file_path := path.Join("/images/data", filename)
+
+	// Check if a json metadata file exists
+	metadata_contents, err := os.ReadFile(metadata_file)
+	if err == nil {
+		var image common.Image
+		err = json.Unmarshal(metadata_contents, &image)
+
+		if err == nil {
+			image.Ext = ext
+			image.Uuid = name
+			image.Filename = filename
+			image.Filepath = file_path
+			return image
+		}
+	}
+
+	return common.Image{
+		Uuid:     filename[:len(filename)-len(ext)],
+		Name:     filename,
+		Filename: filename,
+		Filepath: file_path,
+		Ext:      ext,
+	}
 }
 
 func imagesHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
@@ -48,7 +84,7 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 	valid_images := make([]common.Image, 0)
 	for n, file := range files {
 		// TODO : This is surely not the best way
-		//        to implement pagination in for loops
+		// TODO : to implement pagination in for loops
 		if n >= limit {
 			break
 		}
@@ -66,11 +102,7 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 			continue
 		}
 
-		image := common.Image{
-			Uuid: filename[:len(filename)-len(ext)],
-			Name: filename,
-			Ext:  ext,
-		}
+		image := populateImageMetadata(filename, app_settings)
 		valid_images = append(valid_images, image)
 	}
 

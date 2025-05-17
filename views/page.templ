@@ -4,5 +4,5 @@ import "github.com/matheusgomes28/urchin/common"
 
 
 templ MakePage(title string, content string, links []common.Link) {
-    @MakeLayout(title, links, templ.Raw(content))
+    @MakeLayout(title, links, templ.Raw(content), []string{})
 }

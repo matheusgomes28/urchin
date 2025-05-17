@@ -10,5 +10,5 @@ templ makeError(error_str string) {
 }
 
 templ MakeErrorPage(error_str string, links []common.Link) {
-  @MakeLayout("Error!", links, makeError(error_str))
+  @MakeLayout("Error!", links, makeError(error_str), []string{})
 }
