@@ -7,5 +7,5 @@ templ makeNotFound() {
 }
 
 templ MakeNotFoundPage(links []common.Link) {
-  @MakeLayout("Not Found", links, makeNotFound())
+  @MakeLayout("Not Found", links, makeNotFound(), []string{})
 }

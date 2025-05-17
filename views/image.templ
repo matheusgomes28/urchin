@@ -11,5 +11,5 @@ templ makeImage(image Image) {
 }
 
 templ MakeImagePage(image Image, links []Link) {
-  @MakeLayout(image.Name, links, makeImage(image))
+  @MakeLayout(image.Name, links, makeImage(image), []string{})
 }

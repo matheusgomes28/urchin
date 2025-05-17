@@ -10,5 +10,5 @@ templ makePost(title string, content string) {
 }
 
 templ MakePostPage(title string, content string, links []common.Link) {
-  @MakeLayout(title, links, makePost(title, content))
+  @MakeLayout(title, links, makePost(title, content), []string{})
 }

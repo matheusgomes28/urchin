@@ -18,7 +18,7 @@ build: prepare_env install-tailwindcss
 	$(TEMPL) generate
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
-	./tailwindcss -i ./static/css/custom.css -o ./static/css/style.css --minify
+	./tailwindcss -i ./static/style.css -o ./static/css/style.css --minify
 
 test: prepare_env
 	$(GOCMD) test -v ./...

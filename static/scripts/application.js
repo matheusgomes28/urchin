@@ -1,16 +1,3 @@
-// MARK: Images Modal
-
-/**
- * Shows the modal image popup
- * @param {string} title title of the image
- */
-function showImageModal(title, excerpt, src) {
-  document.getElementById("modal-title").innerHTML = title;
-  document.getElementById("modal-excerpt").innerHTML = excerpt;
-  document.getElementById("modal-image").src = src;
-  modal.showModal();
-}
-
 document.getElementById('menu-toggle').addEventListener('click', function () {
   const menu = document.getElementById('mobile-menu');
   menu.classList.toggle('hidden')
