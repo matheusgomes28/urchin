@@ -1,6 +1,7 @@
 services:
   urchin_app:
     image: mattgomes28/urchin-golang:0.6
+    # user: ${CURRENT_UID:?Need to define CURRENT_UID=$(id -u):$(id -g)}
     ports:
       - "8080:8080"
     volumes:
@@ -19,6 +20,7 @@ services:
 
   urchin_admin_app:
     image: mattgomes28/urchin-golang:0.6
+    # user: ${CURRENT_UID:?Need to define CURRENT_UID=$(id -u):$(id -g)}
     ports:
       - "8081:8081"
     volumes:
