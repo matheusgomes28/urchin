@@ -1,10 +1,12 @@
 module github.com/matheusgomes28/urchin
 
-go 1.22.0
+go 1.23.0
+
+toolchain go1.23.2
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/a-h/templ v0.2.543
+	github.com/a-h/templ v0.3.898
 	github.com/dolthub/go-mysql-server v0.18.1-0.20240317073429-152477c4b580
 	github.com/fossoreslp/go-uuid-v4 v1.0.0
 	github.com/gin-gonic/gin v1.9.1
@@ -61,14 +63,14 @@ require (
 	go.opentelemetry.io/otel/trace v1.20.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678 // indirect
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
-	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.39.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
