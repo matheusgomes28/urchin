@@ -39,3 +39,30 @@ links = [
     { name = "Images", href = "/images", title = "Images page" },
     { name = "Contact", href = "/contact", title = "Contacts page" },
 ]
+
+
+# Gallery Settings
+
+[gallery.lindos]
+name = "Lindos"
+description = "Pictures taken in our visits to Lindos"
+link = "/gallery/lindos"
+thumbnail = "images/data/5c320138-5acb-487b-b008-afecc2ab6ac4.jpg"
+images = [
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+]
+
+[gallery.rhodes]
+name = "Rhodes"
+description = "Pictures taken in our visits to Rhodes"
+link = "/gallery/rhodes"
+thumbnail = "/images/data/5c320138-5acb-487b-b008-afecc2ab6ac4.jpg"
+images = [
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+    { file = "5c320138-5acb-487b-b008-afecc2ab6ac4.jpg", metadata = "5c320138-5acb-487b-b008-afecc2ab6ac4.json"},
+]

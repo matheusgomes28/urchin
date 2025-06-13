@@ -8,4 +8,5 @@ type Image struct {
 	Ext      string   `json:"extension"`
 	Excerpt  string   `json:"excerpt"`
 	Location Location `json:"location"`
+	Date     string   `json:"date"`
 }
