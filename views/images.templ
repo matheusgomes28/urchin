@@ -5,8 +5,21 @@ import (
   . "github.com/matheusgomes28/urchin/common"
 )
 
+templ makeImageDetailsList(image Image) {
+  <div class="flex justify-start mt-4">
+    <div class="flex-none flex items-center">
+      <span class="icon-calendar text-xl mr-2"></span>
+      <span id="modal-text-date">{ image.Date }</span>
+    </div>
+    <div class="flex-none flex items-center ml-4">
+      <span class="icon-map-pin text-xl mr-2"></span>
+      <span id="modal-text-name">{ image.Location.Name }</span>
+    </div>
+  </div>
+}
+
 templ makeModalPaginationButtons(images []Image) {
-  <div class="flex rounded-xl justify-center">
+  <div class="flex flex-none rounded-xl justify-center mt-8">
       <ul class="flex items-center">
           <li class="px-2">
               <button onclick="prevImage()" aria-disabled="false" class="w-9 h-9 flex items-center justify-center rounded-md border disabled">
@@ -37,22 +50,30 @@ templ makeModalPaginationButtons(images []Image) {
 templ makeDefaultModalDialog(images []Image) {
   <!-- Modal -->
   <dialog id="modal" class="p-6 rounded-lg shadow-lg max-w-4xl border border-pastel-blue dark:border-pastel-blue-900 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-    <!-- TODO : Remove this default image -->
-    <img id="modal-image" src="https://loremflickr.com/800/600/girl" class="shadow rounded-lg overflow-hidden border"/>
     
-    <div class="mt-8">
-      <h4 id="modal-title" class="font-bold text-xl">Unset Title</h4>
-      <p id="modal-excerpt" class="mt-2 text-gray-600">
-        Unset Excerpt
-      </p>
-    </div>
-    
-    <!-- Close Button -->
-    <div class="absolute top-2 right-2">
-      <span class="icon-x hover:border-cyan-500 hover:text-indigo-500 cursor-pointer text-lg" onclick="modal.close()"></span>
-    </div>
+    <!-- For some reason setting flex on modal breaks the hiding element -->
+    <div class="flex flex-col">
+      <!-- TODO : Remove this default image -->
+      <h4 id="modal-title" class="font-bold text-xl mb-4">Unset Title</h4>
+      
+      <!-- Main image -->
+      <img id="modal-image" src="https://loremflickr.com/800/600/girl" class="flex-1 shadow rounded-lg overflow-hidden border"/>
 
-    @makeModalPaginationButtons(images)
+      <!-- Excerpt and metadata -->
+      <div class="flex-none">
+        @makeImageDetailsList(Image{})
+        <p id="modal-excerpt" class="mt-4 text-gray-600">
+          Unset Excerpt
+        </p>
+      </div>
+      
+      <!-- Close Button -->
+      <div class="absolute top-2 right-2">
+        <span class="icon-x hover:border-cyan-500 hover:text-indigo-500 cursor-pointer text-lg" onclick="modal.close()"></span>
+      </div>
+
+      @makeModalPaginationButtons(images)
+    </div>
   </dialog>
 }
 

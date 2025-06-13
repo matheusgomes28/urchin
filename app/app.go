@@ -30,6 +30,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/post/:id", postHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images/:name", imageHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
+	addCachableHandler(r, "GET", "/gallery/:name", galleryHandler, &cache, app_settings, database)
 
 	// Pages will be querying the page content from the unique
 	// link given at the creation of the page step
