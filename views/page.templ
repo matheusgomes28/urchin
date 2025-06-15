@@ -3,6 +3,6 @@ package views
 import "github.com/matheusgomes28/urchin/common"
 
 
-templ MakePage(title string, content string, links []common.Link) {
-    @MakeLayout(title, links, templ.Raw(content), []string{})
+templ MakePage(title string, content string, links []common.Link, dropdowns map[string][]common.Link) {
+    @MakeLayout(title, links, dropdowns, templ.Raw(content), []string{})
 }

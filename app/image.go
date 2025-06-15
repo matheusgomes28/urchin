@@ -16,15 +16,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// Since there are no builtin sets in go, we are using a map to improve the performance when checking for valid extensions
-// by creating a map with the valid extensions as keys and using an existence check.
-var valid_extensions = map[string]bool{
-	".jpg":  true,
-	".jpeg": true,
-	".png":  true,
-	".gif":  true,
-}
-
 // This function assumes that the image file
 // exists and is a valid image
 func populateImageMetadata(filename string, app_settings common.AppSettings) common.Image {
@@ -59,7 +50,6 @@ func populateImageMetadata(filename string, app_settings common.AppSettings) com
 }
 
 func imagesHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
-	// TODO: Implement rendering.
 	pageNum := 1 // Default to page 0
 	if pageNumQuery := c.Param("num"); pageNumQuery != "" {
 		num, err := strconv.Atoi(pageNumQuery)
@@ -70,43 +60,29 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 		}
 	}
 
-	limit := 10 // or whatever limit you want
-	offset := (pageNum - 1) * limit
-
 	// Get all the files inside the image directory
 	files, err := os.ReadDir(app_settings.ImageDirectory)
 	if err != nil {
 		log.Error().Msgf("could not read files in image directory: %v", err)
 		return []byte{}, err
 	}
+	filepaths := common.Map(files, func(file os.DirEntry) string {
+		return path.Join(app_settings.ImageDirectory, file.Name())
+	})
 
 	// Filter all the non-images out of the list
-	valid_images := make([]common.Image, 0)
-	for n, file := range files {
-		// TODO : This is surely not the best way
-		// TODO : to implement pagination in for loops
-		if n >= limit {
-			break
-		}
+	image_files := common.FilterStrings(filepaths, func(filepath string) bool {
+		ext := path.Ext(filepath)
+		_, contains := common.ValidImageExtensions[ext]
+		return contains
+	})
 
-		if n < offset {
-			continue
-		}
-
-		filename := file.Name()
-		ext := path.Ext(file.Name())
-		// Checking for the existence of a value in a map takes O(1) and therefore it's faster than
-		// iterating over a string slice
-		_, ok := valid_extensions[ext]
-		if !ok {
-			continue
-		}
-
-		image := populateImageMetadata(filename, app_settings)
-		valid_images = append(valid_images, image)
+	valid_images, err := common.GetImages(image_files, 10, pageNum, app_settings)
+	if err != nil {
+		return []byte{}, err
 	}
 
-	index_view := views.MakeImagesPage(valid_images, app_settings.AppNavbar.Links)
+	index_view := views.MakeImagesPage(valid_images, app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)
@@ -135,5 +111,5 @@ func imageHandler(c *gin.Context, app_settings common.AppSettings, database data
 		Ext:  ext,
 	}
 
-	return renderHtml(c, views.MakeImagePage(image, app_settings.AppNavbar.Links))
+	return renderHtml(c, views.MakeImagePage(image, app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns))
 }

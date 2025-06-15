@@ -107,6 +107,6 @@ templ makeImages(images []Image) {
   </div>
 }
 
-templ MakeImagesPage(images []Image, links []Link) {
-  @MakeLayout("Images", links, makeImages(images), []string{"/static/scripts/images.js"})
+templ MakeImagesPage(images []Image, links []Link, dropdowns map[string][]Link) {
+  @MakeLayout("Images", links, dropdowns, makeImages(images), []string{"/static/scripts/images.js"})
 }

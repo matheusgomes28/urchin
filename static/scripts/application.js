@@ -6,6 +6,8 @@ document.getElementById('menu-toggle').addEventListener('click', function () {
 const themeToggle = document.getElementById('theme-toggle');
 const lightIcon = document.getElementById('light-icon');
 const darkIcon = document.getElementById('dark-icon');
+const galleryDropdownButton = document.getElementById('gallery-dropdown-button');
+const galleryDropdownList = document.getElementById('gallery-dropdown-list');
 
 const html = document.documentElement;
 
@@ -26,8 +28,30 @@ themeToggle.addEventListener('click', function () {
   }
 });
 
-document.getElementById('demo-form').addEventListener('submit', function() {
-  const event = new Event('verified');
-  const elem = document.querySelector("#demo-form");
-  elem.dispatchEvent(event);
-})
+// Toggle dropdown
+galleryDropdownButton.addEventListener('click', function() {
+    const isHidden = galleryDropdownList.classList.contains('hidden');
+    
+    if (isHidden) {
+        galleryDropdownList.classList.remove('hidden');
+        galleryDropdownButton.setAttribute('aria-expanded', 'true');
+    } else {
+        galleryDropdownList.classList.add('hidden');
+        galleryDropdownButton.setAttribute('aria-expanded', 'false');
+    }
+});
+    
+// Close when clicking outside
+document.addEventListener('click', function(event) {
+    if (!galleryDropdownButton.contains(event.target) && !galleryDropdownList.contains(event.target)) {
+        galleryDropdownList.classList.add('hidden');
+        galleryDropdownButton.setAttribute('aria-expanded', 'false');
+    }
+});
+
+// This is not working
+// document.getElementById('demo-form').addEventListener('submit', function() {
+//   const event = new Event('verified');
+//   const elem = document.querySelector("#demo-form");
+//   elem.dispatchEvent(event);
+// })

@@ -4,6 +4,6 @@ import (
   . "github.com/matheusgomes28/urchin/common"
 )
 
-templ MakeAboutPage(links []Link) {
-  @MakeLayout("About", links, makeUnderConstruction(), []string{})
+templ MakeAboutPage(links []Link, dropdowns map[string][]Link) {
+  @MakeLayout("About", links, dropdowns, makeUnderConstruction(), []string{})
 }

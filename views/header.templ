@@ -1,6 +1,7 @@
 package views
 
 import "github.com/matheusgomes28/urchin/common"
+import components "github.com/matheusgomes28/urchin/views/components"
 
 templ makeDarkModeButton() {
 	<button id="theme-toggle" class="text-gray-300 inline-block focus:outline-none">
@@ -22,7 +23,7 @@ templ makeDarkModeButton() {
 	</button>
 }
 
-templ MakeNavBar(links []common.Link) {
+templ MakeNavBar(links []common.Link, dropdowns map[string][]common.Link) {
 	<header>
 		<nav class="fixed bg-gray-800 p-4 top-0 w-full inline">
 			<div class="container mx-auto flex justify-between items-center">
@@ -35,6 +36,9 @@ templ MakeNavBar(links []common.Link) {
 						for _, link := range links {
 						<a class="text-gray-100 dark:text-gray-100 hover:text-gray-400 w-auto h-fit inline-block p-3 text-center leading-4 font-bold transition duration-300 ease-in"
 							href={ templ.URL(link.Href) }>{ link.Name }</a>
+						}
+						for name, dropdown_links := range dropdowns {
+							@components.MakeDropdownButton(name, dropdown_links)
 						}
 					</div>
 					@makeDarkModeButton()

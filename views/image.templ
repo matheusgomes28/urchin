@@ -10,6 +10,6 @@ templ makeImage(image Image) {
   <img src={fmt.Sprintf("/images/data/%s", image.Name)} />
 }
 
-templ MakeImagePage(image Image, links []Link) {
-  @MakeLayout(image.Name, links, makeImage(image), []string{})
+templ MakeImagePage(image Image, links []Link, dropdowns map[string][]Link) {
+  @MakeLayout(image.Name, links, dropdowns, makeImage(image), []string{})
 }

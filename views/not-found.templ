@@ -6,6 +6,6 @@ templ makeNotFound() {
   <h1 class="text-2xl text-bold">Oops - Resource cannot be found 🙁</h1>
 }
 
-templ MakeNotFoundPage(links []common.Link) {
-  @MakeLayout("Not Found", links, makeNotFound(), []string{})
+templ MakeNotFoundPage(links []common.Link, dropdowns map[string][]common.Link) {
+  @MakeLayout("Not Found", links, dropdowns, makeNotFound(), []string{})
 }

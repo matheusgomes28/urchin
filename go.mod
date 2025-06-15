@@ -6,7 +6,7 @@ toolchain go1.23.9
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/a-h/templ v0.3.865
+	github.com/a-h/templ v0.3.898
 	github.com/fossoreslp/go-uuid-v4 v1.0.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-sql-driver/mysql v1.8.0
@@ -58,3 +58,5 @@ require (
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
