@@ -6,7 +6,7 @@ toolchain go1.23.9
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/a-h/templ v0.3.865
+	github.com/a-h/templ v0.3.898
 	github.com/dolthub/go-mysql-server v0.18.1-0.20240317073429-152477c4b580
 	github.com/fossoreslp/go-uuid-v4 v1.0.0
 	github.com/gin-gonic/gin v1.9.1

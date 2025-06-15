@@ -16,7 +16,7 @@ import (
 func serveErrorPage(c *gin.Context, error_msg string, error_code int, app_settings common.AppSettings) error {
 	// Generate HTML page
 	log.Error().Msgf("running the serveErrorPage")
-	error_page := views.MakeErrorPage(error_msg, app_settings.AppNavbar.Links)
+	error_page := views.MakeErrorPage(error_msg, app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns)
 
 	// TODO : is there a better function to serve the bytes?
 	if err := render(c, error_code, error_page); err == nil {
@@ -70,5 +70,5 @@ func postHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	// Generate HTML page
 	post.Content = string(mdToHTML([]byte(post.Content)))
 
-	return renderHtml(c, views.MakePostPage(post.Title, post.Content, app_settings.AppNavbar.Links))
+	return renderHtml(c, views.MakePostPage(post.Title, post.Content, app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns))
 }

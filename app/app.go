@@ -121,7 +121,7 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 	}
 
 	// if not cached, create the cache
-	index_view := views.MakeIndex(posts, settings.AppNavbar.Links)
+	index_view := views.MakeIndex(posts, settings.AppNavbar.Links, settings.AppNavbar.Dropdowns)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)
@@ -135,7 +135,7 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 
 func notFoundHandler(app_settings common.AppSettings) func(*gin.Context) {
 	handler := func(c *gin.Context) {
-		buffer, err := renderHtml(c, views.MakeNotFoundPage(app_settings.AppNavbar.Links))
+		buffer, err := renderHtml(c, views.MakeNotFoundPage(app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
 			return

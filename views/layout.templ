@@ -5,7 +5,7 @@ import (
 )
 
 
-templ MakeLayout(title string, links []Link, content templ.Component, scripts []string) {
+templ MakeLayout(title string, links []Link, dropdowns map[string][]Link, content templ.Component, scripts []string) {
   <!DOCTYPE html>
   <html lang="en">
   // This should go into Make HTML Headers
@@ -28,7 +28,7 @@ templ MakeLayout(title string, links []Link, content templ.Component, scripts []
   </head>
 
   <body class="relative bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-500">
-    @MakeNavBar(links)
+    @MakeNavBar(links, dropdowns)
 
     <main class="container mx-auto py-24 flex-grow sm:py-32">
       @content

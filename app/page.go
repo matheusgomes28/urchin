@@ -32,5 +32,5 @@ func pageHandler(c *gin.Context, app_settings common.AppSettings, database datab
 	// Generate HTML page
 	page.Content = string(mdToHTML([]byte(page.Content)))
 
-	return renderHtml(c, views.MakePage(page.Title, page.Content, app_settings.AppNavbar.Links))
+	return renderHtml(c, views.MakePage(page.Title, page.Content, app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns))
 }
