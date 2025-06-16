@@ -9,9 +9,9 @@
 
 package common
 
-func FilterStrings(strings []string, predicate func(string) bool) []string {
-	result := make([]string, 0)
-	for _, value := range strings {
+func Filter[K any](inputs []K, predicate func(K) bool) []K {
+	result := make([]K, 0)
+	for _, value := range inputs {
 		if predicate(value) {
 			result = append(result, value)
 		}

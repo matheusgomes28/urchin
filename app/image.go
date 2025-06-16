@@ -2,12 +2,9 @@ package app
 
 import (
 	"bytes"
-	"encoding/json"
-	"fmt"
 	"os"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
@@ -15,39 +12,6 @@ import (
 	"github.com/matheusgomes28/urchin/views"
 	"github.com/rs/zerolog/log"
 )
-
-// This function assumes that the image file
-// exists and is a valid image
-func populateImageMetadata(filename string, app_settings common.AppSettings) common.Image {
-
-	ext := path.Ext(filename)
-	name := strings.TrimSuffix(filename, ext)
-	metadata_file := path.Join(app_settings.ImageDirectory, fmt.Sprintf("%s.json", name))
-	file_path := path.Join("/images/data", filename)
-
-	// Check if a json metadata file exists
-	metadata_contents, err := os.ReadFile(metadata_file)
-	if err == nil {
-		var image common.Image
-		err = json.Unmarshal(metadata_contents, &image)
-
-		if err == nil {
-			image.Ext = ext
-			image.Uuid = name
-			image.Filename = filename
-			image.Filepath = file_path
-			return image
-		}
-	}
-
-	return common.Image{
-		Uuid:     filename[:len(filename)-len(ext)],
-		Name:     filename,
-		Filename: filename,
-		Filepath: file_path,
-		Ext:      ext,
-	}
-}
 
 func imagesHandler(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
 	pageNum := 1 // Default to page 0
@@ -66,18 +30,16 @@ func imagesHandler(c *gin.Context, app_settings common.AppSettings, database dat
 		log.Error().Msgf("could not read files in image directory: %v", err)
 		return []byte{}, err
 	}
+
 	filepaths := common.Map(files, func(file os.DirEntry) string {
-		return path.Join(app_settings.ImageDirectory, file.Name())
+		return file.Name()
 	})
-
-	// Filter all the non-images out of the list
-	image_files := common.FilterStrings(filepaths, func(filepath string) bool {
+	filepaths = common.Filter(filepaths, func(filepath string) bool {
 		ext := path.Ext(filepath)
-		_, contains := common.ValidImageExtensions[ext]
-		return contains
+		return ext == ".json"
 	})
 
-	valid_images, err := common.GetImages(image_files, 10, pageNum, app_settings)
+	valid_images, err := common.GetImages(filepaths, 10, pageNum, app_settings)
 	if err != nil {
 		return []byte{}, err
 	}

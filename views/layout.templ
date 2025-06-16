@@ -17,7 +17,7 @@ templ MakeLayout(title string, links []Link, dropdowns map[string][]Link, conten
     <!-- Core script loaded everywhere -->
     <script src="/static/scripts/htmx.min.js"></script>
     <script src="/static/scripts/client-side-templates.js"></script>
-    <script src="/static/scripts/application.js" defer></script>
+    <script src="/static/scripts/application.js" type="module" defer></script>
 
     <!-- Scripts on per page basis -->
     for _, script := range scripts {

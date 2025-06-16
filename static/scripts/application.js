@@ -1,53 +1,75 @@
-document.getElementById('menu-toggle').addEventListener('click', function () {
-  const menu = document.getElementById('mobile-menu');
-  menu.classList.toggle('hidden')
-});
+function initDropdowns() {
+    const dropdownButtons = document.querySelectorAll("[id^=dropdown-button]");
 
-const themeToggle = document.getElementById('theme-toggle');
-const lightIcon = document.getElementById('light-icon');
-const darkIcon = document.getElementById('dark-icon');
-const galleryDropdownButton = document.getElementById('gallery-dropdown-button');
-const galleryDropdownList = document.getElementById('gallery-dropdown-list');
+    // We assume that every dropdown button will have a matching
+    // dropdown list!
+    for (const buttonElem of dropdownButtons) {
+        const buttonId = buttonElem.id;
+        const listId = buttonElem.id.replace("dropdown-button", "dropdown-list");
+        const listElem = document.getElementById(listId);
 
-const html = document.documentElement;
+        buttonElem.addEventListener('click', function () {
+            const isHidden = listElem.classList.contains('hidden');
 
-if (localStorage.getItem('color-theme') === 'dark') {
-  html.classList.add('dark');
-} else {
-  html.classList.remove('dark');
+            if (isHidden) {
+                listElem.classList.remove('hidden');
+                buttonElem.setAttribute('aria-expanded', 'true');
+            } else {
+                listElem.classList.add('hidden');
+                buttonElem.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // close when clicking outside
+        // Lazy - should probably do all of the elements in one go
+        document.addEventListener('click', function (event) {
+            if (!buttonElem.contains(event.target) && !listElem.contains(event.target)) {
+                listElem.classList.add('hidden');
+                buttonElem.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
 }
 
-themeToggle.addEventListener('click', function () {
-  // Toggle dark class on HTML element
-  html.classList.toggle('dark');
+function initThemeToggles() {
+    const themeToggle = document.getElementById('theme-toggle');
+    const lightIcon = document.getElementById('light-icon');
+    const darkIcon = document.getElementById('dark-icon');
 
-  if (html.classList.contains('dark')) {
-    localStorage.setItem('color-theme', 'dark');
-  } else {
-    localStorage.setItem('color-theme', 'light');
-  }
-});
+    const html = document.documentElement;
 
-// Toggle dropdown
-galleryDropdownButton.addEventListener('click', function() {
-    const isHidden = galleryDropdownList.classList.contains('hidden');
-    
-    if (isHidden) {
-        galleryDropdownList.classList.remove('hidden');
-        galleryDropdownButton.setAttribute('aria-expanded', 'true');
+    if (localStorage.getItem('color-theme') === 'dark') {
+        html.classList.add('dark');
     } else {
-        galleryDropdownList.classList.add('hidden');
-        galleryDropdownButton.setAttribute('aria-expanded', 'false');
+        html.classList.remove('dark');
     }
-});
-    
-// Close when clicking outside
-document.addEventListener('click', function(event) {
-    if (!galleryDropdownButton.contains(event.target) && !galleryDropdownList.contains(event.target)) {
-        galleryDropdownList.classList.add('hidden');
-        galleryDropdownButton.setAttribute('aria-expanded', 'false');
-    }
-});
+
+    themeToggle.addEventListener('click', function () {
+        // Toggle dark class on HTML element
+        html.classList.toggle('dark');
+
+        if (html.classList.contains('dark')) {
+            localStorage.setItem('color-theme', 'dark');
+        } else {
+            localStorage.setItem('color-theme', 'light');
+        }
+    });
+}
+
+// Main entrypoint
+function init() {
+  initThemeToggles();
+  initDropdowns();
+}
+
+// Initialize when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+export { initDropdowns, initThemeToggles, init }
 
 // This is not working
 // document.getElementById('demo-form').addEventListener('submit', function() {

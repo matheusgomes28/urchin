@@ -40,7 +40,7 @@ links = [
 ]
 
 [navbar.dropdowns]
-gallery = [
+Gallery = [
     { name = "Lindos", href = "/gallery/lindos", title = "Lindos" },
     { name = "Rhodes", href = "/gallery/rhodes", title = "Rhodes" },
 ]
