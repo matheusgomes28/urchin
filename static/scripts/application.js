@@ -4,9 +4,15 @@ function initDropdowns() {
     // We assume that every dropdown button will have a matching
     // dropdown list!
     for (const buttonElem of dropdownButtons) {
-        const buttonId = buttonElem.id;
         const listId = buttonElem.id.replace("dropdown-button", "dropdown-list");
         const listElem = document.getElementById(listId);
+        const arrowElem = buttonElem.querySelector("[id^=dropdown-arrow");
+
+        // Switches the arrow element's direction
+        const toggleArrowDir = () => {
+            arrowElem.classList.toggle("icon-caret-down");
+            arrowElem.classList.toggle("icon-caret-up");
+        };
 
         buttonElem.addEventListener('click', function () {
             const isHidden = listElem.classList.contains('hidden');
@@ -14,9 +20,11 @@ function initDropdowns() {
             if (isHidden) {
                 listElem.classList.remove('hidden');
                 buttonElem.setAttribute('aria-expanded', 'true');
+                toggleArrowDir();
             } else {
                 listElem.classList.add('hidden');
                 buttonElem.setAttribute('aria-expanded', 'false');
+                toggleArrowDir();
             }
         });
 
@@ -26,6 +34,8 @@ function initDropdowns() {
             if (!buttonElem.contains(event.target) && !listElem.contains(event.target)) {
                 listElem.classList.add('hidden');
                 buttonElem.setAttribute('aria-expanded', 'false');
+                arrowElem.classList.remove("icon-caret-up");
+                arrowElem.classList.add("icon-caret-down");
             }
         });
     }
@@ -33,9 +43,6 @@ function initDropdowns() {
 
 function initThemeToggles() {
     const themeToggle = document.getElementById('theme-toggle');
-    const lightIcon = document.getElementById('light-icon');
-    const darkIcon = document.getElementById('dark-icon');
-
     const html = document.documentElement;
 
     if (localStorage.getItem('color-theme') === 'dark') {
@@ -56,17 +63,25 @@ function initThemeToggles() {
     });
 }
 
+function initMenuToggle() {
+    document.getElementById('menu-toggle').addEventListener('click', function () {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden')
+    });
+}
+
 // Main entrypoint
 function init() {
-  initThemeToggles();
-  initDropdowns();
+    initThemeToggles();
+    initDropdowns();
+    initMenuToggle();
 }
 
 // Initialize when DOM is loaded
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init);
 } else {
-  init();
+    init();
 }
 
 export { initDropdowns, initThemeToggles, init }

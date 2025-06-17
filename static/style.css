@@ -33,12 +33,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-caret-up:before {
+  content: "\e903";
+}
+.icon-caret-down:before {
+  content: "\e904";
+}
+.icon-calendar:before {
+  content: "\e902";
+}
 .icon-map-pin:before {
   content: "\e900";
 }
 .icon-x:before {
   content: "\e901";
-}
-.icon-calendar:before {
-  content: "\e902";
 }
