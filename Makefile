@@ -18,7 +18,7 @@ build: prepare_env install-tailwindcss
 	$(TEMPL) generate
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
-	./tailwindcss -i ./static/css/custom.css -o ./static/css/style.css --minify
+	./tailwindcss -i ./static/style.css -o ./static/css/style.css --minify
 
 test: prepare_env
 	$(GOCMD) test -v ./...
@@ -30,7 +30,7 @@ clean:
 # TODO: For now we support only the linux version of tailwindcss, has to be updated in the future to support Windows and MacOS as well.
 install-tools:
 	go install github.com/pressly/goose/v3/cmd/goose@v3.18.0
-	go install github.com/a-h/templ/cmd/templ@v0.2.543 
+	go install github.com/a-h/templ/cmd/templ@v0.3.865
 	go install github.com/cosmtrek/air@v1.49.0 
 
 install-tailwindcss:

@@ -53,6 +53,6 @@ templ makeContact(recaptcha_sitekey string) {
   }
 }
 
-templ MakeContactPage(links []common.Link, recaptcha_sitekey string) {
-  @MakeLayout("Menu and Contact Form", links, makeContact(recaptcha_sitekey))
+templ MakeContactPage(links []common.Link, dropdowns map[string][]common.Link, recaptcha_sitekey string) {
+  @MakeLayout("Menu and Contact Form", links, dropdowns, makeContact(recaptcha_sitekey), []string{})
 }
