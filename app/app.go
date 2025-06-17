@@ -48,6 +48,11 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	// Where all the static files (css, js, etc) are served from
 	r.Static("/static", "./static")
 
+	// For container health purposes
+	r.Any("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, common.Page{})
+	})
+
 	r.NoRoute(notFoundHandler(app_settings))
 
 	return r
