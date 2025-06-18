@@ -1,6 +1,8 @@
 package admin_app
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
@@ -20,6 +22,11 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	r.DELETE("/images/:name", deleteImageHandler(app_settings))
 
 	r.POST("/pages", postPageHandler(database))
+
+	// For container health purposes
+	r.Any("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, PostIdResponse{Id: 0})
+	})
 
 	return r
 }

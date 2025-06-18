@@ -8,14 +8,23 @@ on:
 
 jobs:
   failfast:
+    name: Fail Fast 🏎️
     uses: ./.github/workflows/failfast.yml
 
   build:
+    name: Build 🧱
     uses: ./.github/workflows/build.yml
     needs: failfast
 
   tests:
     uses: ./.github/workflows/test.yml
+    name: Tests 🧪
+    needs: build
+    secrets: inherit
+
+  e2e-tests:
+    uses: ./.github/workflows/e2e.yml
+    name: Tests 🧪
     needs: build
     secrets: inherit
 

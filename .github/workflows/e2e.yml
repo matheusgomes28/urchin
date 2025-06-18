@@ -1,0 +1,22 @@
+on:
+  workflow_call:
+
+jobs:
+  e2e:
+    name: End2End
+    env:
+      ImageOS: ubuntu20
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set Mapping directory
+      run: |
+        echo "PARENT_PATH=$(dirname $(pwd))" >> $GITHUB_ENV
+
+    - name: Spawning with Docker Compose 🐋
+      run: |
+        PARENT_PATH="$(dirname $(pwd))" docker compose -f test.compose.yml up --abort-on-container-exit
+      working-directory: docker
+      shell: bash

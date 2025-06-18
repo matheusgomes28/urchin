@@ -1,0 +1,15 @@
+include:
+  - docker-compose.yml
+
+services:
+
+  timer:
+    image: alpine
+    command: sh -c "sleep 20 && echo 'Timer finished'"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      urchin_admin_app:
+        condition: service_healthy
+      urchin_app:
+        condition: service_healthy
