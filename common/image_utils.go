@@ -74,6 +74,9 @@ func GetImages(paths []string, page_size, page_num int, app_settings AppSettings
 	offset := (page_num - 1) * page_size
 
 	num_paths := len(paths)
+	if num_paths == 0 {
+		return []Image{}, nil
+	}
 	if offset >= num_paths {
 		return []Image{}, fmt.Errorf("invalid pagination settings: `page_size` (%d) and `page_num` (%d)", page_size, page_num)
 	}
