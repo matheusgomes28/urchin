@@ -1,0 +1,48 @@
+package views
+
+templ MakeCardPage(json_data string) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<title>Card</title>
+			<!-- Minified version -->
+			<link rel="stylesheet" href="/static/simple.min.css"/>
+			<script src="/static/htmx.min.js"></script>
+			<script src="/static/client-side-templates.js"></script>
+			<script>
+    // Parse the JSON string into a JavaScript object.
+    const data = JSON.parse({{ json_data }});
+    
+    // Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', () => {
+        Object.keys(data).forEach(key => {
+            if (key === "name") {
+                document.getElementById("name").textContent = `${key}: ${data[key]}`;
+            } else {
+                const info = document.getElementById("info");
+                const p = document.createElement("p");
+                p.textContent = `${key}: ${data[key]}`;
+                info.appendChild(p);
+            }
+        });
+    });
+</script>
+		</head>
+		<body>
+			@MakeNavBar([]Link{
+				{Name: "Home", Href: "/"},
+				{Name: "About", Href: "/about"},
+				{Name: "Services", Href: "/services"},
+				{Name: "Contact", Href: "/contact"},
+			})
+			<main>
+				<article>
+					<h2 id="name"></h2>
+					<div id="info"></div>
+				</article>
+			</main>
+			@MakeFooter()
+		</body>
+	</html>
+}
