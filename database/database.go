@@ -14,13 +14,9 @@ import (
 )
 
 type Database interface {
-<<<<<<< HEAD
-	GetPosts(int, int) ([]common.Post, error)
-=======
 
 	// Post related stuff
-	GetPosts() ([]common.Post, error)
->>>>>>> 446f776 (Adding basic support for flexible cards)
+	GetPosts(int, int) ([]common.Post, error)
 	GetPost(post_id int) (common.Post, error)
 	AddPost(title string, excerpt string, content string) (int, error)
 	ChangePost(id int, title string, excerpt string, content string) error
@@ -31,7 +27,7 @@ type Database interface {
 
 	// Card related stuff
 	AddCard(uuid string, image_location string, json_data string, schema_name string) error
-	GetCard(uuid int) (common.Card, error)
+	GetCard(uuid string) (common.Card, error)
 }
 
 type SqlDatabase struct {
@@ -239,7 +235,7 @@ func (db SqlDatabase) AddCard(uuid string, image_location string, json_data stri
 
 // / This function gets a post from the database
 // / with the given ID.
-func (db SqlDatabase) GetCard(uuid int) (card common.Card, err error) {
+func (db SqlDatabase) GetCard(uuid string) (card common.Card, err error) {
 	rows, err := db.Connection.Query("SELECT image_location, json_data, json_schema FROM cards WHERE uuid=?;", uuid)
 	if err != nil {
 		return common.Card{}, err
@@ -259,7 +255,7 @@ func (db SqlDatabase) GetCard(uuid int) (card common.Card, err error) {
 	return card, nil
 }
 
-func validateJson(json_data string, schema_name string) (bool, error) { 
+func validateJson(json_data string, schema_name string) (bool, error) {
 	schema_data, err := os.ReadFile(filepath.Join("schemas", fmt.Sprintf("%s.json", schema_name)))
 	if err != nil {
 		return false, err
