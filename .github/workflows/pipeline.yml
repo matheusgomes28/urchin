@@ -28,7 +28,12 @@ jobs:
     needs: build
     secrets: inherit
 
-  # release:
-  #   uses: ./.github/workflows/release.yml
-  #   needs: tests
-  #   if: github.ref == 'refs/heads/main'
+  Deploy:
+    uses: ./.github/workflows/deploy.yml
+    name: Deployment 📨
+    if: github.event.pull_request.merged == true
+    needs:
+      - build
+      - e2e-tests
+      - tests
+    secrets: inherit

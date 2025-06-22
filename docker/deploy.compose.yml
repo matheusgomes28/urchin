@@ -1,0 +1,46 @@
+services:
+  urchin_app:
+    container_name: urchin_app
+    image: ${URCHIN_APP_CONTAINER}
+    ports:
+      - "8080:8080"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /app/migrations && GOOSE_DRIVER="mysql" GOOSE_DBSTRING="urchin:urchinpw@tcp(mariadb:3306)/urchin" goose up
+        cd /app && ./urchin --config ./urchin_config.toml
+    healthcheck:
+      test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider http://localhost:8080/health", "||", "exit 1" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    environment:
+      PATH: "/root/go/bin:/usr/local/bin:/usr/bin:/sbin:$PATH"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: always
+    networks:
+      - common-net
+
+  mariadb:
+    image: mariadb:11.2.3-jammy
+    container_name: mariadb
+    environment:
+      MARIADB_ADDRESS: localhost
+      MARIADB_PORT: 3306
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: urchin
+      MARIADB_USER: urchin
+      MARIADB_PASSWORD: urchinpw
+    healthcheck:
+      test: [ "CMD", "mariadb", "-u", "root", "-proot", "-e", "USE urchin" ]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    networks:
+      - common-net
+
+networks:
+  common-net: {}

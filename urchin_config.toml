@@ -1,18 +1,18 @@
 # Address to the MariaDB database
-database_address = "localhost"
+database_address = "mariadb"
 
 # User to access datbaase
-database_user = "root"
+database_user = "urchin"
 
 # Password for the database user
-database_password = "root"
+database_password = "urchinpw"
 
 # port
 database_port = 3306
 
 # name of database where urchin's
 # migrations was installed
-database_name = "gocms"
+database_name = "urchin"
 
 # port to run the webserver on
 webserver_port = 8080

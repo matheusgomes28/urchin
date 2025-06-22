@@ -1,0 +1,69 @@
+on:
+  workflow_call:
+    secrets:
+      GCP_PROJECT_ID:
+        required: true
+      GCP_CREDENTIALS:
+        required: true
+      GCP_DOCKER_REPOSITORY:
+        required: true
+      GCP_ARTIFACT_REGION:
+        required: true
+      GCP_INSTANCE:
+        required: true
+      GCP_INSTANCE_REGION:
+        required: true
+      GCP_DOCKER_BASE:
+        required: true
+
+jobs:
+  deploy-urchin:
+    name: Deploying to GCP
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: google-github-actions/auth@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID}}
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+    
+    - name: Get Short SHA for Image Tag
+      run: |
+        echo "SHORT_SHA=` echo ${GITHUB_SHA::7}`" >> $GITHUB_ENV
+
+    - name: Change Config
+      run: |
+        sed -i 's/database_address = "localhost"/database_address = "mariadb"/' urchin_config.toml
+        sed -i 's/database_user = "root"/database_user = "urchin"/' urchin_config.toml
+        sed -i 's/database_name = "gocms"/database_name = "urchin"/' urchin_config.toml
+        sed -i 's/database_password = "root"/database_password = "urchinpw"/' urchin_config.toml
+    
+    - name: Build Image From Current Commit
+      run: |
+        gcloud auth configure-docker ${{secrets.GCP_DOCKER_BASE }}
+        echo "Building image with tag ${SHORT_SHA}"
+        docker build -t ${{ secrets.GCP_DOCKER_BASE }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_DOCKER_REPOSITORY }}/urchin-app:${SHORT_SHA} -f docker/app-image/Dockerfile .
+        docker push ${{ secrets.GCP_DOCKER_BASE }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_DOCKER_REPOSITORY }}/urchin-app:${SHORT_SHA}
+
+    - name: Copy Source to GCP
+      run: |
+         gcloud compute scp ./docker/deploy.compose.yml ${{ secrets.GCP_INSTANCE }}:~/deploy.compose.yml \
+           --zone=${{ secrets.GCP_INSTANCE_REGION }} \
+           --project=${{ secrets.GCP_PROJECT_ID }}
+
+    - name: Compose the App
+      run: |
+         gcloud compute ssh ${{ secrets.GCP_INSTANCE }} \
+           --project=${{ secrets.GCP_PROJECT_ID}} \
+           --zone=${{ secrets.GCP_INSTANCE_REGION }} \
+           --command "gcloud auth configure-docker ${{ secrets.GCP_DOCKER_BASE }}"
+
+         gcloud compute ssh ${{ secrets.GCP_INSTANCE }} \
+           --project=${{ secrets.GCP_PROJECT_ID}} \
+           --zone=${{ secrets.GCP_INSTANCE_REGION }} \
+           --command "cd ~ && URCHIN_APP_CONTAINER="${{ secrets.GCP_DOCKER_BASE }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_DOCKER_REPOSITORY }}/urchin-app:${SHORT_SHA}" docker compose -f deploy.compose.yml up -d"
