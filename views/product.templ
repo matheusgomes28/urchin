@@ -1,0 +1,58 @@
+package views
+
+import (
+  "fmt"
+  "github.com/matheusgomes28/urchin/common"
+)
+
+
+templ makeCard(title string, slogan string, excerpt string, image string) {
+  <a href="#" class="relative block rounded-tr-3xl border border-gray-100">
+    <span
+      class="absolute -right-px -top-px rounded-bl-3xl rounded-tr-3xl bg-gray-700 px-6 py-4 font-medium uppercase tracking-widest text-white"
+    >
+      {slogan}
+    </span>
+
+    <!-- TODO : Take the image as param -->
+    <img
+      src={ fmt.Sprintf("/images/data/%s", image) }
+      alt=""
+      class="h-80 w-full rounded-tr-3xl object-cover"
+    />
+
+    <div class="p-4 text-center">
+      <strong class="text-xl font-medium text-gray-900 dark:text-gray-100"> {title} </strong>
+
+      <p class="mt-2 text-pretty text-gray-700 dark:text-gray-100">
+        {excerpt}
+      </p>
+
+      <span
+        class="mt-4 block rounded-md border border-indigo-900 bg-indigo-900 px-5 py-3 text-sm font-medium uppercase tracking-widest text-white transition-colors dark:text-gray-100 hover:bg-white hover:text-indigo-900"
+      >
+        Learn More
+      </span>
+    </div>
+  </a>
+}
+
+templ makeCardGrid(cards []map[string]interface{}) {
+  <div class="grid grid-cols-3 gap-4 content-center justify-center items-center">
+
+  for _, card := range(cards) {
+    <div class="max-w-sm">
+      @makeCard(card["title"].(string), card["slogan"].(string), card["excerpt"].(string), card["image"].(string))
+    </div>
+  }
+
+  </div>
+}
+
+
+templ MakeProductPage(cards []map[string]interface{}, links []common.Link, dropdowns map[string][]common.Link) {
+  @MakeLayout("Product Page", links, dropdowns, makeCardGrid(cards), []string{})
+
+// TODO : for each product coming from the database
+// TODO : we're going to create a card for it
+}

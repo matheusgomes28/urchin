@@ -1,0 +1,24 @@
+name: Build
+
+on: [workflow_call]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Full
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: 🚅 Release
+      run: echo "🚅 Releasing!"
+    - name: Tagging Repo
+      run: |
+        VERSION="$(git describe --tags $(git rev-list --tags --max-count=1) | grep -Eo '[0-9]{1,}.[0-9]{1,}.[0-9]{1,}')"
+        NEW_VERSION="$(awk -vFS=. -vOFS=. '{$NF++;print}' <<< $VERSION)"
+        git tag "$NEW_VERSION"
+        git push --tag

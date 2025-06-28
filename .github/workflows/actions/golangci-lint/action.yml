@@ -16,7 +16,7 @@ runs:
       id: set-command
       run: |
         export LINTERS="${{ inputs.linters }}"
-        export LINTER_CMD="golangci-lint run --disable-all -E ${LINTERS//;/ -E }"
+        export LINTER_CMD="golangci-lint run --timeout 2m --disable-all -E ${LINTERS//;/ -E }"
         echo "linter_cmd=${LINTER_CMD}" >> $GITHUB_OUTPUT
       shell: bash
       
