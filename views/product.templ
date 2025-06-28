@@ -50,8 +50,8 @@ templ makeCardGrid(cards []map[string]interface{}) {
 }
 
 
-templ MakeProductPage(links []common.Link, cards []map[string]interface{}) {
-@MakeLayout("Product Page", links, makeCardGrid(cards))
+templ MakeProductPage(cards []map[string]interface{}, links []common.Link, dropdowns map[string][]common.Link) {
+  @MakeLayout("Product Page", links, dropdowns, makeCardGrid(cards), []string{})
 
 // TODO : for each product coming from the database
 // TODO : we're going to create a card for it
