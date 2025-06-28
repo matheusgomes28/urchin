@@ -61,6 +61,7 @@ func productHandler(c *gin.Context, app_settings common.AppSettings, db database
 		if err != nil {
 			return []byte{}, fmt.Errorf("could not parse card json")
 		}
+		card_data["image"] = card.Image
 		cards_data = append(cards_data, card_data)
 	}
 
