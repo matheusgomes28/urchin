@@ -31,7 +31,7 @@ jobs:
   Deploy:
     uses: ./.github/workflows/deploy.yml
     name: Deployment 📨
-    if: github.event.pull_request.merged == true
+    if: github.ref == 'refs/heads/main'
     needs:
       - build
       - e2e-tests
