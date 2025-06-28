@@ -1,0 +1,28 @@
+package views
+
+import (
+	"fmt"
+	"github.com/matheusgomes28/urchin/common"
+	. "github.com/matheusgomes28/urchin/common"
+)
+
+templ MakeSchemasList(schemas []CardSchema) {
+	if len(schemas) == 0 {
+		<div class="block">
+			<h3 class="text-3xl font-bold text-white m-2">No product list uploaded</h3>
+		</div>
+	} else {
+		<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 m-2 mt-4">
+			for _, schema := range schemas {
+				// <article class="container mx<-auto rounded-lg dark:border-4 dark:border-solid dark:border-blue-300 shadow-lg shadow-gray-600/30 dark:shadow-gray-200/40 my-4 p-6 max-w-4xl w-full">
+				<article class="container mx-auto rounded-lg  shadow-md shadow-gray-600/30 dark:shadow-gray-300 my-4 p-6 max-w-4xl w-full overflow-x-auto">
+					<a class="text-2xl text-gray-700 dark:text-gray-400 font-bold mb-2 underline" href={ templ.URL(fmt.Sprintf("/products/%s", schema.Uuid)) }>{ schema.Title }</a>
+				</article>
+			}
+		</div>
+	}
+}
+
+templ MakeAllSchemas(schemas []CardSchema, links []common.Link) {
+	@MakeLayout("Home Page", links, MakeSchemasList(schemas))
+}

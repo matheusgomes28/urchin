@@ -15,6 +15,7 @@ type DatabaseMock struct {
 	GetCardsHandler       func(schema_uuid string, limit int, page int) ([]common.Card, error)
 	AddChardSchemaHandler func(string, string) (string, error)
 	GetCardSchemaHandler  func(uuid string) (common.CardSchema, error)
+	GetCardSchemasHandler func(offset int, limit int) (schemas []common.CardSchema, err error)
 }
 
 func (db DatabaseMock) GetPosts(limit int, offset int) ([]common.Post, error) {
@@ -59,4 +60,7 @@ func (db DatabaseMock) AddCardSchema(json_schema string, json_title string) (str
 
 func (db DatabaseMock) GetCardSchema(uuid string) (common.CardSchema, error) {
 	return db.GetCardSchemaHandler(uuid)
+}
+func (db DatabaseMock) GetCardSchemas(offset int, limit int) (schemas []common.CardSchema, err error) {
+	return db.GetCardSchemasHandler(offset, limit)
 }
