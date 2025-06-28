@@ -27,6 +27,7 @@ type Database interface {
 	GetCards(schema_uuid string, limit int, page int) ([]common.Card, error)
 	AddCardSchema(json_schema string, json_title string) (string, error)
 	GetCardSchema(uuid string) (common.CardSchema, error)
+	GetCardSchemas(offset int, limit int) (schemas []common.CardSchema, err error)
 }
 
 type SqlDatabase struct {
@@ -317,6 +318,51 @@ func (db SqlDatabase) GetCardSchema(id string) (schema common.CardSchema, err er
 	}
 
 	return schema, nil
+}
+
+func (db SqlDatabase) GetCardSchemas(offset int, limit int) (schemas []common.CardSchema, err error) {
+	all_schemas := []common.CardSchema{}
+	var rows *sql.Rows
+
+	query := "SELECT UuidFromBin(uuid), json_schema, json_title, card_ids FROM card_schemas"
+	args := make([]interface{}, 0)
+
+	// A limit of 0 or less means no limit.
+	if limit > 0 {
+		query += " LIMIT ?"
+		args = append(args, limit)
+		// OFFSET is only valid with LIMIT
+		if offset > 0 {
+			query += " OFFSET ?"
+			args = append(args, offset)
+		}
+	}
+	query += ";"
+
+	rows, err = db.Connection.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var schema common.CardSchema
+		var cardsRaw []byte
+
+		if err = rows.Scan(&schema.Uuid, &schema.Schema, &schema.Title, &cardsRaw); err != nil {
+			return []common.CardSchema{}, err
+		}
+
+		// Aquí parseas el JSON de la base a tu array de Go:
+		if len(cardsRaw) > 0 {
+			if err = json.Unmarshal(cardsRaw, &schema.Cards); err != nil {
+				return []common.CardSchema{}, fmt.Errorf("error unmarshaling card_ids: %w", err)
+			}
+		}
+		all_schemas = append(all_schemas, schema)
+
+	}
+	return all_schemas, rows.Err()
 }
 
 func MakeSqlConnection(user string, password string, address string, port int, database string) (SqlDatabase, error) {
