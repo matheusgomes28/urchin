@@ -55,6 +55,13 @@ services:
     container_name: mariadb
     env_file:
       - ../.dev.env
+    environment:
+      MARIADB_ADDRESS: localhost
+      MARIADB_PORT: 3306
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: urchin
+      MARIADB_USER: urchin
+      MARIADB_PASSWORD: urchinpw
     healthcheck:
       test: [ "CMD", "mariadb", "-u", "root", "-proot", "-e", "USE urchin" ]
       interval: 10s
