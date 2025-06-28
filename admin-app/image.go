@@ -8,14 +8,13 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
+	"github.com/nfnt/resize"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/image/draw"
 )
 
 var allowed_extensions = map[string]bool{
@@ -26,24 +25,9 @@ var allowed_content_types = map[string]bool{
 	"image/jpeg": true, "image/png": true, "image/gif": true,
 }
 
-// Calculates the best suitable resize box for an image with the given
-// `original_width`, `original_height`, such that the returned (width, height)
-// dimensions will always be at most `max_width`, `max_height`
-func calculateResizeBox(original_width, original_height, max_height, desired_height int) (int, int) {
-	width_ratio := float64(max_height) / float64(original_width)
-	new_height := int(float64(original_height) * width_ratio)
-	if new_height <= desired_height {
-		return max_height, new_height
-	}
-
-	height_ratio := float64(desired_height) / float64(original_height)
-	new_width := int(float64(original_width) * height_ratio)
-	return new_width, int(height_ratio)
-}
-
-func resizeImage(src_path, dst_path string, desired_width, desired_height int) error {
+func resizeImage(srcPath string, width uint) error {
 	// Open the source file
-	file, err := os.Open(src_path)
+	file, err := os.Open(srcPath)
 	if err != nil {
 		return fmt.Errorf("could not open source image: %v", err)
 	}
@@ -55,16 +39,16 @@ func resizeImage(src_path, dst_path string, desired_width, desired_height int) e
 		return fmt.Errorf("could not decode image: %v", err)
 	}
 
-	// Calculate new size
+	// Calculate height to maintain aspect ratio
 	bounds := img.Bounds()
-	new_width, new_height := calculateResizeBox(bounds.Dx(), bounds.Dy(), desired_width, desired_height)
-	dst := image.NewRGBA(image.Rect(0, 0, new_width, new_height))
+	ratio := float64(bounds.Dy()) / float64(bounds.Dx())
+	height := uint(float64(width) * ratio)
 
-	// Resize using golang.org/x/image/draw
-	draw.CatmullRom.Scale(dst, dst.Bounds(), img, bounds, draw.Over, nil)
+	// Resize
+	resized := resize.Resize(width, height, img, resize.Lanczos3)
 
 	// Create new file
-	out, err := os.Create(dst_path)
+	out, err := os.Create(srcPath)
 	if err != nil {
 		return fmt.Errorf("could not create output file: %v", err)
 	}
@@ -73,46 +57,16 @@ func resizeImage(src_path, dst_path string, desired_width, desired_height int) e
 	// Save based on format
 	switch format {
 	case "jpeg", "jpg":
-		err = jpeg.Encode(out, dst, &jpeg.Options{Quality: 85})
+		err = jpeg.Encode(out, resized, &jpeg.Options{Quality: 85})
 	case "png":
-		err = png.Encode(out, dst)
+		err = png.Encode(out, resized)
 	case "gif":
-		err = png.Encode(out, dst)
-		log.Warn().Msg("GIF detected: resized image saved as PNG format with .gif extension")
-	default:
-		return fmt.Errorf("unsupported image format: %s", format)
+		// Note: GIF will lose animation
+		err = png.Encode(out, resized)
 	}
 
 	if err != nil {
 		return fmt.Errorf("could not encode resized image: %v", err)
-	}
-
-	return nil
-}
-
-func createMinifiedImages(image_path string) error {
-
-	image_ext := path.Ext(image_path)
-	if len(image_ext) == 0 {
-		return fmt.Errorf("invalid image path: %s", image_path)
-	}
-	image_name := image_path[0 : len(image_path)-len(image_ext)]
-
-	image_types := []struct {
-		FileName  string
-		MaxWidth  int
-		MaxHeight int
-	}{
-		{FileName: fmt.Sprintf("%s_small%s", image_name, image_ext), MaxWidth: 200, MaxHeight: 200},
-		{FileName: fmt.Sprintf("%s_medium%s", image_name, image_ext), MaxWidth: 400, MaxHeight: 400},
-		{FileName: fmt.Sprintf("%s_large%s", image_name, image_ext), MaxWidth: 600, MaxHeight: 600},
-	}
-
-	for _, img_type := range image_types {
-		err := resizeImage(image_path, img_type.FileName, img_type.MaxWidth, img_type.MaxHeight)
-		if err != nil {
-			return fmt.Errorf("could not resize image: %v", err)
-		}
 	}
 
 	return nil
@@ -181,11 +135,12 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 			return
 		}
 
-		// Save lower dimensions of the image if needed
-		log.Info().Msgf("creating minified images for %s", image_path)
-		err = createMinifiedImages(image_path)
+		// Resize image to 477px width
+		err = resizeImage(image_path, 477)
 		if err != nil {
-			log.Error().Msgf("could not create minified images: %v", err)
+			log.Error().Msgf("could not resize image: %v", err)
+			os.Remove(image_path)
+			return
 		}
 
 		// End saving to filesystem
