@@ -2,6 +2,9 @@ package admin_app
 
 import (
 	"fmt"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -10,6 +13,7 @@ import (
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
+	"github.com/nfnt/resize"
 	"github.com/rs/zerolog/log"
 )
 
@@ -19,6 +23,53 @@ var allowed_extensions = map[string]bool{
 
 var allowed_content_types = map[string]bool{
 	"image/jpeg": true, "image/png": true, "image/gif": true,
+}
+
+func resizeImage(srcPath string, width uint) error {
+	// Open the source file
+	file, err := os.Open(srcPath)
+	if err != nil {
+		return fmt.Errorf("could not open source image: %v", err)
+	}
+	defer file.Close()
+
+	// Decode image
+	img, format, err := image.Decode(file)
+	if err != nil {
+		return fmt.Errorf("could not decode image: %v", err)
+	}
+
+	// Calculate height to maintain aspect ratio
+	bounds := img.Bounds()
+	ratio := float64(bounds.Dy()) / float64(bounds.Dx())
+	height := uint(float64(width) * ratio)
+
+	// Resize
+	resized := resize.Resize(width, height, img, resize.Lanczos3)
+
+	// Create new file
+	out, err := os.Create(srcPath)
+	if err != nil {
+		return fmt.Errorf("could not create output file: %v", err)
+	}
+	defer out.Close()
+
+	// Save based on format
+	switch format {
+	case "jpeg", "jpg":
+		err = jpeg.Encode(out, resized, &jpeg.Options{Quality: 85})
+	case "png":
+		err = png.Encode(out, resized)
+	case "gif":
+		// Note: GIF will lose animation
+		err = png.Encode(out, resized)
+	}
+
+	if err != nil {
+		return fmt.Errorf("could not encode resized image: %v", err)
+	}
+
+	return nil
 }
 
 // TODO : need these endpoints
@@ -84,6 +135,15 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to upload image", err))
 			return
 		}
+
+		// Resize image to 477px width
+		err = resizeImage(image_path, 477)
+		if err != nil {
+			log.Error().Msgf("could not resize image: %v", err)
+			os.Remove(image_path)
+			return
+		}
+
 		// End saving to filesystem
 		c.JSON(http.StatusOK, ImageIdResponse{
 			Id: uuid.String(),
