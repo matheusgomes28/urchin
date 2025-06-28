@@ -53,7 +53,7 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 		c.JSON(http.StatusOK, common.Page{})
 	})
 
-	r.NoRoute(notFoundHandler(app_settings))
+	r.NoRoute(NotFoundHandler(app_settings))
 
 	return r
 }
@@ -75,8 +75,7 @@ func addCachableHandler(e *gin.Engine, method string, endpoint string, generator
 		html_buffer, err := generator(c, app_settings, db)
 		if err != nil {
 			log.Error().Msgf("could not generate html: %v", err)
-			// TODO : Need a proper error page
-			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
+			ErrorHandler(err.Error(), app_settings)(c)
 			return
 		}
 
@@ -136,18 +135,4 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 	}
 
 	return html_buffer.Bytes(), nil
-}
-
-func notFoundHandler(app_settings common.AppSettings) func(*gin.Context) {
-	handler := func(c *gin.Context) {
-		buffer, err := renderHtml(c, views.MakeNotFoundPage(app_settings.AppNavbar.Links, app_settings.AppNavbar.Dropdowns))
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, common.ErrorRes("could not render HTML", err))
-			return
-		}
-
-		c.Data(http.StatusOK, "text/html; charset=utf-8", buffer)
-	}
-
-	return handler
 }
