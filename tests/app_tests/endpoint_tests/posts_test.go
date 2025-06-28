@@ -111,9 +111,10 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 		CacheEnabled:     false,
 	}
 
+	error_msg := "post doesn't exist"
 	database_mock := mocks.DatabaseMock{
 		GetPostHandler: func(int) (common.Post, error) {
-			return common.Post{}, fmt.Errorf("post doesn't exist")
+			return common.Post{}, fmt.Errorf("%s", error_msg)
 		},
 	}
 
@@ -121,10 +122,10 @@ func TestPostFailureNegativeInvalidKey(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request, err := http.NewRequest("GET", "/post/-1", nil)
-
 	require.Nil(t, err)
 
 	router.ServeHTTP(responseRecorder, request)
-
 	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	require.Contains(t, responseRecorder.Body.String(), "Error Occurred!")
+	require.Contains(t, responseRecorder.Body.String(), "requested invalid post ID")
 }

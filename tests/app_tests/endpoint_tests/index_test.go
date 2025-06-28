@@ -11,6 +11,7 @@ import (
 	"github.com/matheusgomes28/urchin/tests/mocks"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestIndexSuccess(t *testing.T) {
@@ -38,7 +39,9 @@ func TestIndexSuccess(t *testing.T) {
 
 	r := app.SetupRoutes(app_settings, database_mock)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/page/0", nil)
+	req, err := http.NewRequest("GET", "/page/0", nil)
+	require.Nil(t, err)
+
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusOK, w.Code)
@@ -56,16 +59,20 @@ func TestIndexFailToGetPosts(t *testing.T) {
 		WebserverPort:    8080,
 	}
 
+	error_msg := "could not find posts"
 	database_mock := mocks.DatabaseMock{
 		GetPostsHandler: func(limit int, offset int) ([]common.Post, error) {
-			return []common.Post{}, fmt.Errorf("invalid")
+			return []common.Post{}, fmt.Errorf("%s", error_msg)
 		},
 	}
 
 	r := app.SetupRoutes(app_settings, database_mock)
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, err := http.NewRequest("GET", "/", nil)
+	require.Nil(t, err)
+
 	r.ServeHTTP(w, req)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	require.Equal(t, http.StatusOK, w.Code)
+	require.Contains(t, w.Body.String(), error_msg)
 }
