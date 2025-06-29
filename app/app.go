@@ -124,8 +124,19 @@ func homeHandler(c *gin.Context, settings common.AppSettings, db database.Databa
 		return nil, err
 	}
 
+	sticky_posts := make([]common.Post, 0)
+	for _, sticky_post_id := range settings.StickyPosts {
+		post, err := db.GetPost(sticky_post_id)
+		if err != nil {
+			log.Error().Msgf("could not find sticky post `%d`: %v", sticky_post_id, err)
+			continue
+		}
+		post.Content = string(mdToHTML([]byte(post.Content)))
+		sticky_posts = append(sticky_posts, post)
+	}
+
 	// if not cached, create the cache
-	index_view := views.MakeIndex(posts, settings.AppNavbar.Links, settings.AppNavbar.Dropdowns)
+	index_view := views.MakeIndex(posts, sticky_posts, settings.AppNavbar.Links, settings.AppNavbar.Dropdowns)
 	html_buffer := bytes.NewBuffer(nil)
 
 	err = index_view.Render(c, html_buffer)

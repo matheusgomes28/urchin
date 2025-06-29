@@ -5,7 +5,20 @@ import (
   . "github.com/matheusgomes28/urchin/common"
 )
 
-templ makePosts(posts []Post) {
+templ makePosts(posts []Post, sticky_posts []Post) {
+  // Sopied from posts.templ
+  for _, post := range sticky_posts {
+    <article class="prose lg:prose-xl dark:prose-invert items-center w-full dark:prose-pre:bg-gray-300 dark:prose-pre:text-gray-900 mb-4">
+      <h1>{ post.Title }</h1>
+      @templ.Raw(post.Content)
+    </article>
+  }
+
+  if len(sticky_posts) > 0 {
+    <hr class="w-48 h-1 mx-auto my-4 bg-gray-900 dark:bg-gray-700 border-0 rounded-sm md:my-10">
+    <h2 class="text-3xl font-bold mb-4">Other Posts</h2>
+  }
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols3 gap-6">
     for _, post := range posts {
     <article class="bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md overflow-hidden">
@@ -23,6 +36,6 @@ templ makePosts(posts []Post) {
   </div>
 }
 
-templ MakeIndex(posts []Post, links []Link, dropdowns map[string][]Link) {
-    @MakeLayout("Home Page", links, dropdowns, makePosts(posts), []string{})
+templ MakeIndex(posts []Post, sticky_posts []Post, links []Link, dropdowns map[string][]Link) {
+    @MakeLayout("Home Page", links, dropdowns, makePosts(posts, sticky_posts), []string{})
 }

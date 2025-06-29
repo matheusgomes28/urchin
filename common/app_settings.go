@@ -4,7 +4,7 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-type Navbar struct {
+type NavbarSettings struct {
 	Links     []Link            `toml:"links"`
 	Dropdowns map[string][]Link `toml:"dropdowns"`
 }
@@ -21,8 +21,9 @@ type AppSettings struct {
 	CacheEnabled     bool               `toml:"cache_enabled"`
 	RecaptchaSiteKey string             `toml:"recaptcha_sitekey,omitempty"`
 	RecaptchaSecret  string             `toml:"recaptcha_secret,omitempty"`
-	AppNavbar        Navbar             `toml:"navbar"`
+	AppNavbar        NavbarSettings     `toml:"navbar"`
 	Galleries        map[string]Gallery `toml:"gallery"`
+	StickyPosts      []int              `toml:"sticky_posts"`
 }
 
 func ReadConfigToml(filepath string) (AppSettings, error) {

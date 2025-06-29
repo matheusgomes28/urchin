@@ -1,5 +1,5 @@
 # Address to the MariaDB database
-database_address = "mariadb"
+database_address = "localhost"
 
 # User to access datbaase
 database_user = "urchin"
@@ -29,6 +29,9 @@ cache_enabled = true
 # Recaptcha settings
 recaptcha_sitekey = "6LecCewpAAAAAK7QS2SwuyCIDzwlyXMs4J1Z5LBq"
 recaptcha_secret = "6LecCewpAAAAAPP8Aaxh6jWaDE1xG_MBQa1OOs8f"
+
+# Sticky posts will be expanded on home
+sticky_posts = [2]
 
 [navbar]
 links = [

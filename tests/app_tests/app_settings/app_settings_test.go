@@ -36,7 +36,7 @@ func TestCorrectToml(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		WebserverPort:    99999,
 		DatabasePort:     666,
-		AppNavbar: common.Navbar{
+		AppNavbar: common.NavbarSettings{
 			Links: []common.Link{
 				{Name: "Home", Href: "/", Title: "Homepage"},
 				{Name: "About", Href: "/about", Title: "About page"},
