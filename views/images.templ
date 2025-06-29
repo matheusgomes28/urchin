@@ -86,7 +86,7 @@ templ makeImages(images []Image) {
     @makeDefaultModalDialog(images)
   }
 
-  <div class="grid grid-cols-5 gap-4 sm:grid-cols-3 sm:gap-2">
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-2">
     <script defer>
       window.addEventListener('load', function() {
         refreshImages({{ images }});
@@ -94,10 +94,13 @@ templ makeImages(images []Image) {
     </script>
 
     for i, image := range images {
-      <!-- <a class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2"
-        href={templ.URL("/images/" + image.Name)}> -->
         <div class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2">
-          <img class="w-full h-48 object-cover" src={fmt.Sprintf("/images/data/%s", image.Filename)} onclick={ templ.JSFuncCall("showImageModal", i) } />
+          <img src={ fmt.Sprintf("images/data/%s", image.Filename) } class="w-full object-cover"
+              srcset={ fmt.Sprintf("/images/data/%s 200w, /images/data/%s 400w, /images/data/%s 600w, /images/data/%s 1200w", image.FilenameSmall, image.FilenameMedium, image.FilenameLarge, image.Filename) }
+              sizes="(max-width: 640px) 50vw,
+                     16vw"
+              onclick={ templ.JSFuncCall("showImageModal", i) }
+              alt="Description">
           <div class="p-2">
             <h2 class="text-sm font-semibold truncate">{image.Name}</h2>
           </div>

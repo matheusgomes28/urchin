@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/fossoreslp/go-uuid-v4"
@@ -25,9 +26,24 @@ var allowed_content_types = map[string]bool{
 	"image/jpeg": true, "image/png": true, "image/gif": true,
 }
 
-func resizeImage(srcPath string, dstPath string, width int) error {
+// Calculates the best suitable resize box for an image with the given
+// `original_width`, `original_height`, such that the returned (width, height)
+// dimensions will always be at most `max_width`, `max_height`
+func calculateResizeBox(original_width, original_height, max_height, desired_height int) (int, int) {
+	width_ratio := float64(max_height) / float64(original_width)
+	new_height := int(float64(original_height) * width_ratio)
+	if new_height <= desired_height {
+		return max_height, new_height
+	}
+
+	height_ratio := float64(desired_height) / float64(original_height)
+	new_width := int(float64(original_width) * height_ratio)
+	return new_width, int(height_ratio)
+}
+
+func resizeImage(src_path, dst_path string, desired_width, desired_height int) error {
 	// Open the source file
-	file, err := os.Open(srcPath)
+	file, err := os.Open(src_path)
 	if err != nil {
 		return fmt.Errorf("could not open source image: %v", err)
 	}
@@ -41,15 +57,14 @@ func resizeImage(srcPath string, dstPath string, width int) error {
 
 	// Calculate new size
 	bounds := img.Bounds()
-	ratio := float64(width) / float64(bounds.Dx())
-	newHeight := int(float64(bounds.Dy()) * ratio)
-	dst := image.NewRGBA(image.Rect(0, 0, width, newHeight))
+	new_width, new_height := calculateResizeBox(bounds.Dx(), bounds.Dy(), desired_width, desired_height)
+	dst := image.NewRGBA(image.Rect(0, 0, new_width, new_height))
 
 	// Resize using golang.org/x/image/draw
 	draw.CatmullRom.Scale(dst, dst.Bounds(), img, bounds, draw.Over, nil)
 
 	// Create new file
-	out, err := os.Create(dstPath)
+	out, err := os.Create(dst_path)
 	if err != nil {
 		return fmt.Errorf("could not create output file: %v", err)
 	}
@@ -70,6 +85,34 @@ func resizeImage(srcPath string, dstPath string, width int) error {
 
 	if err != nil {
 		return fmt.Errorf("could not encode resized image: %v", err)
+	}
+
+	return nil
+}
+
+func createMinifiedImages(image_path string) error {
+
+	image_ext := path.Ext(image_path)
+	if len(image_ext) == 0 {
+		return fmt.Errorf("invalid image path: %s", image_path)
+	}
+	image_name := image_path[0 : len(image_path)-len(image_ext)]
+
+	image_types := []struct {
+		FileName  string
+		MaxWidth  int
+		MaxHeight int
+	}{
+		{FileName: fmt.Sprintf("%s_small%s", image_name, image_ext), MaxWidth: 200, MaxHeight: 200},
+		{FileName: fmt.Sprintf("%s_medium%s", image_name, image_ext), MaxWidth: 400, MaxHeight: 400},
+		{FileName: fmt.Sprintf("%s_large%s", image_name, image_ext), MaxWidth: 600, MaxHeight: 600},
+	}
+
+	for _, img_type := range image_types {
+		err := resizeImage(image_path, img_type.FileName, img_type.MaxWidth, img_type.MaxHeight)
+		if err != nil {
+			return fmt.Errorf("could not resize image: %v", err)
+		}
 	}
 
 	return nil
@@ -137,14 +180,12 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to upload image", err))
 			return
 		}
-		// Resize image to 477px width
-		dstImagePath := filepath.Join(app_settings.ImageDirectory, fmt.Sprintf("%s_small%s", uuid.String(), ext))
-		log.Info().Msgf("Saving resized image to: %s", dstImagePath)
-		err = resizeImage(image_path, dstImagePath, 477)
+
+		// Save lower dimensions of the image if needed
+		log.Info().Msgf("creating minified images for %s", image_path)
+		err = createMinifiedImages(image_path)
 		if err != nil {
-			log.Error().Msgf("could not resize image: %v", err)
-			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to resize image", err))
-			return
+			log.Error().Msgf("could not create minified images: %v", err)
 		}
 
 		// End saving to filesystem
