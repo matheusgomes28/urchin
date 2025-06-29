@@ -1,7 +1,7 @@
 services:
   urchin_admin_app:
     container_name: urchin_admin_app
-    image: mattgomes28/urchin-golang:0.7
+    image: mattgomes28/urchin-golang:0.8
     ports:
       - "8081:8081"
     volumes:
@@ -25,7 +25,7 @@ services:
 
   urchin_app:
     container_name: urchin_app
-    image: mattgomes28/urchin-golang:0.7
+    image: mattgomes28/urchin-golang:0.8
     ports:
       - "8080:8080"
     volumes:

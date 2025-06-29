@@ -13,7 +13,7 @@ jobs:
       ImageOS: ubuntu20
     runs-on: ubuntu-latest
     container:
-      image: mattgomes28/urchin-golang:0.6
+      image: mattgomes28/urchin-golang:0.8
       options: --user 0
 
     steps:

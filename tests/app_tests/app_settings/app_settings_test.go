@@ -36,7 +36,7 @@ func TestCorrectToml(t *testing.T) {
 		DatabaseName:     "test_database_name",
 		WebserverPort:    99999,
 		DatabasePort:     666,
-		AppNavbar: common.Navbar{
+		AppNavbar: common.NavbarSettings{
 			Links: []common.Link{
 				{Name: "Home", Href: "/", Title: "Homepage"},
 				{Name: "About", Href: "/about", Title: "About page"},
@@ -45,6 +45,8 @@ func TestCorrectToml(t *testing.T) {
 				{Name: "Contact", Href: "/contact", Title: "Contacts page"},
 			},
 		},
+		Galleries:   map[string]common.Gallery{},
+		StickyPosts: []int{},
 	}
 	bytes, err := toml.Marshal(expected)
 	assert.Nil(t, err)
