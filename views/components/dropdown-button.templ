@@ -7,7 +7,7 @@ templ MakeDropdownButton(name, elem_id string, links []common.Link) {
 	<div class="relative inline-block text-left" id={ fmt.Sprintf("navbar-dropdown-%s", elem_id) }>
 		<div>
 			<!-- TODO: Need to fix the ease-in transition here -->
-			<button type="button" class="inline-flex w-full justify-center leading-4 gap-x-1.5 rounded-md bg-white px-3 py-2 font-bold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50" id={ fmt.Sprintf("dropdown-button-%s", elem_id) } aria-expanded="true" aria-haspopup="true">
+			<button type="button" class="inline-flex w-full justify-center leading-4 gap-x-1.5 rounded-md bg-white px-3 py-2 font-bold shadow-xs text-gray-100 dark:text-gray-100 hover:text-gray-400 transition duration-300 ease-in ring-1 ring-gray-300 ring-inset hover:bg-gray-50" id={ fmt.Sprintf("dropdown-button-%s", elem_id) } aria-expanded="true" aria-haspopup="true">
 				<span>{ templ.EscapeString(name) }</span>
 				<span id={ fmt.Sprintf("dropdown-arrow-%s", elem_id) } class="icon-caret-down"></span>
 			</button>
