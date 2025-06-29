@@ -28,7 +28,7 @@ jobs:
     needs: build
     secrets: inherit
 
-  Deploy:
+  deploy:
     uses: ./.github/workflows/deploy.yml
     name: Deployment 📨
     if: github.ref == 'refs/heads/main'

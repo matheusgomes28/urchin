@@ -52,7 +52,7 @@ jobs:
 
     - name: Copy Source to GCP
       run: |
-         gcloud compute scp ./docker/deploy.compose.yml ${{ secrets.GCP_INSTANCE }}:~/deploy.compose.yml \
+         gcloud compute scp ./docker/deploy.compose.yml ./docker/swag.compose.yml ${{ secrets.GCP_INSTANCE }}:~/ \
            --zone=${{ secrets.GCP_INSTANCE_REGION }} \
            --project=${{ secrets.GCP_PROJECT_ID }}
 
@@ -66,4 +66,6 @@ jobs:
          gcloud compute ssh ${{ secrets.GCP_INSTANCE }} \
            --project=${{ secrets.GCP_PROJECT_ID}} \
            --zone=${{ secrets.GCP_INSTANCE_REGION }} \
-           --command "cd ~ && URCHIN_APP_CONTAINER="${{ secrets.GCP_DOCKER_BASE }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_DOCKER_REPOSITORY }}/urchin-app:${SHORT_SHA}" docker compose -f deploy.compose.yml up -d"
+           --command "cd ~ && \
+                      URCHIN_APP_CONTAINER="${{ secrets.GCP_DOCKER_BASE }}/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_DOCKER_REPOSITORY }}/urchin-app:${SHORT_SHA}" docker compose -f deploy.compose.yml up -d && \
+                      docker compose -f swag.compose.yml up -d"
