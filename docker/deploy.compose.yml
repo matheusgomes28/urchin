@@ -23,6 +23,7 @@ services:
     restart: always
     networks:
       - common-net
+      - urchin-network
 
   mariadb:
     image: mariadb:11.2.3-jammy
@@ -44,3 +45,5 @@ services:
 
 networks:
   common-net: {}
+  urchin-network:
+    external: true

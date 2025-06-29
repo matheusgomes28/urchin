@@ -1,0 +1,27 @@
+services:
+  swag:
+    image: lscr.io/linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+      - URL=gourchin.com
+      - SUBDOMAINS=www,
+      - VALIDATION=http
+      - CERTPROVIDER=zerossl
+      - EMAIL=matheusgarcia28@gmail.com
+    volumes:
+      - ./swag/config:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped
+    networks:
+      - urchin-network
+
+networks:
+    urchin-network:
+      external: true
