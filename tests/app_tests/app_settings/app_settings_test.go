@@ -45,6 +45,8 @@ func TestCorrectToml(t *testing.T) {
 				{Name: "Contact", Href: "/contact", Title: "Contacts page"},
 			},
 		},
+		Galleries:   map[string]common.Gallery{},
+		StickyPosts: []int{},
 	}
 	bytes, err := toml.Marshal(expected)
 	assert.Nil(t, err)
