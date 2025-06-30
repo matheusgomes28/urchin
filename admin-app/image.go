@@ -14,6 +14,7 @@ import (
 	"github.com/fossoreslp/go-uuid-v4"
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
+	"github.com/matheusgomes28/urchin/metadata"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/image/draw"
 )
@@ -180,6 +181,14 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 			c.JSON(http.StatusInternalServerError, common.ErrorRes("failed to upload image", err))
 			return
 		}
+		// Generate Json from metadata
+		excerpt_text_array := form.Value["excerpt"]
+		excerpt := "unknown"
+		if len(excerpt_text_array) > 0 {
+			excerpt = excerpt_text_array[0]
+		}
+		name := file.Filename[:len(file.Filename)-len(ext)]
+		metadata.GenerateJson(filename, name, excerpt, app_settings)
 
 		// Save lower dimensions of the image if needed
 		log.Info().Msgf("creating minified images for %s", image_path)
