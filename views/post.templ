@@ -2,13 +2,12 @@ package views
 
 import "github.com/matheusgomes28/urchin/common"
 
-templ makePost(title string, content string) {
+templ MakePost(title string, content string) {
 <article class="prose lg:prose-xl dark:prose-invert items-center w-full dark:prose-pre:bg-gray-300 dark:prose-pre:text-gray-900">
-  <h1>{ title }</h1>
   @templ.Raw(content)
 </article>
 }
 
 templ MakePostPage(title string, content string, links []common.Link, dropdowns map[string][]common.Link) {
-  @MakeLayout(title, links, dropdowns, makePost(title, content), []string{})
+  @MakeLayout(title, links, dropdowns, MakePost(title, content), []string{})
 }
