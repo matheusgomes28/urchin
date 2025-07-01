@@ -1,3 +1,15 @@
+// @title        Urchin Admin API
+// @version      1.0.0
+// @description  This is the admin API for the Urchin app.
+// @schemes   http
+// @host      localhost:8081
+// @BasePath  /
+// @contact.name   MatheusGomes
+// @contact.email  email@email.com
+// @license.name  MIT
+// @consumes  application/json
+// @consumes  multipart/form-data
+// @produces  application/json
 package main
 
 import (
@@ -6,10 +18,16 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/rs/zerolog/log"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
-	"github.com/rs/zerolog/log"
+
+	// Importa los documentos de Swagger generados para que estén disponibles.
+	_ "github.com/matheusgomes28/urchin/docs/admin"
 )
 
 func main() {
@@ -47,6 +65,9 @@ func main() {
 	}
 
 	r := admin_app.SetupRoutes(app_settings, database)
+	// Esta línea añade la ruta para la UI de Swagger.
+	// La URL será: http://localhost:8081/swagger/index.html
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	err = r.Run(fmt.Sprintf(":%d", app_settings.AdminPort))
 	if err != nil {
 		log.Error().Msgf("could not run app: %v", err)
