@@ -1,8 +1,14 @@
 # Urchin 🐚
 
-Urchin is a headless CMS (Content Management System) written in Golang, designed to be fast, efficient, and easily extensible. It allows you to
+Urchin is a headless CMS (Content Management System) written in Golang,
+designed to be fast, efficient, and easily extensible. It allows you to
 create a website or blog, with any template you like, in only a few
 commands.
+
+Perhaps the best feature of Urchin is its ability to run on very low
+powered machines. The example website is hosted on the cheapest VM
+on cloud providers, costing me about 7 dollars a month for the
+full stack!
 
 ![Really no head?](static/assets/nohead.gif "So no head meme?")
 
@@ -12,12 +18,85 @@ commands.
   be done with easy requests to the API.
 - [x] **Golang-Powered:** Leverage the performance and safety of one of the
   best languages in the market for backend development.
-- [x] **SQL Database Integration:** Store your posts and pages in SQL databases for reliable and scalable data storage.
-- [ ] **Post**: We can add, update, and delete posts. Posts can be served
+- [x] **SQL Database Integration:** Store your posts and pages in SQL
+  databases for reliable and scalable data storage.
+- [x] **Post**: We can add, update, and delete posts. Posts can be served
   through a unique URL.
-- [ ] **Pages**: TODO.
-- [ ] **Menus**: TODO
-- [ ] **Live Reload** through the use of `air`.
+- [x] **Pages**: You can create custom Markdown pages.
+- [x] **Menus**: You can create custom menus with dropdowns.
+- [x] **Live Reload** Through the use of `air`.
+- [ ] **Cards**: Create cards with arbitrary data, so you can essentially
+  have product views!
+
+## Configuration
+
+Urchin is composed by two different apps:
+
+- Client application: provides the actual application that users see. By
+  default, it runs on port `8080` but it's configurable in the config file.
+- Admin application: provides endpoints needed to add, modify, remove
+  resources like pages, posts, cards.
+
+The entire configuration of Urchin is in a single `toml` file, which you
+can pass to both applications with `--config`.
+
+The example config provided in `urchin_config.toml` can be used as the
+primary source of documentation, but the sections below explain their
+purpose.
+
+### Database Configuration
+
+Configurations Related to the database connection, which are used to construct
+the database connection string. These must be provided to properly run both apps.
+
+- `database_address`: the IP address to the database server. I.e. `localhost`.
+- `database_user`: the user to access the database with. I.e. `urchin`.
+- `database_password`: the database password for the user given.
+- `database_port`: the port the database is running on. I.e. `3306`.
+- `database_name`: the database to use for the Urchin app. Make sure it's empty, as
+  all the migrations will be installed here.
+
+### Core Configurations
+
+These are configurations for the core running of the application. These must be
+provided to run Urchin smoothly.
+
+- `webserver_port`: the port to run the main (client) application from. I.e. `8080`.
+- `admin_port`: the port to run the admin app from. **Note** there is no authentication
+  currently, so **DO NOT EXPOSE THE ADMIN PORT**.
+- `image_dir`: the directory to serve/upload static images to. **Note** that this directory
+  is served statically, so don't put anything confidential here. The images will
+  be served in the client application from `/images/data/` endpoint.
+- `cache_enabled`: enables webpage cache. The cache will simply serve the HTML that was
+  pre-calculated for the website pages, and the default cache time is 10 minutes.
+
+### Optional Configurations
+
+- `sticky_posts`: array with post IDs to display fully expanded in the home page. I.e. `[2, 4]`.
+
+### Recaptcha Configurations
+
+Urchin supports reCaptcha for the contact form. If these configurations are provided,
+recaptcha will be enabled for form submission.
+
+- `recaptcha_sitekey`: the sitekey (embedded into frontend) of recaptcha.
+- `recaptcha_secret`: the recaptcha secret (private to backend).
+
+### Navbar Configurations
+
+You can customise the navbar with links and dropdowns. Refer to the `[navbar]` sections in
+the `urchin_config.toml` file for references. But you can currently:
+
+- Create custom links to any link on the internet (including posts and pages in Urchin).
+- Create dropdown links to any link on the internet.
+
+### Gallery Configuration
+
+You can create custom ggallery information from images stored in `images_dir`. These must
+have accompanying `.json` metadata files, which you can find examples of in `images`  directory
+of this repo.
+
+For how to set this up, please refer to `urchin_config.toml`.
 
 ## Running Urchin
 
@@ -28,7 +107,8 @@ following sections.
 ### Build Requirements
 
 If you're runnig Urchin locally, you should install all the requirements needed
-to build the application. Here's a list of all the dependencies needed:
+to build the application. Here's a non-exhaustive list of the important
+build dependencies:
 
 - Goose for database migrations: `go install github.com/pressly/goose/v3/cmd/goose@v3.18.0`
 - Templ for code generation: `go install github.com/a-h/templ/cmd/templ@v0.2.543`
@@ -43,6 +123,12 @@ project repo:
 ```bash
 make install-tools
 ```
+
+#### Database
+
+Go uses a MySql / MariaDB database to keep the posts, pages, and cards. Make
+sure you have it installed locally if you want to debug the project. Alternatively
+you can use the docker compose setup provided!
 
 ### Database Migrations
 
@@ -135,62 +221,3 @@ database:
   pages on a website.
 - **cards**: Still TODO. Need to decide how this will allow users to display
   menu-like pages with cards.
-
-## Configuration
-
-The runtime configuration can be done through a [toml](https://toml.io/en/) configuration file or by setting the mandatory environment variables (*fallback*). This approach was chosen because configuration via toml supports advanced features (i.e. *relationships*, *arrays*, etc.). The `.dev.env`-file is used to configure the development database through `docker-compose`.
-
-### toml configuration
-
-The application can be started by providing the `config` flag which has to be set to a toml configuration file. The file has to contain the following mandatory values:
-
-```toml
-database_address = "localhost" # Address to the MariaDB database
-database_user = "urchin" # User to access database
-database_password = "urchinpw" # Password for the database user
-database_port = 3306 # The port to use for the application
-database_name = "urchin" # The database to use for Urchin
-webserver_port = 8080 # The application port Urchin should use
-admin_port = 8081 # The port in which the admin app will be running
-image_dir = "./images" # Directory to use for storing uploaded images.
-
-# Navbar section specifies the links that appear on
-# the navbar
-[navbar]
-links = [
-    { name = "Home", href = "/", title = "Homepage" },
-    { name = "About", href = "/about", title = "About page" },
-    { name = "Services", href = "/services", title = "Services page" },
-    { name = "Images", href = "/images", title = "Images page" },
-    { name = "Contact", href = "/contact", title = "Contacts page" },
-]
-```
-
-**Important**: The configuration values above are used to start-up the local development database.
-
-## Dependencies
-
-For the development of Urchin, you require additional dependecies, that can easily be installed with go.
-
-- [Templ](https://github.com/a-h/templ) (for generating Go files from temple-files)
-- [Goose](https://github.com/pressly/goose) (for migrating the database that Urchin relies on)
-
-*Optional*:
-
-- [Air](https://github.com/cosmtrek/air) (for hot-reloading Go projects)
-
-To install the development dependencies simply execute the following Go commands:
-
-```bash
-go install github.com/pressly/goose/v3/cmd/goose@v3.18.0 
-go install github.com/a-h/templ/cmd/templ@v0.2.543 
-go install github.com/cosmtrek/air@v1.49.0 
-```
-
-After installing the required dependecies and starting the pre-configured database, you can simply execute the following command to execute the migration of the database for development purposes.
-
-```bash
-source .dev.env # sets the environment variable for the goose command.
-cd migrations/
-GOOSE_DRIVER="mysql" GOOSE_DBSTRING="$MARIADB_USER:$MARIADB_PASSWORD@tcp($MARIADB_ADDRESS:$MARIADB_PORT)/$MARIADB_DATABASE" goose up
-```

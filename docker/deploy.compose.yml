@@ -8,7 +8,8 @@ services:
       - /bin/sh
       - -c
       - |
-        cd /app/migrations && GOOSE_DRIVER="mysql" GOOSE_DBSTRING="urchin:urchinpw@tcp(mariadb:3306)/urchin" goose up
+        cd /app/migrations && GOOSE_DRIVER="mysql" GOOSE_DBSTRING="urchin:urchinpw@tcp(mariadb:3306)/urchin" goose reset
+        GOOSE_DRIVER="mysql" GOOSE_DBSTRING="urchin:urchinpw@tcp(mariadb:3306)/urchin" goose up
         cd /app && ./urchin --config ./urchin_config.toml
     healthcheck:
       test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider http://localhost:8080/health", "||", "exit 1" ]

@@ -8,10 +8,7 @@ import (
 templ makePosts(posts []Post, sticky_posts []Post) {
   // Sopied from posts.templ
   for _, post := range sticky_posts {
-    <article class="prose lg:prose-xl dark:prose-invert items-center w-full dark:prose-pre:bg-gray-300 dark:prose-pre:text-gray-900 mb-4">
-      <h1>{ post.Title }</h1>
-      @templ.Raw(post.Content)
-    </article>
+    @MakePost(post.Title, post.Content)
   }
 
   if len(sticky_posts) > 0 {
