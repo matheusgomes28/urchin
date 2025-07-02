@@ -21,12 +21,15 @@ let currImage = 0;
  * @param {string} index index of the image in current page
  */
 function showImageModal(index) {
-
   // Update the highlighting
   for (let i = 0; i < pageImages.length; ++i) {
-    document.getElementById(`modal-pagination-${i}`).classList.remove(`text-indigo-500`);
+    document
+      .getElementById(`modal-pagination-${i}`)
+      .classList.remove(`text-urchin-text`, `bg-urchin-secondary-highlight`);
   }
-  document.getElementById(`modal-pagination-${index}`).classList.add(`text-indigo-500`);
+  document
+    .getElementById(`modal-pagination-${index}`)
+    .classList.add(`text-urchin-text`, `bg-urchin-secondary-highlight`);
 
   currImage = index;
   const image = pageImages[currImage];
@@ -57,29 +60,30 @@ function refreshImages(images) {
   // TODO : Currently, this will input some dummy data in excerpt
   // TODO : So we need to change the golang Image repr
 
-  const imageData = images.filter(im => {
-    const hasProperties = im.hasOwnProperty("uuid")
-      && (typeof im.uuid === "string")
-      && im.hasOwnProperty("filename")
-      && (typeof im.name === "string")
-      && im.hasOwnProperty("excerpt")
-      && (typeof im.excerpt === "string")
-      && im.hasOwnProperty("date")
-      && (typeof im.date === "string")
-      && im.hasOwnProperty("location")
-      && (typeof im.location === "object")
-      && im.location.hasOwnProperty("latitude")
-      && (typeof im.location.latitude === "Number")
-      && im.location.hasOwnProperty("longitude")
-      && (typeof im.location.longitude === "Number")
-      && im.location.hasOwnProperty("name")
-      && (typeof im.location.name === "string");
+  const imageData = images.filter((im) => {
+    const hasProperties =
+      im.hasOwnProperty("uuid") &&
+      typeof im.uuid === "string" &&
+      im.hasOwnProperty("filename") &&
+      typeof im.name === "string" &&
+      im.hasOwnProperty("excerpt") &&
+      typeof im.excerpt === "string" &&
+      im.hasOwnProperty("date") &&
+      typeof im.date === "string" &&
+      im.hasOwnProperty("location") &&
+      typeof im.location === "object" &&
+      im.location.hasOwnProperty("latitude") &&
+      typeof im.location.latitude === "Number" &&
+      im.location.hasOwnProperty("longitude") &&
+      typeof im.location.longitude === "Number" &&
+      im.location.hasOwnProperty("name") &&
+      typeof im.location.name === "string";
 
     return !hasProperties;
   });
 
-  const sanitizedImages = imageData.map(im => {
-    const newImage = {...im};
+  const sanitizedImages = imageData.map((im) => {
+    const newImage = { ...im };
     newImage.excerpt = im.excerpt === "" ? im.name : im.excerpt;
     return newImage;
   });

@@ -43,19 +43,19 @@ function initDropdowns() {
 
 function initThemeToggles() {
     const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
+    const body = document.body;
 
     if (localStorage.getItem('color-theme') === 'dark') {
-        html.classList.add('dark');
+        body.classList.add('dark');
     } else {
-        html.classList.remove('dark');
+        body.classList.remove('dark');
     }
 
     themeToggle.addEventListener('click', function () {
         // Toggle dark class on HTML element
-        html.classList.toggle('dark');
+        body.classList.toggle('dark');
 
-        if (html.classList.contains('dark')) {
+        if (body.classList.contains('dark')) {
             localStorage.setItem('color-theme', 'dark');
         } else {
             localStorage.setItem('color-theme', 'light');
