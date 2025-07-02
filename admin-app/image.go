@@ -187,8 +187,13 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 		if len(excerpt_text_array) > 0 {
 			excerpt = excerpt_text_array[0]
 		}
+
+		filename_small := fmt.Sprintf("%s_small%s", uuid.String(), ext)
+		filename__medium := fmt.Sprintf("%s_medium%s", uuid.String(), ext)
+		filename__large := fmt.Sprintf("%s_large%s", uuid.String(), ext)
+
 		name := file.Filename[:len(file.Filename)-len(ext)]
-		metadata.GenerateJson(filename, name, excerpt, app_settings)
+		metadata.GenerateJson(filename, filename_small, filename__medium, filename__large, name, excerpt, app_settings)
 
 		// Save lower dimensions of the image if needed
 		log.Info().Msgf("creating minified images for %s", image_path)

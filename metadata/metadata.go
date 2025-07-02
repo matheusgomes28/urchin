@@ -37,11 +37,14 @@ type NominatimResponse struct {
 
 // Estructura para el resultado final
 type PhotoMetadata struct {
-	Filename string   `json:"filename"`
-	Name     string   `json:"name"`
-	Excerpt  string   `json:"excerpt"`
-	Date     string   `json:"date"`
-	Location Location `json:"location"`
+	Filename  string   `json:"filename"`
+	FilenameS string   `json:"filename_small"`
+	FilenameM string   `json:"filename_medium"`
+	FilenameL string   `json:"filename_large"`
+	Name      string   `json:"name"`
+	Excerpt   string   `json:"excerpt"`
+	Date      string   `json:"date"`
+	Location  Location `json:"location"`
 }
 
 type Location struct {
@@ -109,7 +112,7 @@ func getLocationFromNominatim(lat, lon float64) (*NominatimResponse, error) {
 }
 
 // Función principal que extrae toda la metadata
-func extractPhotoMetadata(filepath, filename, name, excerpt string) (*PhotoMetadata, error) {
+func extractPhotoMetadata(filepath, filename, filename_s, filename_m, filename_l, name, excerpt string) (*PhotoMetadata, error) {
 	// Extraer metadata de la imagen
 	lat, lon, date, err := extractImageMetadata(filepath)
 	if err != nil {
@@ -138,10 +141,13 @@ func extractPhotoMetadata(filepath, filename, name, excerpt string) (*PhotoMetad
 	dateStr := date.Format("2006-01-02")
 
 	result := &PhotoMetadata{
-		Filename: filename,
-		Name:     name,
-		Excerpt:  excerpt,
-		Date:     dateStr,
+		Filename:  filename,
+		FilenameS: filename_s,
+		FilenameM: filename_m,
+		FilenameL: filename_l,
+		Name:      name,
+		Excerpt:   excerpt,
+		Date:      dateStr,
 		Location: Location{
 			Latitude:  lat,
 			Longitude: lon,
@@ -174,12 +180,12 @@ func writeJSONToFile(data interface{}, outputPath string) error {
 	return nil
 }
 
-func GenerateJson(filename string, name string, excerpt string, app_settings common.AppSettings) {
+func GenerateJson(filename, filename_s, filename_m, filename_l, name, excerpt string, app_settings common.AppSettings) {
 	// Ejemplo de uso
 	imagePath := path.Join(app_settings.ImageDirectory, filename)
 
 	// Extraer metadata
-	metadata, err := extractPhotoMetadata(imagePath, filename, name, excerpt)
+	metadata, err := extractPhotoMetadata(imagePath, filename, filename_s, filename_m, filename_l, name, excerpt)
 	if err != nil {
 		log.Error().Msgf("Error: %v\n", err)
 		return
