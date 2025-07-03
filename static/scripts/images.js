@@ -52,12 +52,21 @@ function prevImage() {
 	showImageModal(currImage);
 }
 
-function navegateWithArrows() {
+function setupArrowNavigation() {
+	// Añadir navegación por teclado para el modal de imágenes
 	document.addEventListener("keydown", (event) => {
-		if (event.key === "ArrowLeft") {
-			prevImage();
-		} else if (event.key === "ArrowRight") {
+		const modal = document.getElementById("modal");
+		// Solo actuar si el modal está abierto
+		if (!modal || !modal.open) {
+			return;
+		}
+
+		if (event.key === "ArrowRight") {
+			event.preventDefault(); // Evitar el scroll de la página
 			nextImage();
+		} else if (event.key === "ArrowLeft") {
+			event.preventDefault(); // Evitar el scroll de la página
+			prevImage();
 		}
 	});
 }
