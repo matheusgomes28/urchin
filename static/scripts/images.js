@@ -55,6 +55,7 @@ function prevImage() {
 window.addEventListener("load", function () {
 	if (typeof refreshImages === "function" && window.imagesData) {
 		refreshImages(window.imagesData);
+		closeIfClickOut();
 	}
 	window.addEventListener("keydown", function (e) {
 		const modal = document.getElementById("modal");
@@ -68,6 +69,18 @@ window.addEventListener("load", function () {
 		}
 	});
 });
+
+function closeIfClickOut() {
+	const modal = document.getElementById("modal");
+	if (modal) {
+		modal.addEventListener("click", function (event) {
+			console.log(event.target);
+			if (event.target === modal) {
+				modal.close();
+			}
+		});
+	}
+}
 
 function refreshImages(images) {
 	if (!Array.isArray(images)) {
