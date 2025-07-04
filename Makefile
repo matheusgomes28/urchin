@@ -35,6 +35,7 @@ install-tools:
 	go install github.com/pressly/goose/v3/cmd/goose@v3.18.0
 	go install github.com/a-h/templ/cmd/templ@v0.3.898
 	go install github.com/cosmtrek/air@v1.49.0 
+	go install github.com/swaggo/swag/cmd/swag@v1.16.4
 
 install-tailwindcss:
 	if [ ! -f tailwindcss ]; then \
