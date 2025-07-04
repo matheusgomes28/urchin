@@ -79,12 +79,9 @@ templ makeImages(images []Image) {
 		@makeDefaultModalDialog(images)
 	}
 	<div class="grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-2">
-		<script defer>
-			window.addEventListener('load', function() {
-				refreshImages({{ images }});
-				setupArrowNavigation();
-			});
-		</script>
+		<script>
+  window.imagesData = {{ images }};
+</script>
 		for i, image := range images {
 			<div class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2">
 				<img

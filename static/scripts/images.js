@@ -52,24 +52,22 @@ function prevImage() {
 	showImageModal(currImage);
 }
 
-function setupArrowNavigation() {
-	// Añadir navegación por teclado para el modal de imágenes
-	document.addEventListener("keydown", (event) => {
+window.addEventListener("load", function () {
+	if (typeof refreshImages === "function" && window.imagesData) {
+		refreshImages(window.imagesData);
+	}
+	window.addEventListener("keydown", function (e) {
 		const modal = document.getElementById("modal");
-		// Solo actuar si el modal está abierto
-		if (!modal || !modal.open) {
-			return;
-		}
-
-		if (event.key === "ArrowRight") {
-			event.preventDefault(); // Evitar el scroll de la página
-			nextImage();
-		} else if (event.key === "ArrowLeft") {
-			event.preventDefault(); // Evitar el scroll de la página
+		if (!modal || !modal.hasAttribute("open")) return;
+		if (e.key === "ArrowLeft") {
+			e.preventDefault();
 			prevImage();
+		} else if (e.key === "ArrowRight") {
+			e.preventDefault();
+			nextImage();
 		}
 	});
-}
+});
 
 function refreshImages(images) {
 	if (!Array.isArray(images)) {
