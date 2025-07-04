@@ -14,7 +14,7 @@ all: build test
 prepare_env:
 	cp -r migrations tests/helpers/
 
-build: prepare_env install-tailwindcss
+build: prepare_env install-tailwindcss generate-swagger
 	$(TEMPL) generate
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(BINARY_NAME) $(URCHIN_DIR)
 	GIN_MODE=release $(GOCMD) build -ldflags "-s" -v -o $(BUILD_DIR)/$(ADMIN_BINARY_NAME) $(URCHIN_ADMIN_DIR)
