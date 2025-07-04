@@ -8,7 +8,7 @@
  * current page
  * [{name: "1238-1023123-wer123123.jpg", "excerpt": "some test about my image", src="http://..."}, ...]
  */
-const pageImages = []
+const pageImages = [];
 
 /**
  * index to current image in image array
@@ -17,7 +17,7 @@ let currImage = 0;
 
 /**
  * Shows the modal image popup
- * 
+ *
  * @param {string} index index of the image in current page
  */
 function showImageModal(index) {
@@ -86,3 +86,20 @@ function refreshImages(images) {
 
   pageImages.push(...sanitizedImages);
 }
+
+window.addEventListener("load", function () {
+  refreshImages(window.imagesData);
+
+  window.addEventListener("keydown", function (e) {
+    const modal = document.getElementById("modal");
+    if (!modal || !modal.hasAttribute("open")) return;
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      prevImage();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      nextImage();
+    }
+  });
+});
+
