@@ -19,15 +19,10 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/rs/zerolog/log"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
 	admin_app "github.com/matheusgomes28/urchin/admin-app"
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/matheusgomes28/urchin/database"
-
-	// Importa los documentos de Swagger generados para que estén disponibles.
-	_ "github.com/matheusgomes28/urchin/docs/admin"
 )
 
 func main() {
@@ -65,9 +60,7 @@ func main() {
 	}
 
 	r := admin_app.SetupRoutes(app_settings, database)
-	// Esta línea añade la ruta para la UI de Swagger.
-	// La URL será: http://localhost:8081/swagger/index.html
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	err = r.Run(fmt.Sprintf(":%d", app_settings.AdminPort))
 	if err != nil {
 		log.Error().Msgf("could not run app: %v", err)
