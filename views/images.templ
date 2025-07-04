@@ -1,110 +1,115 @@
 package views
 
 import (
-	"fmt"
-	. "github.com/matheusgomes28/urchin/common"
+  "fmt"
+  . "github.com/matheusgomes28/urchin/common"
 )
 
 templ makeImageDetailsList(image Image) {
-	<div class="flex justify-start mt-4">
-		<div class="flex-none flex items-center">
-			<span class="icon-calendar text-xl mr-2"></span>
-			<span id="modal-text-date">{ image.Date }</span>
-		</div>
-		<div class="flex-none flex items-center ml-4">
-			<span class="icon-map-pin text-xl mr-2"></span>
-			<span id="modal-text-name">{ image.Location.Name }</span>
-		</div>
-	</div>
+  <div class="flex justify-start mt-4">
+    <div class="flex-none flex items-center">
+      <span class="icon-calendar text-xl mr-2"></span>
+      <span id="modal-text-date">{ image.Date }</span>
+    </div>
+    <div class="flex-none flex items-center ml-4">
+      <span class="icon-map-pin text-xl mr-2"></span>
+      <span id="modal-text-name">{ image.Location.Name }</span>
+    </div>
+  </div>
 }
 
 templ makeModalPaginationButtons(images []Image) {
-	<div class="flex flex-none rounded-xl justify-center mt-8">
-		<ul class="flex items-center">
-			<li class="px-2">
-				<button onclick="prevImage()" aria-disabled="false" class="w-9 h-9 flex items-center justify-center rounded-md border disabled">
-					<span>
-						<svg width="8" height="15" viewBox="0 0 8 15" class="fill-current stroke-current"><path d="M7.12979 1.91389L7.1299 1.914L7.1344 1.90875C7.31476 1.69833 7.31528 1.36878 7.1047 1.15819C7.01062 1.06412 6.86296 1.00488 6.73613 1.00488C6.57736 1.00488 6.4537 1.07206 6.34569 1.18007L6.34564 1.18001L6.34229 1.18358L0.830207 7.06752C0.830152 7.06757 0.830098 7.06763 0.830043 7.06769C0.402311 7.52078 0.406126 8.26524 0.827473 8.73615L0.827439 8.73618L0.829982 8.73889L6.34248 14.6014L6.34243 14.6014L6.34569 14.6047C6.546 14.805 6.88221 14.8491 7.1047 14.6266C7.30447 14.4268 7.34883 14.0918 7.12833 13.8693L1.62078 8.01209C1.55579 7.93114 1.56859 7.82519 1.61408 7.7797L1.61413 7.77975L1.61729 7.77639L7.12979 1.91389Z" stroke-width="0.3"></path></svg>
-					</span>
-				</button>
-			</li>
-			<!-- <button class="w-9 h-9 rounded-md border hover:border-cyan-500 hover:text-indigo-500 text-indigo-500">1</button> -->
-			for i, _ := range images {
-				<li class="px-2" id={ fmt.Sprintf("modal-pagination-%d", i) }>
-					<button onclick={ templ.JSFuncCall("showImageModal", i) } class="w-9 h-9 rounded-md border hover:border-cyan-500 hover:text-indigo-500">{ i + 1 }</button>
-				</li>
-			}
-			<li class="px-2">
-				<button onclick="nextImage()" aria-disabled="false" class="w-9 h-9 flex items-center justify-center rounded-md border hover:text-indigo-500">
-					<span>
-						<svg width="8" height="15" viewBox="0 0 8 15" class="fill-current stroke-current"><path d="M0.870212 13.0861L0.870097 13.086L0.865602 13.0912C0.685237 13.3017 0.684716 13.6312 0.895299 13.8418C0.989374 13.9359 1.13704 13.9951 1.26387 13.9951C1.42264 13.9951 1.5463 13.9279 1.65431 13.8199L1.65436 13.82L1.65771 13.8164L7.16979 7.93248C7.16985 7.93243 7.1699 7.93237 7.16996 7.93231C7.59769 7.47923 7.59387 6.73477 7.17253 6.26385L7.17256 6.26382L7.17002 6.26111L1.65752 0.398611L1.65757 0.398563L1.65431 0.395299C1.454 0.194997 1.11779 0.150934 0.895299 0.373424C0.695526 0.573197 0.651169 0.908167 0.871667 1.13067L6.37922 6.98791C6.4442 7.06886 6.43141 7.17481 6.38592 7.2203L6.38587 7.22025L6.38271 7.22361L0.870212 13.0861Z" stroke-width="0.3"></path></svg>
-					</span>
-				</button>
-			</li>
-		</ul>
-	</div>
+  <div class="flex flex-none rounded-xl justify-center mt-8">
+      <ul class="flex items-center">
+          <li class="px-2">
+              <button onclick="prevImage()" aria-disabled="false" class="w-9 h-9 flex items-center justify-center rounded-md border disabled">
+                  <span>
+                      <svg width="8" height="15" viewBox="0 0 8 15" class="fill-current stroke-current"><path d="M7.12979 1.91389L7.1299 1.914L7.1344 1.90875C7.31476 1.69833 7.31528 1.36878 7.1047 1.15819C7.01062 1.06412 6.86296 1.00488 6.73613 1.00488C6.57736 1.00488 6.4537 1.07206 6.34569 1.18007L6.34564 1.18001L6.34229 1.18358L0.830207 7.06752C0.830152 7.06757 0.830098 7.06763 0.830043 7.06769C0.402311 7.52078 0.406126 8.26524 0.827473 8.73615L0.827439 8.73618L0.829982 8.73889L6.34248 14.6014L6.34243 14.6014L6.34569 14.6047C6.546 14.805 6.88221 14.8491 7.1047 14.6266C7.30447 14.4268 7.34883 14.0918 7.12833 13.8693L1.62078 8.01209C1.55579 7.93114 1.56859 7.82519 1.61408 7.7797L1.61413 7.77975L1.61729 7.77639L7.12979 1.91389Z" stroke-width="0.3"></path></svg>
+                  </span>
+              </button>
+          </li>
+
+          <!-- <button class="w-9 h-9 rounded-md border hover:border-cyan-500 hover:text-indigo-500 text-indigo-500">1</button> -->
+          for i, _ := range images {
+            <li class="px-2" id={fmt.Sprintf("modal-pagination-%d", i)}>
+                <button onclick={ templ.JSFuncCall("showImageModal", i) } class="w-9 h-9 rounded-md border hover:border-cyan-500 hover:text-indigo-500">{ i + 1 }</button>
+            </li>
+          }
+
+          <li class="px-2">
+              <button onclick="nextImage()" aria-disabled="false" class="w-9 h-9 flex items-center justify-center rounded-md border hover:text-indigo-500">
+                  <span>
+                      <svg width="8" height="15" viewBox="0 0 8 15" class="fill-current stroke-current"><path d="M0.870212 13.0861L0.870097 13.086L0.865602 13.0912C0.685237 13.3017 0.684716 13.6312 0.895299 13.8418C0.989374 13.9359 1.13704 13.9951 1.26387 13.9951C1.42264 13.9951 1.5463 13.9279 1.65431 13.8199L1.65436 13.82L1.65771 13.8164L7.16979 7.93248C7.16985 7.93243 7.1699 7.93237 7.16996 7.93231C7.59769 7.47923 7.59387 6.73477 7.17253 6.26385L7.17256 6.26382L7.17002 6.26111L1.65752 0.398611L1.65757 0.398563L1.65431 0.395299C1.454 0.194997 1.11779 0.150934 0.895299 0.373424C0.695526 0.573197 0.651169 0.908167 0.871667 1.13067L6.37922 6.98791C6.4442 7.06886 6.43141 7.17481 6.38592 7.2203L6.38587 7.22025L6.38271 7.22361L0.870212 13.0861Z" stroke-width="0.3"></path></svg>
+                  </span>
+              </button>
+          </li>
+      </ul>
+  </div>
 }
 
 templ makeDefaultModalDialog(images []Image) {
-	<!-- Modal -->
-	<dialog id="modal" class="p-6 rounded-lg shadow-lg max-w-4xl border border-pastel-blue dark:border-pastel-blue-900 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-		<!-- For some reason setting flex on modal breaks the hiding element -->
-		<div class="flex flex-col">
-			<!-- TODO : Remove this default image -->
-			<h4 id="modal-title" class="font-bold text-xl mb-4">Unset Title</h4>
-			<!-- Main image -->
-			<img id="modal-image" src="https://loremflickr.com/800/600/girl" class="flex-1 shadow rounded-lg overflow-hidden border"/>
-			<!-- Excerpt and metadata -->
-			<div class="flex-none">
-				@makeImageDetailsList(Image{})
-				<p id="modal-excerpt" class="mt-4 text-gray-600">
-					Unset Excerpt
-				</p>
-			</div>
-			<!-- Close Button -->
-			<div class="absolute top-2 right-2">
-				<span class="icon-x hover:border-cyan-500 hover:text-indigo-500 cursor-pointer text-lg" onclick="modal.close()"></span>
-			</div>
-			@makeModalPaginationButtons(images)
-		</div>
-	</dialog>
+  <!-- Modal -->
+  <dialog id="modal" class="p-6 rounded-lg shadow-lg max-w-4xl border border-pastel-blue dark:border-pastel-blue-900 bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+    
+    <!-- For some reason setting flex on modal breaks the hiding element -->
+    <div class="flex flex-col">
+      <!-- TODO : Remove this default image -->
+      <h4 id="modal-title" class="font-bold text-xl mb-4">Unset Title</h4>
+      
+      <!-- Main image -->
+      <img id="modal-image" src="https://loremflickr.com/800/600/girl" class="flex-1 shadow rounded-lg overflow-hidden border"/>
+
+      <!-- Excerpt and metadata -->
+      <div class="flex-none">
+        @makeImageDetailsList(Image{})
+        <p id="modal-excerpt" class="mt-4 text-gray-600">
+          Unset Excerpt
+        </p>
+      </div>
+      
+      <!-- Close Button -->
+      <div class="absolute top-2 right-2">
+        <span class="icon-x hover:border-cyan-500 hover:text-indigo-500 cursor-pointer text-lg" onclick="modal.close()"></span>
+      </div>
+
+      @makeModalPaginationButtons(images)
+    </div>
+  </dialog>
 }
 
 templ makeImages(images []Image) {
-	if len(images) == 0 {
-		<div class="block">
-			<h3 class="text-3xl font-bold">No images uploaded</h3>
-		</div>
-	} else {
-		@makeDefaultModalDialog(images)
-	}
-	<div class="grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-2">
-		<script defer>
-			window.addEventListener('load', function() {
-				refreshImages({{ images }});
-				setupArrowNavigation();
-			});
-		</script>
-		for i, image := range images {
-			<div class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2">
-				<img
-					src={ fmt.Sprintf("images/data/%s", image.Filename) }
-					class="w-full object-cover"
-					srcset={ fmt.Sprintf("/images/data/%s 200w, /images/data/%s 400w, /images/data/%s 600w, /images/data/%s 1200w", image.FilenameSmall, image.FilenameMedium, image.FilenameLarge, image.Filename) }
-					sizes="(max-width: 640px) 50vw,
+  if len(images) == 0 {
+    <div class="block">
+      <h3 class="text-3xl font-bold">No images uploaded</h3>
+    </div>
+  } else {
+    @makeDefaultModalDialog(images)
+  }
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-5 sm:gap-2">
+    <script defer>
+      window.addEventListener('load', function() {
+        refreshImages({{ images }});
+      });
+    </script>
+
+    for i, image := range images {
+        <div class="block border border-pastel-blue dark:border-pastel-blue-900 rounded overflow-hidden p-2">
+          <img src={ fmt.Sprintf("images/data/%s", image.Filename) } class="w-full object-cover"
+              srcset={ fmt.Sprintf("/images/data/%s 200w, /images/data/%s 400w, /images/data/%s 600w, /images/data/%s 1200w", image.FilenameSmall, image.FilenameMedium, image.FilenameLarge, image.Filename) }
+              sizes="(max-width: 640px) 50vw,
                      16vw"
-					onclick={ templ.JSFuncCall("showImageModal", i) }
-					alt="Description"
-				/>
-				<div class="p-2">
-					<h2 class="text-sm font-semibold truncate">{ image.Name }</h2>
-				</div>
-			</div>
-			<!-- </a> -->
-		}
-	</div>
+              onclick={ templ.JSFuncCall("showImageModal", i) }
+              alt="Description">
+          <div class="p-2">
+            <h2 class="text-sm font-semibold truncate">{image.Name}</h2>
+          </div>
+        </div>
+      <!-- </a> -->
+    }
+  </div>
 }
 
 templ MakeImagesPage(images []Image, links []Link, dropdowns map[string][]Link) {
-	@MakeLayout("Images", links, dropdowns, makeImages(images), []string{"/static/scripts/images.js"})
+  @MakeLayout("Images", links, dropdowns, makeImages(images), []string{"/static/scripts/images.js"})
 }
