@@ -12,6 +12,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @Summary      Get a post by ID
+// @Description  Retrieves a post based on its ID.
+// @Tags         posts
+// @Produce      json
+// @Param        id path int true "Post ID"
+// @Success      200 {object} GetPostResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid ID or post not found"
+// @Router       /posts/{id} [get]
 func getPostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		// localhost:8080/post/{id}
@@ -37,6 +45,15 @@ func getPostHandler(database database.Database) func(*gin.Context) {
 	}
 }
 
+// @Summary      Add a new post
+// @Description  Adds a new post to the database.
+// @Tags         posts
+// @Accept       json
+// @Produce      json
+// @Param        post body AddPostRequest true "Post to add"
+// @Success      200 {object} PostIdResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid request body or missing data"
+// @Router       /posts [post]
 func postPostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var add_post_request AddPostRequest
@@ -77,6 +94,15 @@ func postPostHandler(database database.Database) func(*gin.Context) {
 	}
 }
 
+// @Summary      Update an existing post
+// @Description  Updates an existing post with new data.
+// @Tags         posts
+// @Accept       json
+// @Produce      json
+// @Param        post body ChangePostRequest true "Post data to update"
+// @Success      200 {object} PostIdResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid request body or could not change post"
+// @Router       /posts [put]
 func putPostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var change_post_request ChangePostRequest
@@ -108,6 +134,15 @@ func putPostHandler(database database.Database) func(*gin.Context) {
 	}
 }
 
+// @Summary      Delete a post
+// @Description  Deletes a post by its ID.
+// @Tags         posts
+// @Produce      json
+// @Param        id path int true "Post ID"
+// @Success      200 {object} PostIdResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid ID provided"
+// @Failure      404 {object} common.ErrorResponse "Post not found"
+// @Router       /posts/{id} [delete]
 func deletePostHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var delete_post_binding DeletePostBinding
