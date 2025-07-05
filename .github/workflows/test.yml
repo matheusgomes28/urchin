@@ -7,8 +7,8 @@ on:
         required: true
 
 jobs:
-  linters:
-    name: Tests 🧪
+  unit-tests:
+    name: Unit Tests
     env:
       ImageOS: ubuntu20
     runs-on: ubuntu-latest
@@ -42,9 +42,9 @@ jobs:
         go test -p=1 -coverprofile=coverage.out -covermode=atomic ./... -v
         cat coverage.out | grep -v "urchin/tests" > coverage_source_only.out
         rm coverage.out
+        mkdir coverage-results && mv coverage_source_only.out coverage-results
 
-    - name: Upload coverage to Codecov 📓
-      uses: codecov/codecov-action@v5
+    - uses: actions/upload-artifact@v4
       with:
-        fail_ci_if_error: false
-        token: ${{ secrets.CODECOV_TOKEN }}
+        name: coverage-results
+        path: coverage-results

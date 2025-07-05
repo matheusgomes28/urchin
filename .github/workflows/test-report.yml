@@ -1,0 +1,49 @@
+name: Upload Coverage Results
+
+on:
+  workflow_run:
+    workflows: ["Urchin CI"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout Files
+        uses: actions/checkout@v4
+
+      - name: Download coverage (Pull Request)
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          name: coverage-results
+          workflow: pipeline.yml
+          pr: ${{ github.event.workflow_run.pull_requests[0].number }}
+          path: ./coverage
+
+      - name: Download coverage (Push to main)
+        if: github.event.workflow_run.event == 'push'
+        uses: dawidd6/action-download-artifact@v11
+        with:
+          name: coverage-results
+          workflow: pipeline.yml
+          branch: main
+          path: ./coverage
+
+      - name: Upload coverage (Pull Request)
+        if: github.event.workflow_run.event == 'pull_request'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          override_pr: ${{ github.event.workflow_run.pull_requests[0].number }}
+          override_commit: ${{ github.event.workflow_run.pull_requests[0].head.sha }}
+
+      - name: Upload coverage (Push to main)
+        if: github.event.workflow_run.event == 'push'
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          override_commit: ${{ github.event.workflow_run.head_sha }}
