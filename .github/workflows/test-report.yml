@@ -9,15 +9,19 @@ on:
 jobs:
   upload:
     runs-on: ubuntu-latest
-    # if: >
-    #   github.event.workflow_run.event == 'pull_request' &&
-    #   github.event.workflow_run.conclusion == 'success'
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
 
     steps:
 
-      - uses: actions/download-artifact@v4
+      - name: 'Download Artifact From Latest Test'
+        uses: dawidd6/action-download-artifact@v11
         with:
-          name: coverage-results
+          workflow: pipeline.yml
+          name: pr_number
+          path: coverage-data
+          workflow_conclusion: success
 
       - name: Upload coverage to Codecov 📓
         uses: codecov/codecov-action@v5
