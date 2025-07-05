@@ -19,7 +19,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v11
         with:
           name: coverage-results
-          workflow: Urchin CI
+          workflow: pipeline.yml
           pr: ${{ github.event.workflow_run.pull_requests[0].number }}
           path: ./coverage
 
