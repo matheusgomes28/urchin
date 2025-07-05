@@ -13,15 +13,19 @@ jobs:
       options: --user 1001
 
     steps:
+
     - uses: actions/checkout@v4
       name: Checking Out Repo 👀
+
     - name: Golang Build 🐹
       run: make build
+
     - name: Package 📦
       run: |
         mkdir urchin-ubuntu-build
         cp tmp/urchin urchin-ubuntu-build/
         cp tmp/urchin-admin urchin-ubuntu-build/
+
     - uses: actions/upload-artifact@v4
       with:
         name: urchin-ubuntu-build

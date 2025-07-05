@@ -1,0 +1,26 @@
+name: Upload Coverage Results
+
+on:
+  workflow_run:
+    workflows: ["Urchin CI"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    # if: >
+    #   github.event.workflow_run.event == 'pull_request' &&
+    #   github.event.workflow_run.conclusion == 'success'
+
+    steps:
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-results
+
+      - name: Upload coverage to Codecov 📓
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
