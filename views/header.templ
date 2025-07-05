@@ -5,7 +5,7 @@ import "fmt"
 import components "github.com/matheusgomes28/urchin/views/components"
 
 templ makeDarkModeButton() {
-	<button id="theme-toggle" class="text-gray-300 inline-block focus:outline-none">
+	<button id="theme-toggle" class="navbar navbar-element inline-block focus:outline-none ml-4 transition duration-500">
 		<svg id="light-icon" class="w-[30px] h-[30px] dark:block hidden">
 			<circle cx="15" cy="15" r="6" fill="currentColor" />
 			<line id="ray" stroke="currentColor" storke-width="2" stroke-linecap="round" x1="15" y1="1" x2="15" y2="4">
@@ -26,25 +26,26 @@ templ makeDarkModeButton() {
 
 templ MakeNavBar(links []common.Link, dropdowns map[string][]common.Link) {
 	<header>
-		<nav class="fixed bg-gray-800 p-4 top-0 w-full inline">
+		<nav class="fixed bg-urchin-bg-dark p-4 top-0 w-full inline border-b-4 border-urchin-secondary">
 			<div class="container mx-auto flex justify-between items-center">
 				<div class="flex content-center">
 					// <img src="/static/assets/favicon.ico" class="w-[50px] h-[50px] mr-2" />
-					<a href="/" class="text-white text-4xl font-bold align-center">Urchin</a>
+					<a href="/" class="text-urchin-primary text-6xl font-extrabold align-center">Urchin</a>
 				</div>
 				<div class="flex justify-end items-center">
-					<div class="hidden md:flex space-x-4 items-center">
+					<div class="hidden lg:flex space-x-4 items-center">
 						for _, link := range links {
-						<a class="text-gray-100 dark:text-gray-100 hover:text-gray-400 w-auto h-fit inline-block p-3 text-center leading-4 font-bold transition duration-300 ease-in"
-							href={ templ.URL(link.Href) }>{ link.Name }</a>
+						<a class="navbar navbar-element navbar-text font-bold w-auto h-fit inline-block px-5 py-3 text-center leading-4 text-2xl transition duration-300 ease-in" href={ templ.URL(link.Href) }>
+							{ link.Name }
+						</a>
 						}
 						for name, dropdown_links := range dropdowns {
 							@components.MakeDropdownButton(name, name, dropdown_links)
 						}
 					</div>
 					@makeDarkModeButton()
-					<div class="md:hidden">
-						<button id="menu-toggle" class="text-gray-100 dark:text-gray-100 hover:text-gray-400 focus:outline-none">
+					<div class="lg:hidden">
+						<button id="menu-toggle" class="text-urchin-primary hover:text-urchin-primary-highlight focus:outline-none">
 							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
 							</svg>
@@ -52,9 +53,9 @@ templ MakeNavBar(links []common.Link, dropdowns map[string][]common.Link) {
 					</div>
 				</div>
 			</div>
-			<div id="mobile-menu" class="hidden md:hidden">
+			<div id="mobile-menu" class="hidden lg:hidden">
 				for _, link := range links {
-				<a class="text-gray-100 dark:text-gray-100 hover:text-gray-400 block px-2 py-1" href={ templ.URL(link.Href) }>{
+				<a class="text-urchin-primary hover:text-urchin-primary-highlight block px-2 py-1" href={ templ.URL(link.Href) }>{
 					link.Name }</a>
 				}
 				for name, dropdown_links := range dropdowns {

@@ -4,10 +4,10 @@ import "github.com/matheusgomes28/urchin/common"
 import "fmt"
 
 templ MakeDropdownButton(name, elem_id string, links []common.Link) {
-	<div class="relative inline-block text-left" id={ fmt.Sprintf("navbar-dropdown-%s", elem_id) }>
+	<div class="relative inline-block" id={ fmt.Sprintf("navbar-dropdown-%s", elem_id) }>
+		<!-- TODO: Need to fix the ease-in transition here -->
 		<div>
-			<!-- TODO: Need to fix the ease-in transition here -->
-			<button type="button" class="inline-flex w-full justify-center leading-4 gap-x-1.5 rounded-md bg-white px-3 py-2 font-bold shadow-xs text-gray-100 dark:text-gray-100 hover:text-gray-400 transition duration-300 ease-in ring-1 ring-gray-300 ring-inset hover:bg-gray-50" id={ fmt.Sprintf("dropdown-button-%s", elem_id) } aria-expanded="true" aria-haspopup="true">
+			<button type="button" class="navbar navbar-element navbar-text inline-flex w-full justify-center leading-4 gap-x-1.5 shadow-xs transition duration-300 ease-in flex items-center" id={ fmt.Sprintf("dropdown-button-%s", elem_id) } aria-expanded="true" aria-haspopup="true">
 				<span>{ templ.EscapeString(name) }</span>
 				<span id={ fmt.Sprintf("dropdown-arrow-%s", elem_id) } class="icon-caret-down"></span>
 			</button>
@@ -18,15 +18,15 @@ templ MakeDropdownButton(name, elem_id string, links []common.Link) {
     Entering: "transition ease-out duration-100"
       From: "transform opacity-0 scale-95"
       To: "transform opacity-100 scale-100"
-    Leaving: "transition ease-in duration-75"
+    Leaving: "transition ease-in duration-75"	
       From: "transform opacity-100 scale-100"
       To: "transform opacity-0 scale-95"
   -->
-		<div id={ fmt.Sprintf("dropdown-list-%s", elem_id) } class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-800 shadow-lg ring-1 ring-black/5 focus:outline-hidden hidden" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-button-gallery" tabindex="-1">
-			<div class="py-1" role="none">
+		<div id={ fmt.Sprintf("dropdown-list-%s", elem_id) } class="dropdown-content origin-top-right rounded-md bg-urchin-bg-dark shadow-lg border rounded-md border-urchin-primary hidden duration-300 ease-in" role="menu" aria-orientation="vertical" aria-labelledby="dropdown-button-gallery" tabindex="-1">
+			<div role="none" class="overflow-hidden">
 				<!-- Active: "bg-gray-100 text-gray-900 outline-hidden", Not Active: "text-gray-700" -->
 				for i, link := range links {
-					<a href={ templ.URL(link.Href) } class="block text-gray-100 dark:text-gray-100 hover:text-gray-400 w-auto h-fit inline-block p-3 text-center leading-4 font-bold transition duration-300 ease-in" role="menuitem" tabindex="-1" id={ fmt.Sprintf("menu-item-%d", i) }>{ link.Name }</a>
+					<a href={ templ.URL(link.Href) } class="text-urchin-primary hover:text-urchin-primary-highlight w-auto h-fit block p-3 text-center leading-4 font-bold transition" role="menuitem" tabindex="-1" id={ fmt.Sprintf("menu-item-%d", i) }>{ link.Name }</a>
 				}
 			</div>
 		</div>

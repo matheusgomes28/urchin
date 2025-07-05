@@ -2,26 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bangers&display=swap");
 
-body {
-  background: #E5E5E5;
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-urchin-bg-dark: oklch(0.92 0.025 253);
+  --color-urchin-bg: oklch(0.96 0.025 253);
+  --color-urchin-bg-light: oklch(1 0.025 253);
+  --color-urchin-text: oklch(0.15 0.05 253);
+  --color-urchin-text-muted: oklch(0.4 0.05 253);
+  --color-urchin-highlight: oklch(1 0.05 253);
+  --color-urchin-border: oklch(0.6 0.05 253);
+  --color-urchin-border-muted: oklch(0.7 0.05 253);
+  --color-urchin-primary: oklch(0.4 0.1 253);
+  --color-urchin-primary-highlight: oklch(0.5 0.1 253);
+  --color-urchin-secondary: oklch(0.4 0.1 73);
+  --color-urchin-secondary-highlight: oklch(0.5 0.1 73);
+  --color-urchin-danger: oklch(0.5 0.05 30);
+  --color-urchin-warning: oklch(0.5 0.05 100);
+  --color-urchin-success: oklch(0.5 0.05 160);
+  --color-urchin-info: oklch(0.5 0.05 260);
+}
+
+body.dark {
+  --color-urchin-bg-dark: oklch(0.1 0.025 253);
+  --color-urchin-bg: oklch(0.15 0.025 253);
+  --color-urchin-bg-light: oklch(0.2 0.025 253);
+  --color-urchin-text: oklch(0.96 0.05 253);
+  --color-urchin-text-muted: oklch(0.76 0.05 253);
+  --color-urchin-highlight: oklch(0.5 0.05 253);
+  --color-urchin-border: oklch(0.4 0.05 253);
+  --color-urchin-border-muted: oklch(0.3 0.05 253);
+  --color-urchin-primary: oklch(0.76 0.1 253);
+  --color-urchin-primary-highlight: oklch(0.66 0.1 253);
+  --color-urchin-secondary: oklch(0.76 0.1 73);
+  --color-urchin-secondary-highlight: oklch(0.66 0.1 73);
+  --color-urchin-danger: oklch(0.7 0.05 30);
+  --color-urchin-warning: oklch(0.7 0.05 100);
+  --color-urchin-success: oklch(0.7 0.05 160);
+  --color-urchin-info: oklch(0.7 0.05 260);
 }
 
 @font-face {
-  font-family: 'urchin-icons';
-  src: url('../fonts/urchin-icons.eot?7arknw');
-  src: url('../fonts/urchin-icons.ttf?7arknw') format('truetype'),
-    url('../fonts/urchin-icons.woff?7arknw') format('woff');
+  font-family: "urchin-icons";
+  src: url("../fonts/urchin-icons.eot?7arknw");
+  src: url("../fonts/urchin-icons.ttf?7arknw") format("truetype"),
+    url("../fonts/urchin-icons.woff?7arknw") format("woff");
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
 
-[class^="icon-"], [class*=" icon-"] {
+[class^="icon-"],
+[class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'urchin-icons' !important;
+  font-family: "urchin-icons" !important;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -47,4 +84,56 @@ body {
 }
 .icon-x:before {
   content: "\e901";
+}
+
+.navbar {
+  padding: 0.5rem 1rem;
+}
+
+.navbar-element {
+  color: var(--color-urchin-primary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-urchin-border-muted);
+}
+
+.navbar-element:hover,
+.dropdown-content a:hover {
+  color: var(--color-urchin-primary-highlight);
+  background: linear-gradient(
+    0deg,
+    var(--color-urchin-bg) 80%,
+    var(--color-urchin-bg-light)
+  );
+  border-color: var(--color-urchin-primary-highlight);
+}
+
+.navbar-text {
+  font-size: 1rem;
+  line-height: 2rem;
+  font-weight: 700;
+}
+
+.dropdown-content {
+  margin-top: 0.5rem;
+  border: 1px solid var(--color-urchin-primary);
+  position: absolute;
+  min-width: 160px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  padding: 12px 16px;
+  display: block;
+}
+
+.dropdown-content a:first-child {
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.dropdown-content a:last-child {
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+button > span[id^="dropdown-arrow"]::before {
+  margin-left: 0.5rem;
 }
