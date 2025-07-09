@@ -2,6 +2,11 @@ package admin_app
 
 import (
 	"net/http"
+	"strings"
+
+	_ "github.com/matheusgomes28/urchin/docs/admin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/matheusgomes28/urchin/common"
@@ -26,6 +31,15 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	// For container health purposes
 	r.Any("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, PostIdResponse{Id: 0})
+	})
+
+	// Swagger routes
+	r.GET("/swagger/*any", func(c *gin.Context) {
+		// Don't serve index.html again if it's already handled above
+		if strings.HasSuffix(c.Request.URL.Path, "/swagger/") {
+			c.Request.RequestURI = "/swagger/index.html"
+		}
+		ginSwagger.WrapHandler(swaggerFiles.Handler)(c)
 	})
 
 	return r

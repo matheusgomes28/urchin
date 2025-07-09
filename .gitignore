@@ -2,6 +2,7 @@
 **/__debug*
 **/*_templ.go
 tmp/
+docs/admin
 
 tests/system_tests/helpers/migrations
 tests/system_tests/admin_app/endpoint_tests/*.png

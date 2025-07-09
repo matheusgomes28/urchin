@@ -126,9 +126,18 @@ func createMinifiedImages(image_path string) error {
 	return nil
 }
 
+// @Summary      Upload a new image
+// @Description  Uploads an image file, saves it, and creates minified versions.
+// @Tags         images
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        file formData file true "The image file to upload"
+// @Param        excerpt formData string false "A brief description of the image"
+// @Success      200 {object} ImageIdResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid input, file type, or size"
+// @Failure      500 {object} common.ErrorResponse "Server error while saving file"
+// @Router       /images [post]
 // TODO : need these endpoints
-// r.POST("/images", postImageHandler(&database))
-// r.DELETE("/images", deleteImageHandler(&database))
 func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 	return func(c *gin.Context) {
 		c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 10*1000000)
@@ -203,6 +212,15 @@ func postImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 	}
 }
 
+// @Summary      Delete an image
+// @Description  Deletes an image file from the server by its filename.
+// @Tags         images
+// @Accept       json
+// @Produce      json
+// @Param        name path string true "Image filename to delete"
+// @Success      200 {object} ImageIdResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid or missing filename"
+// @Router       /images/{name} [delete]
 func deleteImageHandler(app_settings common.AppSettings) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var delete_image_binding DeleteImageBinding
