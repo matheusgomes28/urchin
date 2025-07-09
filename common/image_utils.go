@@ -19,10 +19,11 @@ import (
 // This list contains the valid file
 // extensions for an image.
 var ValidImageExtensions = map[string]bool{
-	".jpg":  true,
-	".jpeg": true,
-	".png":  true,
 	".gif":  true,
+	".jpeg": true,
+	".jpg":  true,
+	".png":  true,
+	".webp": true,
 }
 
 func populateImageMetadata(metadata_path string, app_settings AppSettings) (Image, error) {

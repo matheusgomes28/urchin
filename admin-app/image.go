@@ -16,14 +16,15 @@ import (
 	"github.com/matheusgomes28/urchin/common"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/image/draw"
+	_ "golang.org/x/image/webp"
 )
 
 var allowed_extensions = map[string]bool{
-	".jpeg": true, ".jpg": true, ".png": true,
+	".jpeg": true, ".jpg": true, ".png": true, ".webp": true,
 }
 
 var allowed_content_types = map[string]bool{
-	"image/jpeg": true, "image/png": true, "image/gif": true,
+	"image/jpeg": true, "image/png": true, "image/gif": true, "image/webp": true,
 }
 
 // Calculates the best suitable resize box for an image with the given
@@ -72,7 +73,7 @@ func resizeImage(src_path, dst_path string, desired_width, desired_height int) e
 
 	// Save based on format
 	switch format {
-	case "jpeg", "jpg":
+	case "jpeg", "jpg", "webp":
 		err = jpeg.Encode(out, dst, &jpeg.Options{Quality: 85})
 	case "png":
 		err = png.Encode(out, dst)
@@ -92,7 +93,14 @@ func resizeImage(src_path, dst_path string, desired_width, desired_height int) e
 
 func createMinifiedImages(image_path string) error {
 
+	// Go std-library doesn't have support for encoding webps, so
+	// we encode them as jpeg
 	image_ext := path.Ext(image_path)
+	desired_ext := image_ext
+	if image_ext == ".webp" {
+		desired_ext = ".jpg"
+	}
+
 	if len(image_ext) == 0 {
 		return fmt.Errorf("invalid image path: %s", image_path)
 	}
@@ -103,9 +111,9 @@ func createMinifiedImages(image_path string) error {
 		MaxWidth  int
 		MaxHeight int
 	}{
-		{FileName: fmt.Sprintf("%s_small%s", image_name, image_ext), MaxWidth: 200, MaxHeight: 200},
-		{FileName: fmt.Sprintf("%s_medium%s", image_name, image_ext), MaxWidth: 400, MaxHeight: 400},
-		{FileName: fmt.Sprintf("%s_large%s", image_name, image_ext), MaxWidth: 600, MaxHeight: 600},
+		{FileName: fmt.Sprintf("%s_small%s", image_name, desired_ext), MaxWidth: 200, MaxHeight: 200},
+		{FileName: fmt.Sprintf("%s_medium%s", image_name, desired_ext), MaxWidth: 400, MaxHeight: 400},
+		{FileName: fmt.Sprintf("%s_large%s", image_name, desired_ext), MaxWidth: 600, MaxHeight: 600},
 	}
 
 	for _, img_type := range image_types {
