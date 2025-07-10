@@ -16,6 +16,9 @@ type Database interface {
 	DeletePost(id int) (int, error)
 	AddPage(title string, content string, link string) (int, error)
 	GetPage(link string) (common.Page, error)
+
+	AddPermalink(permalink common.Permalink) (int, error)
+	GetPermalinks() ([]common.Permalink, error)
 }
 
 type SqlDatabase struct {
@@ -175,4 +178,46 @@ func (db SqlDatabase) GetPage(link string) (common.Page, error) {
 	}
 
 	return page, nil
+}
+
+func (db SqlDatabase) AddPermalink(permalink common.Permalink) (int, error) {
+	res, err := db.Connection.Exec("INSERT INTO post_permalinks(permalink, post_id) VALUES(?, ?)", permalink.Path, permalink.PostId)
+	if err != nil {
+		return -1, err
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		log.Warn().Msgf("could not get last ID: %v", err)
+		return -1, nil
+	}
+
+	// TODO : possibly unsafe int conv,
+	// make sure all IDs are i64 in the
+	// future
+	return int(id), nil
+}
+
+func (db SqlDatabase) GetPermalinks() ([]common.Permalink, error) {
+	rows, err := db.Connection.Query("SELECT permalink, post_id FROM post_permalinks")
+	if err != nil {
+		return []common.Permalink{}, err
+	}
+	defer func() {
+		err = errors.Join(rows.Close())
+	}()
+
+	permalinks := []common.Permalink{}
+	for rows.Next() {
+		var permalink common.Permalink
+
+		if err = rows.Scan(&permalink.Path, &permalink.PostId); err != nil {
+			log.Error().Msgf("could not get permalink from db: %v", err)
+			return []common.Permalink{}, err
+		}
+
+		permalinks = append(permalinks, permalink)
+	}
+
+	return permalinks, nil
 }
