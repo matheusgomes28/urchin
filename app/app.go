@@ -2,6 +2,7 @@ package app
 
 import (
 	"bytes"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -17,6 +18,14 @@ const CACHE_TIMEOUT = 20 * time.Second
 
 type Generator = func(*gin.Context, common.AppSettings, database.Database) ([]byte, error)
 
+// func permalinkPostHandler(c *gin.Context, app_settings common.AppSettings, db database.Database) ([]byte, error) {
+func permalinkPostHandler(post_id int) func(*gin.Context, common.AppSettings, database.Database) ([]byte, error) {
+	return func(c *gin.Context, app_settings common.AppSettings, database database.Database) ([]byte, error) {
+		c.Params = append(c.Params, gin.Param{Key: "id", Value: fmt.Sprintf("%d", post_id)})
+		return postHandler(c, app_settings, database)
+	}
+}
+
 func SetupRoutes(app_settings common.AppSettings, database database.Database) *gin.Engine {
 	r := gin.Default()
 	r.MaxMultipartMemory = 1
@@ -31,6 +40,15 @@ func SetupRoutes(app_settings common.AppSettings, database database.Database) *g
 	addCachableHandler(r, "GET", "/images/:name", imageHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/images", imagesHandler, &cache, app_settings, database)
 	addCachableHandler(r, "GET", "/gallery/:name", galleryHandler, &cache, app_settings, database)
+
+	permalinks, err := database.GetPermalinks()
+	if err != nil {
+		log.Error().Msgf("could not get permalinks: %v", err)
+	} else {
+		for _, permalink := range permalinks {
+			addCachableHandler(r, "GET", permalink.Path, permalinkPostHandler(permalink.PostId), &cache, app_settings, database)
+		}
+	}
 
 	// Pages will be querying the page content from the unique
 	// link given at the creation of the page step
