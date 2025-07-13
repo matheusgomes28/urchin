@@ -16,27 +16,6 @@ import (
 // The manifest files in "gallery.links" should
 // be relative to the image directory
 func getGalleryImages(gallery common.Gallery, app_settings common.AppSettings) ([]common.Image, error) {
-
-	// Get all images from the manifests listed in gallery
-	// image_paths := make([]string, 0)
-	// for _, link := range gallery.Images {
-	// 	contents, err := os.ReadFile(path.Join(app_settings.ImageDirectory, link))
-	// 	if err != nil {
-	// 		log.Warn().Msgf("ignoring image `%s` as manifest couldn't be loaded", link)
-	// 		continue
-	// 	}
-
-	// 	var image_json common.Image
-	// 	err = json.Unmarshal(contents, &image_json)
-	// 	if err != nil {
-	// 		log.Warn().Msgf("ignoring image `%s` as manifest couldn't be unmarshalled", link)
-	// 		continue
-	// 	}
-
-	// 	image_paths = append(image_paths, path.Join("/images", image_json.Filename))
-	// }
-
-	// HACK: just getting all the
 	images, err := common.GetImages(gallery.Images, len(gallery.Images), 1, app_settings)
 	if err != nil {
 		return []common.Image{}, err
