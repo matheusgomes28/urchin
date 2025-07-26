@@ -9,10 +9,6 @@ class ImageModalManager {
     this.touchEndX = 0;
     this.preloadedImages = new Map();
     
-    this.init();
-  }
-
-  init() {
     window.addEventListener("load", () => {
       this.refreshImages(window.imagesData);
       this.setupEventListeners();
