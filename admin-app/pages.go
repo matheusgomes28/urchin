@@ -12,12 +12,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// func getPageHandler(database database.Database) func(*gin.Context) {
-// 	return func(c *gin.Context) {
-// 	}
-// }
-
-// / postPageHandler is the function handling the endpoint for adding new pages
+// @Summary      Add a new page
+// @Description  Adds a new page to the database.
+// @Tags         pages
+// @Accept       json
+// @Produce      json
+// @Param        page body AddPageRequest true "Page to add"
+// @Success      200 {object} PageResponse
+// @Failure      400 {object} common.ErrorResponse "Invalid request body or data"
+// @Router       /pages [post]
 func postPageHandler(database database.Database) func(*gin.Context) {
 	return func(c *gin.Context) {
 		var add_page_request AddPageRequest
